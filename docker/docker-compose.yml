@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: honeyshield-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: honeyshield
+      POSTGRES_USER: honeyshield
+      POSTGRES_PASSWORD: change_this_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - honeyshield
+
+  redis:
+    image: redis:7-alpine
+    container_name: honeyshield-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - honeyshield
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  honeyshield:
+    driver: bridge
