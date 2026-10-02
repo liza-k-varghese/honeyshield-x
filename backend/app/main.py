@@ -5,7 +5,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.routers import attacks, detection, ingestion
+from app.routers import attacks, detection, ingestion, threat_intelligence
 
 app = FastAPI(
     title="HoneyShield X API",
@@ -15,6 +15,7 @@ app = FastAPI(
 app.include_router(attacks.router, prefix="/api/v1")
 app.include_router(ingestion.router, prefix="/api/v1")
 app.include_router(detection.router, prefix="/api/v1")
+app.include_router(threat_intelligence.router, prefix="/api/v1")
 
 POSTGRES_HOST = "127.0.0.1"
 POSTGRES_PORT = 5432

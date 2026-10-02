@@ -154,3 +154,40 @@ class DetectionResult(BaseModel):
 
 DetectionResultResponse = DetectionResult
 
+
+# ==========================================
+# Threat Intelligence Schemas (Module 2.3)
+# ==========================================
+
+class ThreatIntelligenceResult(BaseModel):
+    """Threat intelligence lookup and enrichment result contract."""
+
+    found: bool = Field(description="Whether matching threat intelligence was found")
+    indicator_type: str = Field(
+        description="Indicator type (e.g. ip, domain, hash)"
+    )
+    indicator_value: str = Field(description="Normalized indicator value queried")
+    threat_level: str | None = Field(
+        default=None,
+        description="Threat level if known (e.g. low, medium, high, critical)",
+    )
+    source: str | None = Field(
+        default=None,
+        description="Intelligence feed or reporting source",
+    )
+    confidence: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="Confidence score between 0.0 and 1.0",
+    )
+    description: str | None = Field(
+        default=None,
+        description="Context or details regarding the indicator",
+    )
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+ThreatIntelligenceResponse = ThreatIntelligenceResult
+
