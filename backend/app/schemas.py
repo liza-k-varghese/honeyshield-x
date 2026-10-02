@@ -305,3 +305,27 @@ class AlertEvaluationResult(BaseModel):
 
 AlertEvaluationResponse = AlertEvaluationResult
 
+
+# ==========================================
+# Notification Schemas (Module 2.6)
+# ==========================================
+
+class NotificationDispatchResult(BaseModel):
+    """Response schema for alert notification dispatch."""
+
+    alert_id: int = Field(description="ID of the dispatched alert")
+    provider: str = Field(
+        description="Notification provider used (e.g. webhook, none)",
+    )
+    sent: bool = Field(
+        description="Whether the notification was successfully dispatched",
+    )
+    message: str = Field(
+        description="Human-readable dispatch status or failure explanation",
+    )
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+NotificationDispatchResponse = NotificationDispatchResult
+
