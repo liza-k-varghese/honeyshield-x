@@ -191,3 +191,44 @@ class ThreatIntelligenceResult(BaseModel):
 
 ThreatIntelligenceResponse = ThreatIntelligenceResult
 
+
+# ==========================================
+# Risk Scoring Schemas (Module 2.4)
+# ==========================================
+
+class RiskFactor(BaseModel):
+    """Explanation of an individual factor contributing to the risk score."""
+
+    factor: str = Field(description="Name/identifier of the contributing factor")
+    contribution: float = Field(
+        description="Numerical point contribution to the total risk score"
+    )
+    reason: str = Field(
+        description="Human-readable explanation of why this factor contributed"
+    )
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RiskAnalysisResult(BaseModel):
+    """Result contract for attack risk scoring."""
+
+    attack_id: int = Field(description="ID of the analyzed attack")
+    risk_score: float = Field(
+        ge=0.0,
+        le=100.0,
+        description="Deterministic calculated risk score bounded between 0 and 100",
+    )
+    severity: str = Field(
+        description="Severity band classification (low, medium, high, critical)"
+    )
+    factors: list[RiskFactor] = Field(
+        default_factory=list,
+        description="Breakdown of individual factors contributing to the score",
+    )
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+RiskAnalysisResponse = RiskAnalysisResult
+
