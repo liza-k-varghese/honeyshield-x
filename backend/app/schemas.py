@@ -232,3 +232,76 @@ class RiskAnalysisResult(BaseModel):
 
 RiskAnalysisResponse = RiskAnalysisResult
 
+
+# ==========================================
+# Alert Schemas (Module 2.5)
+# ==========================================
+
+class AlertBase(BaseModel):
+    """Base schema for security alerts."""
+
+    attack_id: int | None = Field(
+        default=None,
+        description="Associated attack ID",
+    )
+    alert_type: str = Field(
+        description="Classification or type of alert (e.g. Brute Force SSH)",
+    )
+    severity: str = Field(
+        default="low",
+        description="Severity level (low, medium, high, critical)",
+    )
+    message: str = Field(description="Alert explanation message")
+    status: str = Field(
+        default="open",
+        description="Lifecycle status (open, acknowledged, resolved)",
+    )
+
+
+class AlertResponse(AlertBase):
+    """Schema for serializing alert records returned by the API."""
+
+    id: int = Field(description="Unique database identifier for the alert")
+    created_at: datetime = Field(description="Timestamp when alert was created")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AlertStatusUpdate(BaseModel):
+    """Schema for updating an alert's lifecycle status."""
+
+    status: str = Field(
+        description="New lifecycle status (open, acknowledged, resolved)",
+    )
+
+
+class AlertEvaluationResult(BaseModel):
+    """Response contract for alert evaluation on an attack container."""
+
+    attack_id: int = Field(description="ID of the evaluated attack")
+    alert_created: bool = Field(
+        description="Whether a new alert was created or an existing one reused"
+    )
+    alert_id: int | None = Field(
+        default=None,
+        description="ID of the created or reused alert, if applicable",
+    )
+    risk_score: float = Field(
+        description="Evaluated risk score of the attack (0-100)"
+    )
+    severity: str = Field(
+        description="Evaluated severity band of the attack (low, medium, high, critical)"
+    )
+    status: str | None = Field(
+        default=None,
+        description="Lifecycle status of the alert (e.g. open), if alert exists",
+    )
+    reason: str = Field(
+        description="Reasoning behind alert creation, reuse, or suppression"
+    )
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+AlertEvaluationResponse = AlertEvaluationResult
+
