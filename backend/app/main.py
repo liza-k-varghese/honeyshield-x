@@ -1,11 +1,20 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException, status
 import psycopg
 import redis
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+from app.database import get_db
+from app.routers import attacks, detection, ingestion
 
 app = FastAPI(
     title="HoneyShield X API",
     version="0.1.0",
 )
+
+app.include_router(attacks.router, prefix="/api/v1")
+app.include_router(ingestion.router, prefix="/api/v1")
+app.include_router(detection.router, prefix="/api/v1")
 
 POSTGRES_HOST = "127.0.0.1"
 POSTGRES_PORT = 5432
@@ -67,3 +76,19 @@ def health():
         "redis": redis_status,
     }
 
+
+@app.get("/api/v1/database/status")
+def database_status(db: Session = Depends(get_db)) -> dict[str, str]:
+    """Check database connectivity using a SQLAlchemy session via dependency injection."""
+    try:
+        db.execute(text("SELECT 1"))
+        return {
+            "status": "connected",
+            "database": "postgresql",
+            "message": "Database connection is healthy",
+        }
+    except Exception as error:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database connection failed: {error}",
+        )
