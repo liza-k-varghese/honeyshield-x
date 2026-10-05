@@ -401,3 +401,47 @@ class PipelineExecutionResult(BaseModel):
 
 PipelineExecutionResponse = PipelineExecutionResult
 
+
+# ==========================================
+# Security Event Correlation Schemas (Module 2.8)
+# ==========================================
+
+class CorrelationResult(BaseModel):
+    """Structured response for security event correlation across attack containers."""
+
+    source_ip: str = Field(description="Analyzed source IP address")
+    window_hours: int = Field(description="Sliding correlation window in hours")
+    total_attacks: int = Field(
+        description="Total attack containers associated with source IP in window"
+    )
+    total_events: int = Field(
+        description="Total attack events associated with source IP in window"
+    )
+    attack_types: list[str] = Field(
+        default_factory=list,
+        description="Distinct attack types / vectors observed",
+    )
+    correlated: bool = Field(
+        description="Whether correlation criteria were satisfied"
+    )
+    correlation_type: str = Field(
+        description="Directive matched: 'multi_vector', 'distributed_burst', 'persistent_attacker', or 'none'"
+    )
+    confidence: float = Field(
+        ge=0.0,
+        le=1.0,
+        description="Correlation confidence score between 0.0 and 1.0",
+    )
+    correlated_attack_ids: list[int] = Field(
+        default_factory=list,
+        description="List of Attack container IDs included in correlation",
+    )
+    reason: str = Field(
+        description="Human-readable explanation of correlation finding"
+    )
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+CorrelationResultResponse = CorrelationResult
+

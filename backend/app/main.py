@@ -8,6 +8,7 @@ from app.database import get_db
 from app.routers import (
     alerts,
     attacks,
+    correlation,
     detection,
     ingestion,
     notifications,
@@ -29,6 +30,7 @@ app.include_router(risk.router, prefix="/api/v1")
 app.include_router(alerts.router, prefix="/api/v1")
 app.include_router(notifications.router, prefix="/api/v1")
 app.include_router(pipeline.router, prefix="/api/v1")
+app.include_router(correlation.router, prefix="/api/v1")
 
 POSTGRES_HOST = "127.0.0.1"
 POSTGRES_PORT = 5432
