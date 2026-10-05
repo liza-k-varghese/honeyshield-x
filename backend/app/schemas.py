@@ -445,3 +445,81 @@ class CorrelationResult(BaseModel):
 
 CorrelationResultResponse = CorrelationResult
 
+
+# ==========================================
+# Multi-Vector Detection Schemas (Module 2.9)
+# ==========================================
+
+class TriggeredRuleEvidence(BaseModel):
+    """Evidence details for a triggered detection rule."""
+
+    rule_id: str = Field(description="Unique identifier of the rule")
+    rule_name: str = Field(description="Human-readable rule name")
+    vector: str = Field(description="Attack vector category ('auth', 'web', 'network')")
+    severity: str = Field(description="Assigned severity level")
+    risk_score: float = Field(description="Base risk score contribution")
+    evidence_count: int = Field(
+        description="Number of matching evidence events or distinct probes"
+    )
+    matched_patterns: list[str] = Field(
+        default_factory=list,
+        description="Sanitized matched signature patterns or tokens",
+    )
+    description: str = Field(description="Description of the rule and finding")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class MultiVectorDetectionResponse(BaseModel):
+    """Structured response for extended multi-vector rule evaluation."""
+
+    detected: bool = Field(description="Whether any detection rule was triggered")
+    is_multi_vector: bool = Field(
+        description="Whether triggered rules span >= 2 distinct vector categories"
+    )
+    vectors_detected: list[str] = Field(
+        default_factory=list,
+        description="List of distinct vector categories triggered (e.g. ['auth', 'web'])",
+    )
+    rules_triggered: list[TriggeredRuleEvidence] = Field(
+        default_factory=list,
+        description="List of triggered detection rules with evidence",
+    )
+    suggested_risk_score: float = Field(
+        ge=0.0,
+        le=10.0,
+        description="Recommended deterministic risk score between 0.0 and 10.0",
+    )
+    severity: str = Field(
+        description="Highest severity level observed ('low', 'medium', 'high', 'critical')"
+    )
+    analyzed_event_count: int = Field(
+        description="Number of events inspected in payload scan + aggregated"
+    )
+    total_event_count: int = Field(
+        description="Total events available in time window"
+    )
+    truncated: bool = Field(
+        description="Whether payload analysis was capped at maximum query limit"
+    )
+    message: str = Field(
+        description="Human-readable explanation of detection finding"
+    )
+    attack_id: int | None = Field(
+        default=None,
+        description="Evaluated attack container ID, if applicable",
+    )
+    source_ip: str | None = Field(
+        default=None,
+        description="Evaluated source IP address, if applicable",
+    )
+    window_minutes: int = Field(
+        description="Sliding evaluation window in minutes"
+    )
+    attack_ids: list[int] = Field(
+        default_factory=list,
+        description="List of attack container IDs included in evaluation",
+    )
+
+    model_config = ConfigDict(from_attributes=True)
+
