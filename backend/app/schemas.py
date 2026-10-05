@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -328,4 +329,75 @@ class NotificationDispatchResult(BaseModel):
 
 
 NotificationDispatchResponse = NotificationDispatchResult
+
+
+# ==========================================
+# Pipeline Orchestration Schemas (Module 2.7)
+# ==========================================
+
+class PipelineStageDetection(BaseModel):
+    """Detection stage summary."""
+
+    detected: bool = Field(description="Whether detection pattern was triggered")
+    detection_type: str = Field(description="Name/identifier of the detection rule")
+    severity: str | None = Field(default=None, description="Severity assigned by detection")
+    risk_score: float | None = Field(default=None, description="Base score from detection")
+    evidence_count: int = Field(default=0, description="Number of correlated evidence events")
+    message: str | None = Field(default=None, description="Detection finding message")
+
+
+class PipelineStageThreatIntel(BaseModel):
+    """Threat intelligence enrichment stage summary."""
+
+    found: bool = Field(description="Whether indicator was found in threat intel database")
+    indicator_value: str | None = Field(default=None, description="Queried indicator (e.g. source IP)")
+    threat_level: str | None = Field(default=None, description="Assigned threat level if matched")
+    confidence: float | None = Field(default=None, description="Confidence score if matched")
+    source: str | None = Field(default=None, description="Threat intel source")
+
+
+class PipelineStageRisk(BaseModel):
+    """Risk scoring stage summary."""
+
+    risk_score: float = Field(description="Calculated bounded 0-100 risk score")
+    severity: str = Field(description="Severity classification band")
+    factors: list[dict[str, Any]] = Field(default_factory=list, description="Scoring factor contributions")
+
+
+class PipelineStageAlert(BaseModel):
+    """Alert Manager stage summary."""
+
+    alert_created: bool = Field(description="Whether a new alert was created")
+    alert_id: int | None = Field(default=None, description="ID of generated or reused alert")
+    severity: str | None = Field(default=None, description="Alert severity")
+    status: str | None = Field(default=None, description="Alert status (open, acknowledged, resolved)")
+    reason: str = Field(description="Explanation of alert generation or threshold gating decision")
+
+
+class PipelineStageNotification(BaseModel):
+    """Notification dispatch stage summary."""
+
+    attempted: bool = Field(description="Whether notification delivery was attempted")
+    alert_id: int | None = Field(default=None, description="Target alert ID if attempted")
+    provider: str | None = Field(default=None, description="Notification provider used")
+    sent: bool = Field(default=False, description="Whether notification was successfully delivered")
+    message: str = Field(description="Delivery result or reason for skipping")
+
+
+class PipelineExecutionResult(BaseModel):
+    """Complete end-to-end pipeline execution result."""
+
+    attack_id: int = Field(description="Target attack ID processed by the pipeline")
+    pipeline_status: str = Field(description="Status of pipeline execution ('completed' or 'failed')")
+    detection: PipelineStageDetection
+    threat_intelligence: PipelineStageThreatIntel
+    risk_scoring: PipelineStageRisk
+    alert: PipelineStageAlert
+    notification: PipelineStageNotification
+    execution_time_ms: float = Field(description="Total pipeline execution duration in milliseconds")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+PipelineExecutionResponse = PipelineExecutionResult
 

@@ -11,6 +11,7 @@ from app.routers import (
     detection,
     ingestion,
     notifications,
+    pipeline,
     risk,
     threat_intelligence,
 )
@@ -27,6 +28,7 @@ app.include_router(threat_intelligence.router, prefix="/api/v1")
 app.include_router(risk.router, prefix="/api/v1")
 app.include_router(alerts.router, prefix="/api/v1")
 app.include_router(notifications.router, prefix="/api/v1")
+app.include_router(pipeline.router, prefix="/api/v1")
 
 POSTGRES_HOST = "127.0.0.1"
 POSTGRES_PORT = 5432
