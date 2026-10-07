@@ -523,3 +523,130 @@ class MultiVectorDetectionResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
+
+# ==========================================
+# Unified Orchestrator Schemas (Module 2.10)
+# ==========================================
+
+class CompositeRiskProvenance(BaseModel):
+    """Provenance and factor breakdown for composite operational risk."""
+
+    baseline_risk: float = Field(description="Baseline risk score from Module 2.4 (0-100)")
+    detection_risk: float = Field(description="Scaled detection risk from Module 2.9 (0-100)")
+    correlation_boost: float = Field(description="Correlation boost points from Module 2.8 (0-10)")
+    operational_risk: float = Field(description="Authoritative composite operational risk score (0-100)")
+    operational_severity: str = Field(description="Standardized severity band ('low', 'medium', 'high', 'critical')")
+    rules_triggered_count: int = Field(description="Total count of detection rules triggered")
+    correlation_type: str = Field(description="Behavioral correlation directive from Module 2.8")
+    correlation_confidence: float = Field(description="Confidence level of behavioral correlation directive")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UnifiedStageDetectionSSH(BaseModel):
+    """Results from Module 2.2 SSH detection."""
+
+    detected: bool = Field(description="Whether SSH brute-force pattern was detected")
+    detection_type: str | None = Field(default=None, description="Detection rule type classification")
+    severity: str | None = Field(default=None, description="Severity classification from detection rule")
+    risk_score: float | None = Field(default=None, description="Base risk score from detection rule")
+    evidence_count: int = Field(default=0, description="Count of matching failed SSH login events")
+    message: str | None = Field(default=None, description="Human-readable explanation of detection result")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UnifiedStageDetectionMultiVector(BaseModel):
+    """Results from Module 2.9 Multi-Vector detection."""
+
+    detected: bool = Field(description="Whether any vector-specific detection rule triggered")
+    is_multi_vector: bool = Field(description="Whether triggered rules span >= 2 vectors")
+    vectors_detected: list[str] = Field(default_factory=list, description="Triggered vector categories")
+    rules_triggered: list[TriggeredRuleEvidence] = Field(default_factory=list, description="Triggered detection rules with evidence")
+    suggested_risk_score: float = Field(description="Recommended risk score from rule registry (0-10)")
+    severity: str = Field(description="Highest severity observed among triggered rules")
+    message: str = Field(description="Human-readable detection summary")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UnifiedStageThreatIntel(BaseModel):
+    """Results from Module 2.3 Threat Intelligence enrichment."""
+
+    found: bool = Field(description="Whether the attacker indicator exists in TI database")
+    indicator_value: str | None = Field(default=None, description="Queried indicator string")
+    threat_level: str | None = Field(default=None, description="Known threat severity level")
+    confidence: float | None = Field(default=None, description="Threat intelligence confidence score")
+    source: str | None = Field(default=None, description="Intelligence source feed identifier")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UnifiedStageCorrelation(BaseModel):
+    """Results from Module 2.8 Cross-Attack Behavioral Correlation."""
+
+    correlated: bool = Field(description="Whether behavioral correlation criteria were met")
+    correlation_type: str = Field(description="Directive: 'multi_vector', 'distributed_burst', 'persistent_attacker', 'none'")
+    confidence: float = Field(description="Confidence score for correlation directive (0.0 to 1.0)")
+    total_attacks: int = Field(description="Count of attack containers associated with source IP")
+    total_events: int = Field(description="Count of events associated with source IP")
+    reason: str = Field(description="Human-readable explanation of correlation finding")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UnifiedStageRiskComposition(BaseModel):
+    """Results from Module 2.10 Risk Composition."""
+
+    baseline_risk: float = Field(description="Baseline risk from Module 2.4")
+    detection_risk: float = Field(description="Detection risk from Module 2.9")
+    correlation_boost: float = Field(description="Correlation boost from Module 2.8")
+    operational_risk: float = Field(description="Final composite operational risk")
+    severity: str = Field(description="Operational severity band")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UnifiedStageAlert(BaseModel):
+    """Results from Module 2.5 Alert Manager evaluation."""
+
+    alert_created: bool = Field(description="Whether a new alert was created")
+    alert_id: int | None = Field(default=None, description="ID of created or active reused alert")
+    severity: str | None = Field(default=None, description="Alert severity level")
+    status: str | None = Field(default=None, description="Alert status ('open', 'acknowledged', 'resolved')")
+    reason: str = Field(default="", description="Reason for alert action or suppression")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UnifiedStageNotification(BaseModel):
+    """Results from Module 2.6 Notification Dispatch."""
+
+    attempted: bool = Field(description="Whether notification dispatch was attempted")
+    alert_id: int | None = Field(default=None, description="Target alert ID")
+    provider: str | None = Field(default=None, description="Active notification provider name")
+    sent: bool = Field(description="Whether notification was successfully sent")
+    message: str = Field(default="", description="Dispatch status or reason message")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UnifiedSecurityProcessingResponse(BaseModel):
+    """Structured response for unified security processing pipeline (Module 2.10)."""
+
+    attack_id: int = Field(description="Target attack container ID")
+    pipeline_status: str = Field(description="Overall pipeline status ('completed' or 'failed')")
+    source_ip: str | None = Field(default=None, description="Attacker source IP address")
+    attack_type: str = Field(description="Primary attack classification")
+    provenance: CompositeRiskProvenance = Field(description="Provenance breakdown of synthesized risk")
+    detection_ssh: UnifiedStageDetectionSSH = Field(description="SSH brute force detection stage")
+    detection_multi_vector: UnifiedStageDetectionMultiVector = Field(description="Multi-vector detection stage")
+    threat_intelligence: UnifiedStageThreatIntel = Field(description="Threat intelligence stage")
+    correlation: UnifiedStageCorrelation = Field(description="Cross-attack behavioral correlation stage")
+    risk_composition: UnifiedStageRiskComposition = Field(description="Operational risk composition stage")
+    alert: UnifiedStageAlert = Field(description="Alert evaluation stage")
+    notification: UnifiedStageNotification = Field(description="Notification dispatch stage")
+    execution_time_ms: float = Field(description="Total pipeline execution duration in milliseconds")
+
+    model_config = ConfigDict(from_attributes=True)
