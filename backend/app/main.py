@@ -1,4 +1,6 @@
+import os
 from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 import psycopg
 import redis
 from sqlalchemy import text
@@ -9,6 +11,7 @@ from app.routers import (
     alerts,
     attacks,
     correlation,
+    dashboard,
     detection,
     ingestion,
     multi_vector_detection,
@@ -24,7 +27,25 @@ app = FastAPI(
     version="0.1.0",
 )
 
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "HONEYSHIELD_CORS_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000",
+    ).split(",")
+    if origin.strip()
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(attacks.router, prefix="/api/v1")
+app.include_router(dashboard.router, prefix="/api/v1")
 app.include_router(ingestion.router, prefix="/api/v1")
 app.include_router(detection.router, prefix="/api/v1")
 app.include_router(threat_intelligence.router, prefix="/api/v1")

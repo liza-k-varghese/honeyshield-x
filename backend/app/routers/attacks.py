@@ -3,8 +3,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Attack
-from app.schemas import AttackCreate, AttackResponse
+from app.models import Attack, AttackEvent
+from app.schemas import AttackCreate, AttackEventResponse, AttackResponse
 
 router = APIRouter(
     prefix="/attacks",
@@ -76,3 +76,39 @@ def get_attack(
             detail=f"Attack with ID {attack_id} not found",
         )
     return attack
+
+
+@router.get(
+    "/{attack_id}/events",
+    response_model=list[AttackEventResponse],
+    summary="Get chronological events for an attack",
+)
+def get_attack_events(
+    attack_id: int,
+    skip: int = Query(default=0, ge=0, description="Number of event records to skip"),
+    limit: int = Query(
+        default=50, ge=1, le=200, description="Maximum number of events to return (1-200)"
+    ),
+    db: Session = Depends(get_db),
+) -> list[AttackEvent]:
+    """Retrieve chronological security events associated with an attack container.
+
+    - Validates attack existence (returns 404 if not found)
+    - Orders events ascending by event_time and id
+    - Supports bounded pagination (default 50, maximum 200)
+    """
+    attack = db.get(Attack, attack_id)
+    if not attack:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Attack with ID {attack_id} not found",
+        )
+
+    stmt = (
+        select(AttackEvent)
+        .where(AttackEvent.attack_id == attack_id)
+        .order_by(AttackEvent.event_time.asc(), AttackEvent.id.asc())
+        .offset(skip)
+        .limit(limit)
+    )
+    return list(db.scalars(stmt).all())

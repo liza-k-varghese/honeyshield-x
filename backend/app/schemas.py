@@ -650,3 +650,36 @@ class UnifiedSecurityProcessingResponse(BaseModel):
     execution_time_ms: float = Field(description="Total pipeline execution duration in milliseconds")
 
     model_config = ConfigDict(from_attributes=True)
+
+
+# ==========================================
+# Dashboard Schemas (Module 3.1)
+# ==========================================
+
+class AlertSeverityCounts(BaseModel):
+    """Breakdown of active/open alerts by severity band."""
+
+    critical: int = Field(default=0, ge=0, description="Count of open critical alerts")
+    high: int = Field(default=0, ge=0, description="Count of open high alerts")
+    medium: int = Field(default=0, ge=0, description="Count of open medium alerts")
+    low: int = Field(default=0, ge=0, description="Count of open low alerts")
+
+
+class SystemHealthSummary(BaseModel):
+    """Health status of platform core services."""
+
+    api: str = Field(default="healthy", description="API operational status")
+    postgresql: str = Field(description="PostgreSQL database connectivity status")
+    redis: str = Field(description="Redis server connectivity status")
+
+
+class DashboardStatsResponse(BaseModel):
+    """Aggregated operational security metrics for SOC Dashboard."""
+
+    total_attacks: int = Field(ge=0, description="Total count of attack containers recorded")
+    active_alerts: int = Field(ge=0, description="Total count of open alerts")
+    active_alerts_by_severity: AlertSeverityCounts = Field(description="Breakdown of open alerts by severity")
+    unique_attacker_ips_24h: int = Field(ge=0, description="Count of distinct attacker IPs detected in last 24h")
+    system_health: SystemHealthSummary = Field(description="Platform component health indicators")
+
+    model_config = ConfigDict(from_attributes=True)
