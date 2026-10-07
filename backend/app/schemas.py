@@ -683,3 +683,137 @@ class DashboardStatsResponse(BaseModel):
     system_health: SystemHealthSummary = Field(description="Platform component health indicators")
 
     model_config = ConfigDict(from_attributes=True)
+
+
+# ==========================================
+# Investigation & Attack-Chain Schemas (Module 3.2)
+# ==========================================
+
+class MitreTechniqueMapping(BaseModel):
+    """Mapping of an event or rule to MITRE ATT&CK taxonomy."""
+
+    tactic_id: str = Field(description="MITRE Tactic ID (e.g. TA0043, TA0001)")
+    tactic_name: str = Field(description="MITRE Tactic name (e.g. Reconnaissance)")
+    technique_id: str = Field(description="MITRE Technique ID (e.g. T1046, T1190)")
+    technique_name: str = Field(description="MITRE Technique name (e.g. Network Service Discovery)")
+    confidence: float = Field(ge=0.0, le=1.0, description="Mapping confidence score (0.0 - 1.0)")
+    source: str = Field(description="Provenance source of mapping (rule ID or event type)")
+    evidence_ids: list[int] = Field(default_factory=list, description="IDs of matching evidence events")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class MitreCatalogEntry(BaseModel):
+    """Entry in declarative MITRE ATT&CK catalog."""
+
+    rule_or_event_id: str = Field(description="Rule ID, event type, or wildcard")
+    mapping_type: str = Field(description="'rule', 'event_fallback', or 'unknown'")
+    tactic_id: str = Field(description="Target MITRE tactic identifier")
+    tactic_name: str = Field(description="Target MITRE tactic name")
+    technique_id: str = Field(description="Target MITRE technique identifier")
+    technique_name: str = Field(description="Target MITRE technique name")
+    confidence: float = Field(description="Confidence weight of mapping")
+    description: str = Field(description="Taxonomy explanation")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class MitreCatalogResponse(BaseModel):
+    """Complete declarative MITRE ATT&CK catalog response."""
+
+    catalog: list[MitreCatalogEntry]
+    total_entries: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class GraphNode(BaseModel):
+    """Node in the derived Attack-Chain DAG."""
+
+    id: str = Field(description="Unique node identifier in graph")
+    type: str = Field(description="Node type: 'entity', 'tactic_stage', or 'alert'")
+    label: str = Field(description="Human-readable node label")
+    stage: str = Field(description="Stage or lifecycle phase represented")
+    tactic_id: str | None = Field(default=None, description="MITRE Tactic ID if stage node")
+    technique_id: str | None = Field(default=None, description="MITRE Technique ID if stage node")
+    technique_name: str | None = Field(default=None, description="MITRE Technique name if stage node")
+    severity: str = Field(default="low", description="Severity level for node")
+    risk_score: float | None = Field(default=None, description="Risk score if applicable")
+    event_count: int = Field(default=0, description="Evidence events represented by this node")
+    evidence_ids: list[int] = Field(default_factory=list, description="Representative event IDs")
+    first_seen: datetime | None = Field(default=None, description="Earliest event timestamp")
+    last_seen: datetime | None = Field(default=None, description="Latest event timestamp")
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional context metadata")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class GraphEdge(BaseModel):
+    """Directed transition edge in the derived Attack-Chain DAG."""
+
+    id: str = Field(description="Unique edge identifier")
+    source: str = Field(description="Source node ID")
+    target: str = Field(description="Target node ID")
+    label: str = Field(description="Transition description label")
+    transition_type: str = Field(description="'chronological', 'escalation', or 'impact'")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class GraphSummary(BaseModel):
+    """Summary metrics for the derived Attack-Chain DAG."""
+
+    stages_observed: int = Field(description="Count of distinct active tactic stages")
+    total_events: int = Field(description="Total event count represented")
+    highest_severity: str = Field(description="Highest severity observed in graph")
+    has_execution: bool = Field(description="Whether execution tactic (TA0002) was reached")
+    risk_score: float = Field(default=0.0, description="Associated overall risk score")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AttackGraphResponse(BaseModel):
+    """Response contract for derived Attack-Chain DAG."""
+
+    entity_id: str = Field(description="Queried attack ID or source IP")
+    entity_type: str = Field(description="'attack' or 'source_ip'")
+    nodes: list[GraphNode] = Field(description="Graph nodes representing stages and entities")
+    edges: list[GraphEdge] = Field(description="Directed transition edges")
+    summary: GraphSummary = Field(description="Summary metrics of attack progression")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CrossAttackEventResponse(BaseModel):
+    """Chronological security event with attached MITRE taxonomy."""
+
+    id: int = Field(description="Unique database identifier for the attack event")
+    attack_id: int = Field(description="Associated attack container ID")
+    event_type: str = Field(description="Type or classification of event")
+    source_ip: str | None = Field(default=None, description="Source IP address")
+    message: str | None = Field(default=None, description="Log message or event payload")
+    event_time: datetime = Field(description="Timestamp when event occurred")
+    mitre: MitreTechniqueMapping | None = Field(default=None, description="Deterministic MITRE ATT&CK taxonomy mapping")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class IpDossierResponse(BaseModel):
+    """Aggregated Attacker Entity Dossier for SOC deep-dive investigation."""
+
+    source_ip: str = Field(description="Investigated source IP address")
+    first_seen: datetime | None = Field(default=None, description="Earliest detection timestamp")
+    last_seen: datetime | None = Field(default=None, description="Most recent detection timestamp")
+    total_attacks: int = Field(default=0, ge=0, description="Total attack containers for this IP")
+    total_events: int = Field(default=0, ge=0, description="Total security events for this IP")
+    attack_ids: list[int] = Field(default_factory=list, description="IDs of attack containers")
+    attack_types: list[str] = Field(default_factory=list, description="Observed attack classifications")
+    highest_severity: str = Field(default="low", description="Highest severity observed")
+    highest_risk_score: float = Field(default=0.0, description="Highest risk score observed")
+    threat_intelligence: ThreatIntelligenceResult = Field(description="Threat intelligence context (Module 2.3)")
+    correlation: CorrelationResult = Field(description="Behavioral correlation context (Module 2.8)")
+    multi_vector: MultiVectorDetectionResponse = Field(description="Multi-vector rule results (Module 2.9)")
+    active_alerts_count: int = Field(default=0, ge=0, description="Count of open or acknowledged alerts")
+    alerts: list[AlertResponse] = Field(default_factory=list, description="Recent alerts for this attacker")
+
+    model_config = ConfigDict(from_attributes=True)

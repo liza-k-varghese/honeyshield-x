@@ -76,3 +76,52 @@ export async function updateAlertStatus(
   });
   return handleResponse<Alert>(res);
 }
+
+// ==========================================
+// Module 3.2 Investigation Endpoints
+// ==========================================
+
+export async function fetchIpDossier(
+  sourceIp: string,
+  windowHours: number = 24
+): Promise<import('../types').IpDossier> {
+  const params = new URLSearchParams({ window_hours: windowHours.toString() });
+  const res = await fetch(`${API_BASE}/investigation/ip/${encodeURIComponent(sourceIp)}?${params.toString()}`);
+  return handleResponse<import('../types').IpDossier>(res);
+}
+
+export async function fetchAttackGraph(
+  attackId: number
+): Promise<import('../types').AttackGraphResponse> {
+  const res = await fetch(`${API_BASE}/investigation/attacks/${attackId}/graph`);
+  return handleResponse<import('../types').AttackGraphResponse>(res);
+}
+
+export async function fetchIpGraph(
+  sourceIp: string,
+  windowHours: number = 24
+): Promise<import('../types').AttackGraphResponse> {
+  const params = new URLSearchParams({ window_hours: windowHours.toString() });
+  const res = await fetch(`${API_BASE}/investigation/ip/${encodeURIComponent(sourceIp)}/graph?${params.toString()}`);
+  return handleResponse<import('../types').AttackGraphResponse>(res);
+}
+
+export async function fetchCrossAttackEvents(
+  sourceIp: string,
+  windowHours: number = 24,
+  skip: number = 0,
+  limit: number = 50
+): Promise<import('../types').CrossAttackEvent[]> {
+  const params = new URLSearchParams({
+    window_hours: windowHours.toString(),
+    skip: skip.toString(),
+    limit: limit.toString(),
+  });
+  const res = await fetch(`${API_BASE}/investigation/ip/${encodeURIComponent(sourceIp)}/events?${params.toString()}`);
+  return handleResponse<import('../types').CrossAttackEvent[]>(res);
+}
+
+export async function fetchMitreCatalog(): Promise<import('../types').MitreCatalogResponse> {
+  const res = await fetch(`${API_BASE}/investigation/mitre/catalog`);
+  return handleResponse<import('../types').MitreCatalogResponse>(res);
+}

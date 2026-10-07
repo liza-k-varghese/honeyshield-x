@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, CheckCircle2, AlertOctagon, RotateCcw, Shield, ExternalLink, Calendar, Hash } from 'lucide-react';
+import { X, CheckCircle2, AlertOctagon, RotateCcw, Shield, ExternalLink, Calendar, Hash, Search } from 'lucide-react';
 import { Alert, AlertLifecycleStatus } from '../types';
 import { useAttackDetail, useAttackEvents, useUpdateAlertStatus } from '../hooks/useDashboard';
 import { NotificationBadge, SeverityBadge, StatusBadge } from './Badge';
@@ -8,9 +8,10 @@ import { EventTimeline } from './EventTimeline';
 interface AlertDetailDrawerProps {
   alert: Alert | null;
   onClose: () => void;
+  onInvestigateIp?: (sourceIp: string) => void;
 }
 
-export const AlertDetailDrawer: React.FC<AlertDetailDrawerProps> = ({ alert, onClose }) => {
+export const AlertDetailDrawer: React.FC<AlertDetailDrawerProps> = ({ alert, onClose, onInvestigateIp }) => {
   const updateMutation = useUpdateAlertStatus();
 
   const attackId = alert?.attack_id ?? null;
@@ -180,6 +181,21 @@ export const AlertDetailDrawer: React.FC<AlertDetailDrawerProps> = ({ alert, onC
                   <span className="text-slate-500">Target:</span> {attack.destination_ip || 'Honeypot'}
                 </div>
               </div>
+
+              {attack.source_ip && onInvestigateIp && (
+                <div className="pt-2">
+                  <button
+                    onClick={() => {
+                      onInvestigateIp(attack.source_ip!);
+                      onClose();
+                    }}
+                    className="w-full inline-flex items-center justify-center space-x-2 px-3 py-2 rounded-lg text-xs font-mono font-medium bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/30 transition-colors"
+                  >
+                    <Search className="w-3.5 h-3.5" />
+                    <span>Investigate Attacker Entity ({attack.source_ip})</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

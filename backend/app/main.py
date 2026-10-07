@@ -14,6 +14,7 @@ from app.routers import (
     dashboard,
     detection,
     ingestion,
+    investigation,
     multi_vector_detection,
     notifications,
     pipeline,
@@ -56,6 +57,7 @@ app.include_router(pipeline.router, prefix="/api/v1")
 app.include_router(correlation.router, prefix="/api/v1")
 app.include_router(multi_vector_detection.router, prefix="/api/v1")
 app.include_router(unified_orchestrator.router, prefix="/api/v1")
+app.include_router(investigation.router, prefix="/api/v1")
 
 POSTGRES_HOST = "127.0.0.1"
 POSTGRES_PORT = 5432

@@ -5,25 +5,53 @@ import { SystemHealth } from '../types';
 interface HeaderProps {
   health?: SystemHealth;
   isFetching?: boolean;
+  activeView?: 'dashboard' | 'investigation';
+  onViewChange?: (view: 'dashboard' | 'investigation') => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ health, isFetching }) => {
+export const Header: React.FC<HeaderProps> = ({ health, isFetching, activeView = 'dashboard', onViewChange }) => {
   return (
     <header className="bg-slate-900/90 border-b border-slate-800 px-6 py-3.5 backdrop-blur sticky top-0 z-30">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        {/* Brand */}
-        <div className="flex items-center space-x-3">
-          <div className="p-2 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400">
-            <ShieldAlert className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-lg font-bold tracking-tight text-white">HoneyShield-X</h1>
-              <span className="text-[11px] font-mono uppercase bg-slate-800 text-sky-400 px-1.5 py-0.5 rounded border border-slate-700">
-                SOC Workspace
-              </span>
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        {/* Brand & Workspace Navigation */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400">
+              <ShieldAlert className="w-6 h-6" />
             </div>
-            <p className="text-xs text-slate-400">Autonomous Honeypot & Intrusion Defense Platform</p>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h1 className="text-lg font-bold tracking-tight text-white">HoneyShield-X</h1>
+                <span className="text-[11px] font-mono uppercase bg-slate-800 text-sky-400 px-1.5 py-0.5 rounded border border-slate-700">
+                  SOC Workspace
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">Autonomous Honeypot & Intrusion Defense Platform</p>
+            </div>
+          </div>
+
+          {/* View Mode Switcher */}
+          <div className="flex items-center space-x-1 bg-slate-950/80 p-1 rounded-lg border border-slate-800 self-start sm:self-auto">
+            <button
+              onClick={() => onViewChange?.('dashboard')}
+              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                activeView === 'dashboard'
+                  ? 'bg-sky-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              SOC Overview
+            </button>
+            <button
+              onClick={() => onViewChange?.('investigation')}
+              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                activeView === 'investigation'
+                  ? 'bg-sky-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Entity Investigation
+            </button>
           </div>
         </div>
 
