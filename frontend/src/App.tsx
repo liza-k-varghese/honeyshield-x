@@ -10,6 +10,7 @@ import { RuleDetailDrawer } from './components/RuleDetailDrawer';
 import { ReplayStudioView } from './components/ReplayStudioView';
 import { SimulationSandboxView } from './components/SimulationSandboxView';
 import { AuditTrailView } from './components/AuditTrailView';
+import { LiveCommandCenterView } from './components/LiveCommandCenterView';
 import { useAlerts, useDashboardStats } from './hooks/useDashboard';
 import { Alert, DetectionRuleSummary } from './types';
 import { Search, Network, ArrowRight, Shield, History, Sliders, FileText } from 'lucide-react';
@@ -24,7 +25,7 @@ const queryClient = new QueryClient({
 });
 
 function DashboardContent() {
-  const [activeView, setActiveView] = useState<'dashboard' | 'investigation' | 'rules'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'command' | 'investigation' | 'rules'>('dashboard');
   const [rulesSubTab, setRulesSubTab] = useState<'catalog' | 'replay' | 'simulation' | 'audit'>('catalog');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
@@ -122,6 +123,12 @@ function DashboardContent() {
               onStatusFilterChange={(status) => setStatusFilter(status)}
             />
           </>
+        ) : activeView === 'command' ? (
+          /* Module 3.4 Live Incident Command Workspace */
+          <LiveCommandCenterView
+            onInvestigateIp={handleDeepLinkInvestigate}
+            onReplayAttack={handleDeepLinkReplayAttack}
+          />
         ) : activeView === 'investigation' ? (
           <div className="space-y-6">
             {/* IP Search / Query Ribbon */}
@@ -302,7 +309,7 @@ function DashboardContent() {
 
       {/* Footer */}
       <footer className="border-t border-slate-900 py-4 text-center text-xs text-slate-600">
-        HoneyShield-X System 1 SOC Operator Workspace &bull; Phase 3 Modules 3.1, 3.2 & 3.3 &bull; Clean-Room Security Console
+        HoneyShield-X System 1 SOC Operator Workspace &bull; Phase 3 Modules 3.1, 3.2, 3.3 & 3.4 &bull; Clean-Room Security Console
       </footer>
     </div>
   );

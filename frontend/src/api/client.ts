@@ -204,3 +204,83 @@ export async function fetchAuditEvents(
   const res = await fetch(`${API_BASE}/audit/events?${params.toString()}`);
   return handleResponse<import('../types').AuditEventsResponse>(res);
 }
+
+// ==========================================
+// Module 3.4 Incident Command API Functions
+// ==========================================
+
+export async function fetchGovernorStatus(
+  operatorId: string = 'soc_operator'
+): Promise<import('../types').GovernorStatusResponse> {
+  const params = new URLSearchParams({ operator_id: operatorId });
+  const res = await fetch(`${API_BASE}/incident-command/governor/status?${params.toString()}`);
+  return handleResponse<import('../types').GovernorStatusResponse>(res);
+}
+
+export async function executeIncidentCommand(
+  req: import('../types').IncidentCommandRequest,
+  idempotencyKey?: string,
+  operatorId: string = 'soc_operator'
+): Promise<import('../types').IncidentCommandResponse> {
+  const key = idempotencyKey || crypto.randomUUID();
+  const res = await fetch(`${API_BASE}/incident-command/execute`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Idempotency-Key': key,
+      'X-Operator-Id': operatorId,
+    },
+    body: JSON.stringify(req),
+  });
+  return handleResponse<import('../types').IncidentCommandResponse>(res);
+}
+
+export async function previewIncidentCommand(
+  req: import('../types').IncidentCommandRequest,
+  operatorId: string = 'soc_operator'
+): Promise<import('../types').ApprovalTokenResponse> {
+  const res = await fetch(`${API_BASE}/incident-command/preview`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Operator-Id': operatorId,
+    },
+    body: JSON.stringify(req),
+  });
+  return handleResponse<import('../types').ApprovalTokenResponse>(res);
+}
+
+export async function toggleGovernorLockout(
+  engaged: boolean,
+  justification: string,
+  operatorId: string = 'soc_operator'
+): Promise<import('../types').IncidentCommandResponse> {
+  const key = crypto.randomUUID();
+  const res = await fetch(`${API_BASE}/incident-command/governor/lockout`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Idempotency-Key': key,
+      'X-Operator-Id': operatorId,
+    },
+    body: JSON.stringify({ engaged, justification }),
+  });
+  return handleResponse<import('../types').IncidentCommandResponse>(res);
+}
+
+export async function fetchVirtualIncidents(
+  statusFilter?: string,
+  limit: number = 50
+): Promise<import('../types').VirtualIncidentsResponse> {
+  const params = new URLSearchParams({ limit: limit.toString() });
+  if (statusFilter && statusFilter !== 'all') {
+    params.append('status', statusFilter);
+  }
+  const res = await fetch(`${API_BASE}/incident-command/incidents?${params.toString()}`);
+  return handleResponse<import('../types').VirtualIncidentsResponse>(res);
+}
+
+export async function fetchAllowlistedActions(): Promise<import('../types').ActionCatalogResponse> {
+  const res = await fetch(`${API_BASE}/incident-command/actions`);
+  return handleResponse<import('../types').ActionCatalogResponse>(res);
+}

@@ -343,3 +343,97 @@ export interface AuditEventsResponse {
   total_events: number;
   events: AuditEventItem[];
 }
+
+// ==========================================
+// Module 3.4 Incident Command Types
+// ==========================================
+
+export type IncidentCommandAction =
+  | 'ALERT_ACKNOWLEDGE'
+  | 'ALERT_RESOLVE'
+  | 'ALERT_ESCALATE'
+  | 'NOTIFICATION_DISPATCH'
+  | 'NOTIFICATION_SUPPRESS'
+  | 'CONTAINMENT_STAGING_REQUEST'
+  | 'GOVERNOR_LOCKOUT_ENGAGE'
+  | 'GOVERNOR_LOCKOUT_RELEASE';
+
+export interface IncidentCommandRequest {
+  action: IncidentCommandAction | string;
+  target_id: number;
+  justification?: string;
+  approval_token?: string;
+}
+
+export interface IncidentCommandResponse {
+  command_id: string;
+  success: boolean;
+  action: string;
+  target_id: number;
+  new_status?: string | null;
+  message: string;
+  governor_status: string;
+  audit_event_id?: number | null;
+  execution_duration_ms: number;
+}
+
+export interface ApprovalTokenResponse {
+  approval_token: string;
+  action: string;
+  target_id: number;
+  operator_id?: string;
+  expires_in_seconds: number;
+  expires_at: string;
+}
+
+export interface CircuitBreakerStatus {
+  state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' | string;
+  consecutive_failures: number;
+  failure_threshold: number;
+  cooldown_remaining_seconds: number;
+  total_successes: number;
+  total_failures: number;
+  tripped_count: number;
+}
+
+export interface GovernorStatusResponse {
+  lockout_engaged: boolean;
+  operator_id: string;
+  operator_actions_last_minute: number;
+  operator_rate_limit_max: number;
+  active_cooldowns_count: number;
+  circuit_breaker: CircuitBreakerStatus;
+  allowlisted_actions: string[];
+}
+
+export interface VirtualIncidentItem {
+  incident_id: string;
+  alert_id: number;
+  attack_id: number | null;
+  source_ip: string;
+  attack_type: string;
+  severity: string;
+  status: AlertLifecycleStatus | string;
+  risk_score: number;
+  notification_status: string;
+  event_count: number;
+  created_at: string;
+}
+
+export interface VirtualIncidentsResponse {
+  total_incidents: number;
+  incidents: VirtualIncidentItem[];
+}
+
+export interface AllowlistedActionItem {
+  action: string;
+  blast_tier: number;
+  requires_justification: boolean;
+  cooldown_seconds: number;
+  description: string;
+}
+
+export interface ActionCatalogResponse {
+  total_actions: number;
+  actions: AllowlistedActionItem[];
+}

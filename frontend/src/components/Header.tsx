@@ -5,8 +5,8 @@ import { SystemHealth } from '../types';
 interface HeaderProps {
   health?: SystemHealth;
   isFetching?: boolean;
-  activeView?: 'dashboard' | 'investigation' | 'rules';
-  onViewChange?: (view: 'dashboard' | 'investigation' | 'rules') => void;
+  activeView?: 'dashboard' | 'investigation' | 'rules' | 'command';
+  onViewChange?: (view: 'dashboard' | 'investigation' | 'rules' | 'command') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ health, isFetching, activeView = 'dashboard', onViewChange }) => {
@@ -41,6 +41,16 @@ export const Header: React.FC<HeaderProps> = ({ health, isFetching, activeView =
               }`}
             >
               SOC Overview
+            </button>
+            <button
+              onClick={() => onViewChange?.('command')}
+              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                activeView === 'command'
+                  ? 'bg-cyan-600 text-white shadow-sm font-semibold'
+                  : 'text-cyan-400/80 hover:text-cyan-300'
+              }`}
+            >
+              Live Command
             </button>
             <button
               onClick={() => onViewChange?.('investigation')}

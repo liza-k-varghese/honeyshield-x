@@ -1006,3 +1006,112 @@ class AuditEventsResponse(BaseModel):
 
     total_events: int = Field(ge=0, description="Total matching audit events returned")
     events: list[AuditEventItem] = Field(description="Chronological audit records")
+
+
+# ==========================================
+# Module 3.4 Incident Command Schemas
+# ==========================================
+
+class IncidentCommandRequest(BaseModel):
+    """Payload for submitting a governed incident command."""
+
+    action: str = Field(description="Allowlisted command action name")
+    target_id: int = Field(default=0, description="Target entity ID (e.g. alert_id)")
+    justification: str | None = Field(default=None, description="Operator justification for Level 2/3 actions")
+    approval_token: str | None = Field(default=None, description="Ephemeral approval token from pre-flight preview")
+
+
+class IncidentCommandResponse(BaseModel):
+    """Structured response for governed command execution."""
+
+    command_id: str = Field(description="Unique execution identifier")
+    success: bool = Field(description="Whether the command executed successfully")
+    action: str = Field(description="Executed action name")
+    target_id: int = Field(description="Target entity ID")
+    new_status: str | None = Field(default=None, description="Updated entity lifecycle status")
+    message: str = Field(description="Execution summary message")
+    governor_status: str = Field(description="Governor policy verdict")
+    audit_event_id: int | None = Field(default=None, description="Associated SystemEvent audit row ID")
+    execution_duration_ms: float = Field(description="Execution latency in milliseconds")
+
+
+class ApprovalTokenResponse(BaseModel):
+    """Two-phase pre-flight approval token response."""
+
+    approval_token: str = Field(description="Ephemeral approval token (UUID v4)")
+    action: str = Field(description="Target allowlisted action")
+    target_id: int = Field(description="Target entity ID")
+    operator_id: str = Field(default="default_operator", description="Operator identifier bound to token")
+    expires_in_seconds: int = Field(description="Token validity window in seconds")
+    expires_at: str = Field(description="ISO timestamp of token expiry")
+
+
+class CircuitBreakerStatus(BaseModel):
+    """Metrics and state for outbound notification circuit breaker."""
+
+    state: str = Field(description="Breaker state: CLOSED, OPEN, or HALF_OPEN")
+    consecutive_failures: int = Field(description="Current consecutive error count")
+    failure_threshold: int = Field(description="Trip threshold count")
+    cooldown_remaining_seconds: float = Field(description="Remaining seconds until HALF_OPEN probe")
+    total_successes: int = Field(description="Lifetime successful dispatches")
+    total_failures: int = Field(description="Lifetime failed dispatches")
+    tripped_count: int = Field(description="Total times breaker has tripped to OPEN")
+
+
+class GovernorStatusResponse(BaseModel):
+    """Comprehensive status for Deterministic Governor."""
+
+    lockout_engaged: bool = Field(description="Whether emergency outbound lockout is active")
+    operator_id: str = Field(description="Queried operator identifier")
+    operator_actions_last_minute: int = Field(description="Actions issued by this operator in the last 60s")
+    operator_rate_limit_max: int = Field(description="Allowed actions per 60s")
+    active_cooldowns_count: int = Field(description="Number of target entities currently in cooldown")
+    circuit_breaker: CircuitBreakerStatus = Field(description="Outbound notification circuit breaker status")
+    allowlisted_actions: list[str] = Field(description="List of all allowlisted actions")
+
+
+class LockoutToggleRequest(BaseModel):
+    """Payload to engage or release emergency system-wide lockout."""
+
+    engaged: bool = Field(description="True to engage emergency lockout; False to release")
+    justification: str = Field(min_length=5, description="Mandatory operator justification for lockout toggle")
+
+
+class VirtualIncidentItem(BaseModel):
+    """Virtual incident projection aggregated from Alert and Attack."""
+
+    incident_id: str = Field(description="Virtual incident identifier, e.g. 'INC-42'")
+    alert_id: int = Field(description="Associated alert primary key")
+    attack_id: int | None = Field(default=None, description="Associated attack primary key")
+    source_ip: str = Field(description="Attacker source IP address")
+    attack_type: str = Field(description="Classification of attack or alert")
+    severity: str = Field(description="Severity classification")
+    status: str = Field(description="Current lifecycle status (open, acknowledged, resolved)")
+    risk_score: float = Field(description="Calculated risk score 0.0-100.0")
+    notification_status: str = Field(description="Notification delivery status")
+    event_count: int = Field(description="Total correlated attack telemetry events")
+    created_at: datetime = Field(description="Timestamp when incident was created")
+
+
+class VirtualIncidentsResponse(BaseModel):
+    """Query response for virtual incident collection."""
+
+    total_incidents: int = Field(description="Total virtual incidents matching criteria")
+    incidents: list[VirtualIncidentItem] = Field(description="List of virtual incidents")
+
+
+class AllowlistedActionItem(BaseModel):
+    """Specification of an allowlisted incident command action."""
+
+    action: str = Field(description="Action name")
+    blast_tier: int = Field(description="Blast radius tier (1=low, 2=medium, 3=high)")
+    requires_justification: bool = Field(description="Whether non-empty justification is required")
+    cooldown_seconds: float = Field(description="Cooldown window in seconds")
+    description: str = Field(description="Human-readable description of action effect")
+
+
+class ActionCatalogResponse(BaseModel):
+    """Catalog of all allowlisted incident command actions."""
+
+    total_actions: int = Field(description="Total allowlisted actions")
+    actions: list[AllowlistedActionItem] = Field(description="Catalog of allowlisted actions")
