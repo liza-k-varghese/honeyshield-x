@@ -9,9 +9,17 @@ interface AlertDetailDrawerProps {
   alert: Alert | null;
   onClose: () => void;
   onInvestigateIp?: (sourceIp: string) => void;
+  onReplayAttack?: (attackId: number) => void;
+  onInspectRule?: (ruleId: string) => void;
 }
 
-export const AlertDetailDrawer: React.FC<AlertDetailDrawerProps> = ({ alert, onClose, onInvestigateIp }) => {
+export const AlertDetailDrawer: React.FC<AlertDetailDrawerProps> = ({
+  alert,
+  onClose,
+  onInvestigateIp,
+  onReplayAttack,
+  onInspectRule,
+}) => {
   const updateMutation = useUpdateAlertStatus();
 
   const attackId = alert?.attack_id ?? null;
@@ -193,6 +201,21 @@ export const AlertDetailDrawer: React.FC<AlertDetailDrawerProps> = ({ alert, onC
                   >
                     <Search className="w-3.5 h-3.5" />
                     <span>Investigate Attacker Entity ({attack.source_ip})</span>
+                  </button>
+                </div>
+              )}
+
+              {attack.id && onReplayAttack && (
+                <div className="pt-1.5">
+                  <button
+                    onClick={() => {
+                      onReplayAttack(attack.id);
+                      onClose();
+                    }}
+                    className="w-full inline-flex items-center justify-center space-x-2 px-3 py-2 rounded-lg text-xs font-mono font-medium bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 transition-colors"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Replay Attack #{attack.id} Telemetry</span>
                   </button>
                 </div>
               )}

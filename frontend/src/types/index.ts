@@ -196,3 +196,150 @@ export interface IpDossier {
   active_alerts_count: number;
   alerts: Alert[];
 }
+
+// =============================================================================
+// Module 3.3: Detection Rule Management, Replay & Simulation Types
+// =============================================================================
+
+export interface DetectionRuleSummary {
+  rule_id: string;
+  name: string;
+  vector: 'auth' | 'web' | 'network' | string;
+  description: string;
+  severity: SeverityLevel;
+  base_risk_score: number;
+  rule_type: 'threshold' | 'signature' | string;
+  target_event_types: string[];
+  window_minutes: number;
+  threshold_count: number;
+  match_tokens: string[];
+  regex_patterns: string[];
+  is_active: boolean;
+  is_immutable: boolean;
+}
+
+export interface RuleCatalogResponse {
+  total_rules: number;
+  rules: DetectionRuleSummary[];
+}
+
+export interface TopAttackerStat {
+  source_ip: string;
+  trigger_count: number;
+}
+
+export interface RuleEfficacyResponse {
+  rule_id: string;
+  rule_name: string;
+  time_range_hours: number;
+  total_triggers: number;
+  unique_attackers: number;
+  correlated_multi_vector_triggers: number;
+  isolated_triggers: number;
+  correlated_rate_pct: number;
+  avg_associated_risk_score: number;
+  last_triggered_at: string | null;
+  false_positive_indicator: number | null;
+  false_positive_indicator_note: string;
+  top_attacking_ips: TopAttackerStat[];
+}
+
+export interface ReplayRequest {
+  window_minutes?: number;
+  max_events?: number;
+  record_audit?: boolean;
+  start_time?: string;
+  end_time?: string;
+}
+
+export interface ReplayTimelineEvent {
+  event_id: number;
+  event_time: string;
+  event_type: string;
+  source_ip: string;
+  payload_preview: string;
+  cumulative_rules_triggered: string[];
+}
+
+export interface ReplayDetectionSummary {
+  detected: boolean;
+  is_multi_vector: boolean;
+  vectors_detected: string[];
+  rules_triggered: string[];
+  suggested_risk_score: number;
+  severity: string;
+}
+
+export interface DetectionDiff {
+  match_status: 'identical' | 'expanded_coverage' | 'reduced_coverage' | 'drift_detected' | string;
+  historical_rules_triggered: string[];
+  replayed_rules_triggered: string[];
+  new_rules_triggered: string[];
+  suppressed_rules: string[];
+  risk_score_delta: number;
+  severity_changed: boolean;
+}
+
+export interface ReplayExecutionResponse {
+  replay_id: string;
+  scope: 'attack' | 'ip';
+  target_identifier: string;
+  total_events_evaluated: number;
+  execution_duration_ms: number;
+  deterministic_pass: boolean;
+  match_status: string;
+  baseline_detection: ReplayDetectionSummary | null;
+  replayed_detection: ReplayDetectionSummary;
+  detection_diff: DetectionDiff;
+  event_timeline: ReplayTimelineEvent[];
+}
+
+export interface CandidateRuleSpec {
+  rule_id: string;
+  name: string;
+  vector: string;
+  rule_type: string;
+  target_event_types: string[];
+  window_minutes: number;
+  threshold_count: number;
+  severity: string;
+  base_risk_score: number;
+  match_tokens: string[];
+  regex_patterns: string[];
+}
+
+export interface SimulationRequest {
+  target_scope: 'attack' | 'ip';
+  target_identifier: string;
+  window_minutes?: number;
+  candidate_rule: CandidateRuleSpec;
+}
+
+export interface SimulationExecutionResponse {
+  simulation_id: string;
+  target_scope: string;
+  target_identifier: string;
+  events_evaluated: number;
+  execution_duration_ms: number;
+  candidate_rule_triggered: boolean;
+  candidate_evidence_count: number;
+  baseline_rules_triggered: string[];
+  simulation_rules_triggered: string[];
+  new_detections_count: number;
+  comparison_summary: string;
+  matched_payload_samples: string[];
+}
+
+export interface AuditEventItem {
+  id: number;
+  event_type: string;
+  source: string;
+  severity: string;
+  message: string;
+  created_at: string;
+}
+
+export interface AuditEventsResponse {
+  total_events: number;
+  events: AuditEventItem[];
+}

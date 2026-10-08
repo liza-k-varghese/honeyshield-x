@@ -10,14 +10,17 @@ from app.database import get_db
 from app.routers import (
     alerts,
     attacks,
+    audit,
     correlation,
     dashboard,
     detection,
+    detection_rules,
     ingestion,
     investigation,
     multi_vector_detection,
     notifications,
     pipeline,
+    replay,
     risk,
     threat_intelligence,
     unified_orchestrator,
@@ -58,6 +61,9 @@ app.include_router(correlation.router, prefix="/api/v1")
 app.include_router(multi_vector_detection.router, prefix="/api/v1")
 app.include_router(unified_orchestrator.router, prefix="/api/v1")
 app.include_router(investigation.router, prefix="/api/v1")
+app.include_router(detection_rules.router, prefix="/api/v1")
+app.include_router(replay.router, prefix="/api/v1")
+app.include_router(audit.router, prefix="/api/v1")
 
 POSTGRES_HOST = "127.0.0.1"
 POSTGRES_PORT = 5432

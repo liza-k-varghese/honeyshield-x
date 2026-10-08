@@ -125,3 +125,82 @@ export async function fetchMitreCatalog(): Promise<import('../types').MitreCatal
   const res = await fetch(`${API_BASE}/investigation/mitre/catalog`);
   return handleResponse<import('../types').MitreCatalogResponse>(res);
 }
+
+// =============================================================================
+// Module 3.3 API Client Functions
+// =============================================================================
+
+export async function fetchRuleCatalog(
+  vector?: string,
+  ruleType?: string
+): Promise<import('../types').RuleCatalogResponse> {
+  const params = new URLSearchParams();
+  if (vector) params.append('vector', vector);
+  if (ruleType) params.append('rule_type', ruleType);
+  const qs = params.toString() ? `?${params.toString()}` : '';
+  const res = await fetch(`${API_BASE}/detection/rules${qs}`);
+  return handleResponse<import('../types').RuleCatalogResponse>(res);
+}
+
+export async function fetchRuleDetail(
+  ruleId: string
+): Promise<import('../types').DetectionRuleSummary> {
+  const res = await fetch(`${API_BASE}/detection/rules/${encodeURIComponent(ruleId)}`);
+  return handleResponse<import('../types').DetectionRuleSummary>(res);
+}
+
+export async function fetchRuleEfficacy(
+  ruleId: string,
+  timeRangeHours: number = 24
+): Promise<import('../types').RuleEfficacyResponse> {
+  const params = new URLSearchParams({ time_range_hours: timeRangeHours.toString() });
+  const res = await fetch(`${API_BASE}/detection/rules/${encodeURIComponent(ruleId)}/efficacy?${params.toString()}`);
+  return handleResponse<import('../types').RuleEfficacyResponse>(res);
+}
+
+export async function replayAttack(
+  attackId: number,
+  req?: import('../types').ReplayRequest
+): Promise<import('../types').ReplayExecutionResponse> {
+  const res = await fetch(`${API_BASE}/replay/attack/${attackId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req || {}),
+  });
+  return handleResponse<import('../types').ReplayExecutionResponse>(res);
+}
+
+export async function replayIp(
+  sourceIp: string,
+  req?: import('../types').ReplayRequest
+): Promise<import('../types').ReplayExecutionResponse> {
+  const res = await fetch(`${API_BASE}/replay/ip/${encodeURIComponent(sourceIp)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req || {}),
+  });
+  return handleResponse<import('../types').ReplayExecutionResponse>(res);
+}
+
+export async function simulateCandidateRule(
+  req: import('../types').SimulationRequest
+): Promise<import('../types').SimulationExecutionResponse> {
+  const res = await fetch(`${API_BASE}/simulation/rule-test`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+  return handleResponse<import('../types').SimulationExecutionResponse>(res);
+}
+
+export async function fetchAuditEvents(
+  limit: number = 50,
+  source?: string,
+  eventType?: string
+): Promise<import('../types').AuditEventsResponse> {
+  const params = new URLSearchParams({ limit: limit.toString() });
+  if (source) params.append('source', source);
+  if (eventType) params.append('event_type', eventType);
+  const res = await fetch(`${API_BASE}/audit/events?${params.toString()}`);
+  return handleResponse<import('../types').AuditEventsResponse>(res);
+}

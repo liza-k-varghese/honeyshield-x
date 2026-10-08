@@ -5,9 +5,14 @@ import { KpiRibbon } from './components/KpiRibbon';
 import { AlertTable } from './components/AlertTable';
 import { AlertDetailDrawer } from './components/AlertDetailDrawer';
 import { IpDossierView } from './components/IpDossierView';
+import { RuleCatalogView } from './components/RuleCatalogView';
+import { RuleDetailDrawer } from './components/RuleDetailDrawer';
+import { ReplayStudioView } from './components/ReplayStudioView';
+import { SimulationSandboxView } from './components/SimulationSandboxView';
+import { AuditTrailView } from './components/AuditTrailView';
 import { useAlerts, useDashboardStats } from './hooks/useDashboard';
-import { Alert } from './types';
-import { Search, Network, ArrowRight } from 'lucide-react';
+import { Alert, DetectionRuleSummary } from './types';
+import { Search, Network, ArrowRight, Shield, History, Sliders, FileText } from 'lucide-react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,11 +24,18 @@ const queryClient = new QueryClient({
 });
 
 function DashboardContent() {
-  const [activeView, setActiveView] = useState<'dashboard' | 'investigation'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'investigation' | 'rules'>('dashboard');
+  const [rulesSubTab, setRulesSubTab] = useState<'catalog' | 'replay' | 'simulation' | 'audit'>('catalog');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [investigationIp, setInvestigationIp] = useState<string>('');
   const [searchInput, setSearchInput] = useState<string>('');
+
+  // Module 3.3 state
+  const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
+  const [simulationRule, setSimulationRule] = useState<DetectionRuleSummary | null>(null);
+  const [replayTarget, setReplayTarget] = useState<string>('');
+  const [replayScope, setReplayScope] = useState<'attack' | 'ip'>('attack');
 
   const {
     data: stats,
@@ -43,7 +55,6 @@ function DashboardContent() {
   const suggestedIps = useMemo(() => {
     const ips = new Set<string>();
     alerts.forEach((a) => {
-      // Look for IP in alert message or fallback
       const ipMatch = a.message.match(/\b(?:\d{1,3}\.){3}\d{1,3}\b/);
       if (ipMatch) ips.add(ipMatch[0]);
     });
@@ -55,6 +66,27 @@ function DashboardContent() {
     setSearchInput(sourceIp);
     setActiveView('investigation');
     setSelectedAlert(null);
+  };
+
+  const handleDeepLinkReplayAttack = (attackId: number) => {
+    setReplayTarget(String(attackId));
+    setReplayScope('attack');
+    setRulesSubTab('replay');
+    setActiveView('rules');
+    setSelectedAlert(null);
+  };
+
+  const handleDeepLinkReplayIp = (sourceIp: string) => {
+    setReplayTarget(sourceIp);
+    setReplayScope('ip');
+    setRulesSubTab('replay');
+    setActiveView('rules');
+  };
+
+  const handleOpenSimulation = (rule?: DetectionRuleSummary) => {
+    if (rule) setSimulationRule(rule);
+    setRulesSubTab('simulation');
+    setActiveView('rules');
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -90,7 +122,7 @@ function DashboardContent() {
               onStatusFilterChange={(status) => setStatusFilter(status)}
             />
           </>
-        ) : (
+        ) : activeView === 'investigation' ? (
           <div className="space-y-6">
             {/* IP Search / Query Ribbon */}
             <div className="p-4 rounded-lg bg-slate-900 border border-slate-800 space-y-3">
@@ -151,6 +183,7 @@ function DashboardContent() {
               <IpDossierView
                 sourceIp={investigationIp}
                 onSelectAlert={(alert) => setSelectedAlert(alert)}
+                onReplayIp={handleDeepLinkReplayIp}
               />
             ) : (
               <div className="py-20 text-center space-y-3 bg-slate-900/30 border border-slate-800 rounded-lg">
@@ -162,6 +195,90 @@ function DashboardContent() {
               </div>
             )}
           </div>
+        ) : (
+          /* Module 3.3 Detection & Replay Workspace */
+          <div className="space-y-6">
+            {/* Sub-navigation tabs */}
+            <div className="flex items-center space-x-2 border-b border-slate-800 pb-3 text-xs font-medium">
+              <button
+                onClick={() => setRulesSubTab('catalog')}
+                className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors ${
+                  rulesSubTab === 'catalog'
+                    ? 'bg-sky-600 text-white font-semibold shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                }`}
+              >
+                <Shield className="w-4 h-4" />
+                <span>Detection Rules Catalog</span>
+              </button>
+
+              <button
+                onClick={() => setRulesSubTab('replay')}
+                className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors ${
+                  rulesSubTab === 'replay'
+                    ? 'bg-sky-600 text-white font-semibold shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                }`}
+              >
+                <History className="w-4 h-4" />
+                <span>Historical Replay Studio</span>
+              </button>
+
+              <button
+                onClick={() => setRulesSubTab('simulation')}
+                className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors ${
+                  rulesSubTab === 'simulation'
+                    ? 'bg-sky-600 text-white font-semibold shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                }`}
+              >
+                <Sliders className="w-4 h-4" />
+                <span>Candidate Rule Simulation</span>
+              </button>
+
+              <button
+                onClick={() => setRulesSubTab('audit')}
+                className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors ${
+                  rulesSubTab === 'audit'
+                    ? 'bg-sky-600 text-white font-semibold shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                }`}
+              >
+                <FileText className="w-4 h-4" />
+                <span>Operator Audit Trail</span>
+              </button>
+            </div>
+
+            {/* Active Sub-tab View */}
+            {rulesSubTab === 'catalog' && (
+              <RuleCatalogView
+                onSelectRule={(id) => setSelectedRuleId(id)}
+                onOpenSimulation={handleOpenSimulation}
+              />
+            )}
+
+            {rulesSubTab === 'replay' && (
+              <ReplayStudioView
+                initialTarget={replayTarget}
+                initialScope={replayScope}
+                onSimulateCandidate={(target, scope) => {
+                  setReplayTarget(target);
+                  setReplayScope(scope);
+                  setRulesSubTab('simulation');
+                }}
+              />
+            )}
+
+            {rulesSubTab === 'simulation' && (
+              <SimulationSandboxView
+                initialRule={simulationRule}
+                initialTarget={replayTarget}
+                initialScope={replayScope}
+              />
+            )}
+
+            {rulesSubTab === 'audit' && <AuditTrailView />}
+          </div>
         )}
       </main>
 
@@ -170,11 +287,22 @@ function DashboardContent() {
         alert={selectedAlert}
         onClose={() => setSelectedAlert(null)}
         onInvestigateIp={handleDeepLinkInvestigate}
+        onReplayAttack={handleDeepLinkReplayAttack}
+      />
+
+      {/* Detection Rule Detail Drawer */}
+      <RuleDetailDrawer
+        ruleId={selectedRuleId}
+        onClose={() => setSelectedRuleId(null)}
+        onSimulateCandidate={(rId) => {
+          setSelectedRuleId(null);
+          setRulesSubTab('simulation');
+        }}
       />
 
       {/* Footer */}
       <footer className="border-t border-slate-900 py-4 text-center text-xs text-slate-600">
-        HoneyShield-X System 1 SOC Operator Workspace &bull; Phase 3 Modules 3.1 & 3.2 &bull; Clean-Room Security Console
+        HoneyShield-X System 1 SOC Operator Workspace &bull; Phase 3 Modules 3.1, 3.2 & 3.3 &bull; Clean-Room Security Console
       </footer>
     </div>
   );

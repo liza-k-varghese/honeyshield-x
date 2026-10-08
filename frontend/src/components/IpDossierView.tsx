@@ -37,9 +37,10 @@ import {
 interface IpDossierViewProps {
   sourceIp: string;
   onSelectAlert?: (alert: Alert) => void;
+  onReplayIp?: (sourceIp: string) => void;
 }
 
-export const IpDossierView: React.FC<IpDossierViewProps> = ({ sourceIp, onSelectAlert }) => {
+export const IpDossierView: React.FC<IpDossierViewProps> = ({ sourceIp, onSelectAlert, onReplayIp }) => {
   const [windowHours, setWindowHours] = useState<number>(24);
   const [activeTab, setActiveTab] = useState<'graph' | 'matrix' | 'timeline' | 'alerts'>('graph');
   const [copied, setCopied] = useState(false);
@@ -153,8 +154,18 @@ export const IpDossierView: React.FC<IpDossierViewProps> = ({ sourceIp, onSelect
             </div>
           </div>
 
-          {/* Time Window Selector */}
-          <div className="flex items-center space-x-2 self-start md:self-auto">
+          {/* Time Window Selector & Replay Action */}
+          <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+            {onReplayIp && (
+              <button
+                onClick={() => onReplayIp(sourceIp)}
+                className="px-2.5 py-1 rounded bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-mono font-medium flex items-center space-x-1.5 transition-colors"
+                title="Replay this entity's telemetry in Replay Studio"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Replay Telemetry</span>
+              </button>
+            )}
             <span className="text-xs font-mono text-slate-400">Time Window:</span>
             <select
               value={windowHours}

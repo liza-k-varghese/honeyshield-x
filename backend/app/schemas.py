@@ -817,3 +817,192 @@ class IpDossierResponse(BaseModel):
     alerts: list[AlertResponse] = Field(default_factory=list, description="Recent alerts for this attacker")
 
     model_config = ConfigDict(from_attributes=True)
+
+
+# =============================================================================
+# Detection Rule Management, Replay & Simulation Schemas (Module 3.3)
+# =============================================================================
+
+class DetectionRuleSummary(BaseModel):
+    """Declarative detection rule summary and criteria (Module 3.3)."""
+
+    rule_id: str = Field(description="Unique rule identifier")
+    name: str = Field(description="Human-readable rule name")
+    vector: str = Field(description="Canonical vector category (auth, web, network)")
+    description: str = Field(description="Rule description and rationale")
+    severity: str = Field(description="Severity classification (critical, high, medium, low)")
+    base_risk_score: float = Field(ge=0.0, le=10.0, description="Base risk score contribution")
+    rule_type: str = Field(description="Rule evaluation mechanism ('threshold' or 'signature')")
+    target_event_types: list[str] = Field(description="Telemetry event types evaluated by this rule")
+    window_minutes: int = Field(ge=1, le=60, description="Sliding evaluation window in minutes")
+    threshold_count: int = Field(ge=1, description="Minimum events or matches required to trigger")
+    match_tokens: list[str] = Field(default_factory=list, description="Sanitized substring tokens for fast matching")
+    regex_patterns: list[str] = Field(default_factory=list, description="Compiled regex pattern strings")
+    is_active: bool = Field(default=True, description="Whether the rule is active in production")
+    is_immutable: bool = Field(default=True, description="Whether the rule definition is immutable in code")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RuleCatalogResponse(BaseModel):
+    """Active declarative detection rules catalog."""
+
+    total_rules: int = Field(ge=0, description="Total active registered detection rules")
+    rules: list[DetectionRuleSummary] = Field(description="List of registered detection rules")
+
+
+class TopAttackerStat(BaseModel):
+    """Attacking source IP and trigger count statistic."""
+
+    source_ip: str = Field(description="Source IP address")
+    trigger_count: int = Field(ge=0, description="Number of times rule triggered for this IP")
+
+
+class RuleEfficacyResponse(BaseModel):
+    """Empirical performance metrics and trigger telemetry for a detection rule."""
+
+    rule_id: str = Field(description="Unique rule identifier")
+    rule_name: str = Field(description="Human-readable rule name")
+    time_range_hours: int = Field(ge=1, le=168, description="Historical analysis window in hours")
+    total_triggers: int = Field(ge=0, description="Total times rule has triggered in window")
+    unique_attackers: int = Field(ge=0, description="Distinct attacker IPs that triggered rule")
+    correlated_multi_vector_triggers: int = Field(ge=0, description="Triggers occurring alongside other vector rules")
+    isolated_triggers: int = Field(ge=0, description="Triggers where this was the sole rule triggered")
+    correlated_rate_pct: float = Field(ge=0.0, le=100.0, description="Percentage of triggers correlated with multi-vector activity")
+    avg_associated_risk_score: float = Field(ge=0.0, le=10.0, description="Average risk score of attacks triggering rule")
+    last_triggered_at: datetime | None = Field(default=None, description="Timestamp of most recent trigger")
+    false_positive_indicator: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=100.0,
+        description="Heuristic false-positive indicator percentage based on un-escalated single-event occurrences",
+    )
+    false_positive_indicator_note: str = Field(
+        default="Heuristic indicator derived from available telemetry; not an authoritative ground-truth classification.",
+        description="Methodological note regarding the false-positive indicator",
+    )
+    top_attacking_ips: list[TopAttackerStat] = Field(default_factory=list, description="Top IPs triggering this rule")
+
+
+class ReplayRequest(BaseModel):
+    """Request payload for deterministic historical event replay."""
+
+    window_minutes: int = Field(default=15, ge=1, le=60, description="Sliding evaluation window in minutes")
+    max_events: int = Field(default=200, ge=1, le=200, description="Maximum historical events to evaluate (cap 200)")
+    record_audit: bool = Field(default=True, description="Whether to log an operator audit record in SystemEvent")
+    start_time: datetime | None = Field(default=None, description="Optional start timestamp filter")
+    end_time: datetime | None = Field(default=None, description="Optional end timestamp filter")
+
+
+class ReplayTimelineEvent(BaseModel):
+    """Chronological event representation in replay timeline."""
+
+    event_id: int = Field(description="Primary key of AttackEvent")
+    event_time: datetime = Field(description="Event timestamp")
+    event_type: str = Field(description="Event classification type")
+    source_ip: str = Field(description="Attacker source IP")
+    payload_preview: str = Field(description="Sanitized and truncated payload preview")
+    cumulative_rules_triggered: list[str] = Field(default_factory=list, description="Rules triggered up to this event")
+
+
+class ReplayDetectionSummary(BaseModel):
+    """Detection findings summary for baseline and replayed evaluation."""
+
+    detected: bool = Field(description="Whether any rule triggered")
+    is_multi_vector: bool = Field(description="Whether triggers span >= 2 vectors")
+    vectors_detected: list[str] = Field(default_factory=list, description="Distinct vectors triggered")
+    rules_triggered: list[str] = Field(default_factory=list, description="List of rule IDs triggered")
+    suggested_risk_score: float = Field(ge=0.0, le=10.0, description="Computed risk score")
+    severity: str = Field(description="Highest severity observed")
+
+
+class DetectionDiff(BaseModel):
+    """Comparison delta between baseline findings and replayed findings."""
+
+    match_status: str = Field(
+        description="Comparison outcome: 'identical', 'expanded_coverage', 'reduced_coverage', or 'drift_detected'"
+    )
+    historical_rules_triggered: list[str] = Field(default_factory=list, description="Rules originally triggered")
+    replayed_rules_triggered: list[str] = Field(default_factory=list, description="Rules triggered during replay")
+    new_rules_triggered: list[str] = Field(default_factory=list, description="Rules triggered during replay but not baseline")
+    suppressed_rules: list[str] = Field(default_factory=list, description="Rules in baseline that did not trigger in replay")
+    risk_score_delta: float = Field(description="Difference in risk score (replayed - baseline)")
+    severity_changed: bool = Field(description="Whether severity level differs between baseline and replay")
+
+
+class ReplayExecutionResponse(BaseModel):
+    """Structured response for deterministic historical event replay."""
+
+    replay_id: str = Field(description="Unique deterministic replay execution ID")
+    scope: str = Field(description="Replay scope: 'attack' or 'ip'")
+    target_identifier: str = Field(description="Target attack ID or source IP")
+    total_events_evaluated: int = Field(ge=0, description="Total events processed in replay sandbox")
+    execution_duration_ms: float = Field(ge=0.0, description="Replay execution duration in milliseconds")
+    deterministic_pass: bool = Field(description="Whether replay completed deterministically")
+    match_status: str = Field(description="Comparison outcome against baseline findings")
+    baseline_detection: ReplayDetectionSummary | None = Field(default=None, description="Original persisted detection findings")
+    replayed_detection: ReplayDetectionSummary = Field(description="Detection findings derived from replay evaluation")
+    detection_diff: DetectionDiff = Field(description="Side-by-side detection delta")
+    event_timeline: list[ReplayTimelineEvent] = Field(default_factory=list, description="Chronological event progression")
+
+
+class CandidateRuleSpec(BaseModel):
+    """Candidate rule specification for dry-run simulation testing."""
+
+    rule_id: str = Field(description="Candidate rule identifier", min_length=2, max_length=64)
+    name: str = Field(description="Candidate rule name", min_length=2, max_length=128)
+    vector: str = Field(description="Canonical vector: 'auth', 'web', or 'network'")
+    rule_type: str = Field(description="Rule evaluation type: 'threshold' or 'signature'")
+    target_event_types: list[str] = Field(description="Target telemetry event types")
+    window_minutes: int = Field(default=15, ge=1, le=60, description="Sliding evaluation window in minutes")
+    threshold_count: int = Field(default=1, ge=1, le=1000, description="Minimum count to trigger")
+    severity: str = Field(default="medium", description="Severity classification")
+    base_risk_score: float = Field(default=5.0, ge=0.0, le=10.0, description="Base risk score contribution")
+    match_tokens: list[str] = Field(default_factory=list, description="Tokens to match against payload")
+    regex_patterns: list[str] = Field(default_factory=list, description="Regex pattern strings")
+
+
+class SimulationRequest(BaseModel):
+    """Request payload for dry-run rule simulation against historical events."""
+
+    target_scope: str = Field(default="attack", description="Simulation target scope: 'attack' or 'ip'")
+    target_identifier: str = Field(description="Target attack ID (int as str) or source IP")
+    window_minutes: int = Field(default=15, ge=1, le=60, description="Historical event window in minutes")
+    candidate_rule: CandidateRuleSpec = Field(description="Candidate rule specification to evaluate")
+
+
+class SimulationExecutionResponse(BaseModel):
+    """Structured response for candidate rule dry-run simulation."""
+
+    simulation_id: str = Field(description="Unique simulation execution identifier")
+    target_scope: str = Field(description="Target scope evaluated ('attack' or 'ip')")
+    target_identifier: str = Field(description="Target attack ID or source IP")
+    events_evaluated: int = Field(ge=0, description="Total historical events evaluated in simulation sandbox")
+    execution_duration_ms: float = Field(ge=0.0, description="Simulation sandbox execution duration in milliseconds")
+    candidate_rule_triggered: bool = Field(description="Whether the candidate rule triggered on historical events")
+    candidate_evidence_count: int = Field(ge=0, description="Evidence events matching candidate rule criteria")
+    baseline_rules_triggered: list[str] = Field(default_factory=list, description="Production rules triggered on same events")
+    simulation_rules_triggered: list[str] = Field(default_factory=list, description="Rules triggered including candidate")
+    new_detections_count: int = Field(ge=0, description="Count of new detections introduced by candidate rule")
+    comparison_summary: str = Field(description="Analytical comparison between candidate and baseline")
+    matched_payload_samples: list[str] = Field(default_factory=list, description="Sanitized samples of matching event payloads")
+
+
+class AuditEventItem(BaseModel):
+    """Audit log event record from SystemEvent table."""
+
+    id: int = Field(description="System event record ID")
+    event_type: str = Field(description="Event classification type")
+    source: str = Field(description="Originating subsystem or operator console")
+    severity: str = Field(description="Severity classification")
+    message: str = Field(description="Event description and audit payload")
+    created_at: datetime = Field(description="Timestamp when event was logged")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AuditEventsResponse(BaseModel):
+    """Query response for operator and system audit logs."""
+
+    total_events: int = Field(ge=0, description="Total matching audit events returned")
+    events: list[AuditEventItem] = Field(description="Chronological audit records")

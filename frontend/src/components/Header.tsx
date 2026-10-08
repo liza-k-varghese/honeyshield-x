@@ -5,8 +5,8 @@ import { SystemHealth } from '../types';
 interface HeaderProps {
   health?: SystemHealth;
   isFetching?: boolean;
-  activeView?: 'dashboard' | 'investigation';
-  onViewChange?: (view: 'dashboard' | 'investigation') => void;
+  activeView?: 'dashboard' | 'investigation' | 'rules';
+  onViewChange?: (view: 'dashboard' | 'investigation' | 'rules') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ health, isFetching, activeView = 'dashboard', onViewChange }) => {
@@ -51,6 +51,16 @@ export const Header: React.FC<HeaderProps> = ({ health, isFetching, activeView =
               }`}
             >
               Entity Investigation
+            </button>
+            <button
+              onClick={() => onViewChange?.('rules')}
+              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                activeView === 'rules'
+                  ? 'bg-sky-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Detection & Replay
             </button>
           </div>
         </div>
