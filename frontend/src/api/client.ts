@@ -344,3 +344,121 @@ export async function fetchCurrentOperator(): Promise<import('../types').Operato
   });
   return handleResponse<import('../types').OperatorProfile>(res);
 }
+
+// =============================================================================
+// Module 3.6: Incident Case Management & Playbook Endpoints
+// =============================================================================
+
+export async function fetchCases(params?: {
+  status?: string;
+  severity?: string;
+  handler_id?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<import('../types').CaseListResponse> {
+  const qp = new URLSearchParams();
+  if (params?.status && params.status !== 'all') {
+    qp.append('status', params.status);
+  }
+  if (params?.severity && params.severity !== 'all') {
+    qp.append('severity', params.severity);
+  }
+  if (params?.handler_id) {
+    qp.append('handler_id', params.handler_id);
+  }
+  if (params?.limit) {
+    qp.append('limit', params.limit.toString());
+  }
+  if (params?.offset) {
+    qp.append('offset', params.offset.toString());
+  }
+  const res = await fetch(`${API_BASE}/cases?${qp.toString()}`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+  return handleResponse<import('../types').CaseListResponse>(res);
+}
+
+export async function fetchCase(caseId: string): Promise<import('../types').IncidentCase> {
+  const res = await fetch(`${API_BASE}/cases/${encodeURIComponent(caseId)}`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+  return handleResponse<import('../types').IncidentCase>(res);
+}
+
+export async function createCase(
+  payload: import('../types').CaseCreatePayload
+): Promise<import('../types').IncidentCase> {
+  const res = await fetch(`${API_BASE}/cases`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<import('../types').IncidentCase>(res);
+}
+
+export async function updateCase(
+  caseId: string,
+  payload: import('../types').CaseUpdatePayload
+): Promise<import('../types').IncidentCase> {
+  const res = await fetch(`${API_BASE}/cases/${encodeURIComponent(caseId)}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<import('../types').IncidentCase>(res);
+}
+
+export async function completeCaseTask(
+  caseId: string,
+  taskId: string,
+  payload: import('../types').CaseTaskCompletePayload
+): Promise<import('../types').IncidentCase> {
+  const res = await fetch(
+    `${API_BASE}/cases/${encodeURIComponent(caseId)}/tasks/${encodeURIComponent(taskId)}/complete`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(),
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+  return handleResponse<import('../types').IncidentCase>(res);
+}
+
+export async function addCaseNote(
+  caseId: string,
+  message: string
+): Promise<import('../types').CaseNote> {
+  const res = await fetch(`${API_BASE}/cases/${encodeURIComponent(caseId)}/notes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify({ message }),
+  });
+  return handleResponse<import('../types').CaseNote>(res);
+}
+
+export async function fetchCaseReport(
+  caseId: string
+): Promise<import('../types').PostIncidentReport> {
+  const res = await fetch(`${API_BASE}/cases/${encodeURIComponent(caseId)}/report`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+  return handleResponse<import('../types').PostIncidentReport>(res);
+}

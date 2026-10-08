@@ -11,6 +11,8 @@ import { ReplayStudioView } from './components/ReplayStudioView';
 import { SimulationSandboxView } from './components/SimulationSandboxView';
 import { AuditTrailView } from './components/AuditTrailView';
 import { LiveCommandCenterView } from './components/LiveCommandCenterView';
+import { CaseManagementView } from './components/CaseManagementView';
+import { CasePromotionModal } from './components/CasePromotionModal';
 import { LoginModal } from './components/LoginModal';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { useAlerts, useDashboardStats } from './hooks/useDashboard';
@@ -27,13 +29,14 @@ const queryClient = new QueryClient({
 });
 
 function DashboardContent() {
-  const [activeView, setActiveView] = useState<'dashboard' | 'command' | 'investigation' | 'rules'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'command' | 'cases' | 'investigation' | 'rules'>('dashboard');
   const [rulesSubTab, setRulesSubTab] = useState<'catalog' | 'replay' | 'simulation' | 'audit'>('catalog');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [investigationIp, setInvestigationIp] = useState<string>('');
   const [searchInput, setSearchInput] = useState<string>('');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [promotedAlert, setPromotedAlert] = useState<Alert | null>(null);
 
   const { sessionExpired } = useAuth();
 
@@ -134,6 +137,11 @@ function DashboardContent() {
           <LiveCommandCenterView
             onInvestigateIp={handleDeepLinkInvestigate}
             onReplayAttack={handleDeepLinkReplayAttack}
+          />
+        ) : activeView === 'cases' ? (
+          /* Module 3.6 Incident Case Management & Playbooks */
+          <CaseManagementView
+            onInvestigateIp={handleDeepLinkInvestigate}
           />
         ) : activeView === 'investigation' ? (
           <div className="space-y-6">
@@ -301,7 +309,26 @@ function DashboardContent() {
         onClose={() => setSelectedAlert(null)}
         onInvestigateIp={handleDeepLinkInvestigate}
         onReplayAttack={handleDeepLinkReplayAttack}
+        onPromoteToCase={(alert) => {
+          setSelectedAlert(null);
+          setPromotedAlert(alert);
+        }}
       />
+
+      {/* Case Promotion Modal */}
+      {promotedAlert && (
+        <CasePromotionModal
+          isOpen={!!promotedAlert}
+          onClose={() => setPromotedAlert(null)}
+          initialAlertIds={[promotedAlert.id]}
+          initialSeverity={promotedAlert.severity}
+          initialTargetId={promotedAlert.attack_id || undefined}
+          onCaseCreated={() => {
+            setPromotedAlert(null);
+            setActiveView('cases');
+          }}
+        />
+      )}
 
       {/* Detection Rule Detail Drawer */}
       <RuleDetailDrawer

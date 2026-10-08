@@ -48,6 +48,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         'command:resolve',
         'command:stage_containment',
         'command:dispatch_notification',
+        'case:view',
+        'case:create',
+        'case:update',
+        'case:respond',
       ],
       is_active: true,
     };

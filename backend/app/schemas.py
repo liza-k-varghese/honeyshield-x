@@ -1174,3 +1174,140 @@ class BreakGlassResponse(BaseModel):
     expires_in: int = Field(description="Session lifetime remaining in seconds (max 1800s)")
     operator: OperatorProfile = Field(description="Emergency Security Administrator profile")
     warning: str = Field(description="Operational emergency warning")
+
+
+# ============================================================================
+# MODULE 3.6 — SOC INCIDENT CASE MANAGEMENT & INTERACTIVE RESPONSE PLAYBOOKS
+# ============================================================================
+
+
+class PlaybookTask(BaseModel):
+    """Deterministic SOP task within an incident response playbook."""
+
+    task_id: str = Field(description="Unique task identifier, e.g. task_1")
+    stage: str = Field(
+        description="SANS/NIST incident response stage: identification, containment, eradication, recovery, lessons_learned"
+    )
+    title: str = Field(description="Short title of the SOP task")
+    description: str = Field(description="Operational description and verification criteria")
+    action_type: str = Field(
+        default="manual_check",
+        description="Task action category: manual_check, governor_command, evidence_collection, notification",
+    )
+    suggested_command: str | None = Field(
+        default=None,
+        description="Optional Module 3.4 Governor action name, e.g. CONTAINMENT_STAGING_REQUEST",
+    )
+    is_mandatory: bool = Field(default=True, description="Whether completing this task is required for case resolution")
+    status: str = Field(default="pending", description="Task state: pending, in_progress, completed, skipped")
+    completed_by: str | None = Field(default=None, description="Username of operator who completed the task")
+    completed_at: str | None = Field(default=None, description="ISO timestamp of task completion")
+    command_execution_id: str | None = Field(
+        default=None, description="Governor command execution ID associated with this task"
+    )
+    notes: str | None = Field(default=None, description="Operator notes entered upon task completion")
+
+
+class CaseNote(BaseModel):
+    """Forensic investigation journal note."""
+
+    note_id: str = Field(description="Unique note identifier")
+    operator_id: str = Field(description="Author operator username")
+    role: str = Field(description="Author operator SOC role tier")
+    message: str = Field(description="Investigation findings or forensic notes")
+    created_at: str = Field(description="ISO timestamp of note creation")
+
+
+class IncidentCase(BaseModel):
+    """SOC Incident Case model uniting alerts, playbook SOPs, and forensic notes."""
+
+    case_id: str = Field(description="Unique incident case identifier, e.g. CASE-2026-0001")
+    title: str = Field(description="Descriptive incident title")
+    description: str | None = Field(default=None, description="Detailed incident narrative or scope")
+    severity: str = Field(description="Incident severity tier: low, medium, high, critical")
+    status: str = Field(
+        description="Case lifecycle state: new, investigating, containment_in_progress, contained, resolved, closed"
+    )
+    assigned_to: str | None = Field(default=None, description="Assigned operator username")
+    source_ip: str | None = Field(default=None, description="Primary adversary source IP address")
+    target_id: int | None = Field(default=None, description="Primary target attack ID or alert ID")
+    alert_ids: list[int] = Field(default_factory=list, description="IDs of linked alerts")
+    playbook_template: str = Field(
+        default="GENERIC_INCIDENT_SOP",
+        description="Active playbook SOP template name",
+    )
+    tasks: list[PlaybookTask] = Field(default_factory=list, description="Checklist of playbook tasks")
+    notes: list[CaseNote] = Field(default_factory=list, description="Journal of forensic notes")
+    created_by: str = Field(description="Creator operator username")
+    created_at: str = Field(description="ISO timestamp of case creation")
+    updated_at: str = Field(description="ISO timestamp of latest update")
+    closed_at: str | None = Field(default=None, description="ISO timestamp of case closure")
+    closed_by: str | None = Field(default=None, description="Operator username who signed off on closure")
+    playbook_progress: float = Field(default=0.0, description="Completion ratio from 0.0 to 1.0")
+    advisory_summary: str | None = Field(default=None, description="Advisory threat contextualization summary")
+
+
+class CaseCreateRequest(BaseModel):
+    """Payload for creating a new incident case or promoting an alert."""
+
+    title: str = Field(..., min_length=3, max_length=200, description="Incident case title")
+    description: str | None = Field(default=None, max_length=2000, description="Optional incident description")
+    severity: str = Field(default="medium", description="Severity: low, medium, high, critical")
+    source_ip: str | None = Field(default=None, max_length=128, description="Primary adversary source IP")
+    target_id: int | None = Field(default=None, description="Primary target ID")
+    initial_alert_ids: list[int] = Field(default_factory=list, description="Alert IDs to bind to this case")
+    playbook_template: str = Field(
+        default="GENERIC_INCIDENT_SOP",
+        description="Playbook template: SSH_BRUTE_FORCE_SOP, WEB_EXPLOIT_SOP, PORT_SCAN_RECON_SOP, GENERIC_INCIDENT_SOP",
+    )
+    assigned_to: str | None = Field(default=None, description="Initial assignee username")
+    initial_note: str | None = Field(default=None, max_length=2000, description="Optional initial triage note")
+
+
+class CaseUpdateRequest(BaseModel):
+    """Payload for updating case metadata, status, or assignee."""
+
+    title: str | None = Field(default=None, min_length=3, max_length=200, description="Updated title")
+    severity: str | None = Field(default=None, description="Updated severity")
+    status: str | None = Field(default=None, description="Target lifecycle state")
+    assigned_to: str | None = Field(default=None, description="Updated assignee username")
+
+
+class CaseTaskCompleteRequest(BaseModel):
+    """Payload for marking a playbook task complete or skipped."""
+
+    notes: str | None = Field(default=None, max_length=1000, description="Verification notes for this task")
+    command_execution_id: str | None = Field(
+        default=None, max_length=128, description="Governor command execution ID if applicable"
+    )
+    status: str = Field(default="completed", description="Target task status: completed or skipped")
+
+
+class CaseNoteCreateRequest(BaseModel):
+    """Payload for appending an investigation note to a case."""
+
+    message: str = Field(..., min_length=1, max_length=5000, description="Forensic investigation note message")
+
+
+class CaseListResponse(BaseModel):
+    """Paginated list of incident cases."""
+
+    cases: list[IncidentCase] = Field(description="List of matching incident cases")
+    total: int = Field(description="Total count of matching cases")
+
+
+class PostIncidentReportResponse(BaseModel):
+    """Structured Post-Incident Review (PIR) executive closure report."""
+
+    case_id: str = Field(description="Case ID")
+    title: str = Field(description="Incident title")
+    severity: str = Field(description="Incident severity")
+    status: str = Field(description="Incident lifecycle status")
+    executive_summary: str = Field(description="Executive narrative summary")
+    incident_timeline: list[dict[str, Any]] = Field(description="Key milestones and chronological evidence timeline")
+    playbook_adherence: str = Field(description="Calculated playbook task adherence percentage")
+    remediation_actions: list[str] = Field(description="List of executed defensive remediation actions")
+    root_cause_analysis: str = Field(description="Synthesized root cause analysis")
+    assigned_operator: str | None = Field(default=None, description="Assigned incident handler")
+    signoff_operator: str = Field(description="Operator username who signed off on the PIR")
+    generated_at: str = Field(description="ISO timestamp of PIR generation")

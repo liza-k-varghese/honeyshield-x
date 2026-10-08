@@ -12,6 +12,7 @@ from app.routers import (
     attacks,
     audit,
     auth,
+    cases,
     correlation,
     dashboard,
     detection,
@@ -68,6 +69,7 @@ app.include_router(detection_rules.router, prefix="/api/v1")
 app.include_router(replay.router, prefix="/api/v1")
 app.include_router(audit.router, prefix="/api/v1")
 app.include_router(incident_command.router, prefix="/api/v1")
+app.include_router(cases.router, prefix="/api/v1")
 
 POSTGRES_HOST = "127.0.0.1"
 POSTGRES_PORT = 5432

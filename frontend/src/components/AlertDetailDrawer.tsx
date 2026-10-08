@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, CheckCircle2, AlertOctagon, RotateCcw, Shield, ExternalLink, Calendar, Hash, Search } from 'lucide-react';
+import { X, CheckCircle2, AlertOctagon, RotateCcw, Shield, ExternalLink, Calendar, Hash, Search, FolderPlus } from 'lucide-react';
 import { Alert, AlertLifecycleStatus } from '../types';
 import { useAttackDetail, useAttackEvents, useUpdateAlertStatus } from '../hooks/useDashboard';
 import { NotificationBadge, SeverityBadge, StatusBadge } from './Badge';
@@ -11,6 +11,7 @@ interface AlertDetailDrawerProps {
   onInvestigateIp?: (sourceIp: string) => void;
   onReplayAttack?: (attackId: number) => void;
   onInspectRule?: (ruleId: string) => void;
+  onPromoteToCase?: (alert: Alert) => void;
 }
 
 export const AlertDetailDrawer: React.FC<AlertDetailDrawerProps> = ({
@@ -216,6 +217,21 @@ export const AlertDetailDrawer: React.FC<AlertDetailDrawerProps> = ({
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Replay Attack #{attack.id} Telemetry</span>
+                  </button>
+                </div>
+              )}
+
+              {onPromoteToCase && (
+                <div className="pt-1.5">
+                  <button
+                    onClick={() => {
+                      onPromoteToCase(alert);
+                      onClose();
+                    }}
+                    className="w-full inline-flex items-center justify-center space-x-2 px-3 py-2 rounded-lg text-xs font-mono font-medium bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 transition-colors"
+                  >
+                    <FolderPlus className="w-3.5 h-3.5" />
+                    <span>Promote Alert to Incident Case</span>
                   </button>
                 </div>
               )}

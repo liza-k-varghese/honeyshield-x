@@ -466,3 +466,113 @@ export interface BreakGlassResponse {
   operator: OperatorProfile;
   warning: string;
 }
+
+// =============================================================================
+// Module 3.6: Incident Case Management & Playbooks Types
+// =============================================================================
+
+export type CaseStatus =
+  | 'new'
+  | 'investigating'
+  | 'containment_in_progress'
+  | 'contained'
+  | 'resolved'
+  | 'closed';
+
+export type PlaybookTaskStatus = 'pending' | 'in_progress' | 'completed' | 'skipped';
+
+export interface PlaybookTask {
+  task_id: string;
+  step_number: number;
+  phase: string;
+  title: string;
+  description: string;
+  governor_action: string | null;
+  is_mandatory: boolean;
+  status: PlaybookTaskStatus;
+  completed_by: string | null;
+  completed_at: string | null;
+  command_execution_id: string | null;
+  notes: string | null;
+}
+
+export interface CaseNote {
+  note_id: string;
+  operator_id: string;
+  role: string;
+  message: string;
+  created_at: string;
+}
+
+export interface IncidentCase {
+  case_id: string;
+  title: string;
+  description: string | null;
+  severity: SeverityLevel;
+  status: CaseStatus;
+  assigned_to: string | null;
+  source_ip: string | null;
+  target_id: number | null;
+  alert_ids: number[];
+  playbook_template: string;
+  tasks: PlaybookTask[];
+  notes: CaseNote[];
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  closed_at: string | null;
+  closed_by: string | null;
+  playbook_progress: number;
+  advisory_summary: string | null;
+}
+
+export interface CaseCreatePayload {
+  title: string;
+  description?: string | null;
+  severity?: SeverityLevel;
+  source_ip?: string | null;
+  target_id?: number | null;
+  initial_alert_ids?: number[];
+  playbook_template?: string;
+  assigned_to?: string | null;
+  initial_note?: string | null;
+}
+
+export interface CaseUpdatePayload {
+  title?: string;
+  severity?: SeverityLevel;
+  status?: CaseStatus;
+  assigned_to?: string | null;
+}
+
+export interface CaseTaskCompletePayload {
+  notes?: string | null;
+  command_execution_id?: string | null;
+  status?: 'completed' | 'skipped';
+}
+
+export interface CaseListResponse {
+  cases: IncidentCase[];
+  total: number;
+}
+
+export interface PostIncidentReport {
+  case_id: string;
+  title: string;
+  severity: SeverityLevel;
+  status: CaseStatus;
+  executive_summary: string;
+  incident_timeline: Array<{
+    timestamp: string;
+    phase: string;
+    actor: string;
+    event: string;
+    type: string;
+  }>;
+  playbook_adherence: string;
+  remediation_actions: string[];
+  root_cause_analysis: string;
+  assigned_operator: string | null;
+  signoff_operator: string;
+  generated_at: string;
+}
