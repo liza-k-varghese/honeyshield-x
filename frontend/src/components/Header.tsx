@@ -1,15 +1,55 @@
 import React from 'react';
-import { ShieldAlert, Activity, Database, Server, RefreshCw } from 'lucide-react';
+import { ShieldAlert, Activity, Database, Server, RefreshCw, User, LogOut, Key } from 'lucide-react';
 import { SystemHealth } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 interface HeaderProps {
   health?: SystemHealth;
   isFetching?: boolean;
   activeView?: 'dashboard' | 'investigation' | 'rules' | 'command';
   onViewChange?: (view: 'dashboard' | 'investigation' | 'rules' | 'command') => void;
+  onOpenLogin?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ health, isFetching, activeView = 'dashboard', onViewChange }) => {
+export const Header: React.FC<HeaderProps> = ({
+  health,
+  isFetching,
+  activeView = 'dashboard',
+  onViewChange,
+  onOpenLogin,
+}) => {
+  const { operator, logout } = useAuth();
+
+  const getRoleBadgeColor = (role?: string) => {
+    switch (role) {
+      case 'viewer':
+        return 'bg-slate-800 text-slate-300 border-slate-700';
+      case 'analyst':
+        return 'bg-amber-950/70 text-amber-300 border-amber-800/60';
+      case 'incident_responder':
+        return 'bg-cyan-950/70 text-cyan-300 border-cyan-800/60';
+      case 'security_administrator':
+        return 'bg-purple-950/70 text-purple-300 border-purple-800/60';
+      default:
+        return 'bg-slate-800 text-slate-400 border-slate-700';
+    }
+  };
+
+  const formatRoleName = (role?: string) => {
+    switch (role) {
+      case 'viewer':
+        return 'Viewer';
+      case 'analyst':
+        return 'Analyst';
+      case 'incident_responder':
+        return 'Responder';
+      case 'security_administrator':
+        return 'Sec Admin';
+      default:
+        return role || 'Anonymous';
+    }
+  };
+
   return (
     <header className="bg-slate-900/90 border-b border-slate-800 px-6 py-3.5 backdrop-blur sticky top-0 z-30">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -75,8 +115,31 @@ export const Header: React.FC<HeaderProps> = ({ health, isFetching, activeView =
           </div>
         </div>
 
-        {/* System Health Indicators & Refresh Status */}
+        {/* Operator Ribbon & System Health Indicators */}
         <div className="flex flex-wrap items-center gap-3">
+          {/* Authenticated Operator Ribbon */}
+          <div className="flex items-center space-x-2 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-xs">
+            <User className="w-3.5 h-3.5 text-slate-400" />
+            <span className="font-medium text-slate-200">{operator?.username || 'Not logged in'}</span>
+            <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border uppercase font-semibold ${getRoleBadgeColor(operator?.role)}`}>
+              {formatRoleName(operator?.role)}
+            </span>
+            <button
+              onClick={onOpenLogin}
+              title="Switch operator account or engage emergency break-glass"
+              className="text-[11px] text-sky-400 hover:text-sky-300 ml-1 px-1.5 py-0.5 rounded bg-sky-950/40 border border-sky-800/50 hover:bg-sky-900/40 transition-colors"
+            >
+              Switch
+            </button>
+            <button
+              onClick={() => logout()}
+              title="Sign out of current session"
+              className="text-slate-400 hover:text-rose-400 p-0.5 transition-colors"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
           {/* API Health */}
           <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded bg-slate-950/70 border border-slate-800 text-xs">
             <Activity className="w-3.5 h-3.5 text-emerald-400" />
@@ -88,8 +151,8 @@ export const Header: React.FC<HeaderProps> = ({ health, isFetching, activeView =
           <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded bg-slate-950/70 border border-slate-800 text-xs">
             <Database className="w-3.5 h-3.5 text-sky-400" />
             <span className="text-slate-400 font-mono">DB:</span>
-            <span className={health?.postgresql.includes('connect') ? 'text-emerald-400 font-medium' : 'text-rose-400 font-medium'}>
-              {health?.postgresql.includes('connect') ? 'Connected' : 'Offline'}
+            <span className={health?.postgresql?.includes('connect') ? 'text-emerald-400 font-medium' : 'text-rose-400 font-medium'}>
+              {health?.postgresql?.includes('connect') ? 'Connected' : 'Offline'}
             </span>
           </div>
 
@@ -97,8 +160,8 @@ export const Header: React.FC<HeaderProps> = ({ health, isFetching, activeView =
           <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded bg-slate-950/70 border border-slate-800 text-xs">
             <Server className="w-3.5 h-3.5 text-purple-400" />
             <span className="text-slate-400 font-mono">Redis:</span>
-            <span className={health?.redis.includes('connect') ? 'text-emerald-400 font-medium' : 'text-amber-400 font-medium'}>
-              {health?.redis.includes('connect') ? 'Connected' : 'Offline'}
+            <span className={health?.redis?.includes('connect') ? 'text-emerald-400 font-medium' : 'text-amber-400 font-medium'}>
+              {health?.redis?.includes('connect') ? 'Connected' : 'Offline'}
             </span>
           </div>
 

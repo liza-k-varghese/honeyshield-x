@@ -11,6 +11,7 @@ from app.routers import (
     alerts,
     attacks,
     audit,
+    auth,
     correlation,
     dashboard,
     detection,
@@ -49,6 +50,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router, prefix="/api/v1")
 app.include_router(attacks.router, prefix="/api/v1")
 app.include_router(dashboard.router, prefix="/api/v1")
 app.include_router(ingestion.router, prefix="/api/v1")

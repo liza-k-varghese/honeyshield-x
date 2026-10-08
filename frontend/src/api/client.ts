@@ -8,7 +8,20 @@ import {
 
 const API_BASE = '/api/v1';
 
+export function getAuthHeaders(): Record<string, string> {
+  const token = typeof sessionStorage !== 'undefined'
+    ? (sessionStorage.getItem('hsx_token') || sessionStorage.getItem('hsx_auth_token'))
+    : null;
+  if (token) {
+    return { 'Authorization': `Bearer ${token}` };
+  }
+  return {};
+}
+
 async function handleResponse<T>(res: Response): Promise<T> {
+  if (res.status === 401 && typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('session-expired'));
+  }
   if (!res.ok) {
     const errorText = await res.text();
     let detail = `Request failed with status ${res.status}`;
@@ -229,6 +242,7 @@ export async function executeIncidentCommand(
       'Content-Type': 'application/json',
       'X-Idempotency-Key': key,
       'X-Operator-Id': operatorId,
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(req),
   });
@@ -244,6 +258,7 @@ export async function previewIncidentCommand(
     headers: {
       'Content-Type': 'application/json',
       'X-Operator-Id': operatorId,
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(req),
   });
@@ -262,6 +277,7 @@ export async function toggleGovernorLockout(
       'Content-Type': 'application/json',
       'X-Idempotency-Key': key,
       'X-Operator-Id': operatorId,
+      ...getAuthHeaders(),
     },
     body: JSON.stringify({ engaged, justification }),
   });
@@ -283,4 +299,48 @@ export async function fetchVirtualIncidents(
 export async function fetchAllowlistedActions(): Promise<import('../types').ActionCatalogResponse> {
   const res = await fetch(`${API_BASE}/incident-command/actions`);
   return handleResponse<import('../types').ActionCatalogResponse>(res);
+}
+
+export async function authLogin(credentials: {
+  username: string;
+  password: string;
+}): Promise<import('../types').LoginResponse> {
+  const res = await fetch(`${API_BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials),
+  });
+  return handleResponse<import('../types').LoginResponse>(res);
+}
+
+export async function authLogout(): Promise<{ status: string; detail: string }> {
+  const res = await fetch(`${API_BASE}/auth/logout`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+  });
+  return handleResponse<{ status: string; detail: string }>(res);
+}
+
+export async function authBreakGlass(req: {
+  passphrase: string;
+  justification: string;
+}): Promise<import('../types').BreakGlassResponse> {
+  const res = await fetch(`${API_BASE}/auth/break-glass`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+  return handleResponse<import('../types').BreakGlassResponse>(res);
+}
+
+export async function fetchCurrentOperator(): Promise<import('../types').OperatorProfile> {
+  const res = await fetch(`${API_BASE}/auth/me`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+  return handleResponse<import('../types').OperatorProfile>(res);
 }

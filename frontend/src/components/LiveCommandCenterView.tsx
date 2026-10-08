@@ -12,6 +12,7 @@ import { CommandExecutionModal } from './CommandExecutionModal';
 import { useIncidentStream } from '../hooks/useIncidentStream';
 import { useVirtualIncidents, useExecuteIncidentCommand } from '../hooks/useIncidentCommand';
 import { VirtualIncidentItem, IncidentCommandAction } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 interface LiveCommandCenterViewProps {
   onInvestigateIp?: (ip: string) => void;
@@ -22,6 +23,7 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
   onInvestigateIp,
   onReplayAttack,
 }) => {
+  const { operator, hasPermission } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedIncident, setSelectedIncident] = useState<VirtualIncidentItem | null>(null);
@@ -46,6 +48,10 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
 
   const handleQuickAcknowledge = async (inc: VirtualIncidentItem, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!hasPermission('command:ack')) {
+      alert(`Access Denied: Role '${operator?.role}' cannot acknowledge alerts.`);
+      return;
+    }
     try {
       await executeMutation.mutateAsync({
         req: {
@@ -53,7 +59,7 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
           target_id: inc.alert_id,
         },
         idempotencyKey: crypto.randomUUID(),
-        operatorId: 'soc_operator',
+        operatorId: operator?.username || 'soc_operator',
       });
     } catch (err: any) {
       alert(`Error acknowledging alert: ${err.message}`);
@@ -245,8 +251,13 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
                             {inc.status === 'open' && (
                               <button
                                 onClick={(e) => handleQuickAcknowledge(inc, e)}
-                                className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 text-[11px] font-medium border border-slate-700 transition"
-                                title="Quick Acknowledge"
+                                disabled={!hasPermission('command:ack')}
+                                className={`px-2 py-1 rounded text-[11px] font-medium border transition ${
+                                  hasPermission('command:ack')
+                                    ? 'bg-slate-800 hover:bg-slate-700 text-cyan-300 border-slate-700'
+                                    : 'bg-slate-900 text-slate-600 border-slate-800 cursor-not-allowed'
+                                }`}
+                                title={hasPermission('command:ack') ? 'Quick Acknowledge' : 'Requires Analyst or higher'}
                               >
                                 Ack
                               </button>
@@ -323,6 +334,7 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
           incident={selectedIncident}
           defaultAction={defaultAction}
           onClose={() => setSelectedIncident(null)}
+          operatorId={operator?.username || 'soc_operator'}
         />
       )}
     </div>

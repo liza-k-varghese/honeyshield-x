@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Shield, AlertCircle, CheckCircle, Clock, X, ArrowRight } from 'lucide-react';
 import { useExecuteIncidentCommand } from '../hooks/useIncidentCommand';
 import { previewIncidentCommand } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { IncidentCommandAction, VirtualIncidentItem } from '../types';
 
 interface CommandExecutionModalProps {
@@ -11,12 +12,24 @@ interface CommandExecutionModalProps {
   operatorId?: string;
 }
 
+const ACTION_PERMISSIONS: Record<IncidentCommandAction, string> = {
+  ALERT_ACKNOWLEDGE: 'command:ack',
+  ALERT_RESOLVE: 'command:resolve',
+  ALERT_ESCALATE: 'command:escalate',
+  NOTIFICATION_DISPATCH: 'command:dispatch',
+  NOTIFICATION_SUPPRESS: 'command:suppress',
+  CONTAINMENT_STAGING_REQUEST: 'command:contain',
+};
+
 export const CommandExecutionModal: React.FC<CommandExecutionModalProps> = ({
   incident,
   defaultAction = 'ALERT_ACKNOWLEDGE',
   onClose,
-  operatorId = 'soc_operator',
+  operatorId,
 }) => {
+  const { operator, hasPermission } = useAuth();
+  const effectiveOperatorId = operatorId || operator?.username || 'soc_operator';
+
   const [selectedAction, setSelectedAction] = useState<IncidentCommandAction>(defaultAction);
   const [justification, setJustification] = useState('');
   const [approvalToken, setApprovalToken] = useState<string | null>(null);
@@ -25,10 +38,17 @@ export const CommandExecutionModal: React.FC<CommandExecutionModalProps> = ({
 
   const executeMutation = useExecuteIncidentCommand();
 
+  const requiredPermission = ACTION_PERMISSIONS[selectedAction];
+  const isPermitted = hasPermission(requiredPermission);
+
   const isLevel3 = selectedAction === 'NOTIFICATION_DISPATCH' || selectedAction === 'CONTAINMENT_STAGING_REQUEST';
   const requiresJustification = selectedAction !== 'ALERT_ACKNOWLEDGE' && selectedAction !== 'NOTIFICATION_SUPPRESS';
 
   const handlePreview = async () => {
+    if (!isPermitted) {
+      setErrorMessage(`Unauthorized: Pre-flight approval requires '${requiredPermission}' permission.`);
+      return;
+    }
     setIsPreviewing(true);
     setErrorMessage(null);
     try {
@@ -38,7 +58,7 @@ export const CommandExecutionModal: React.FC<CommandExecutionModalProps> = ({
           target_id: incident.alert_id,
           justification: justification.trim() || undefined,
         },
-        operatorId
+        effectiveOperatorId
       );
       setApprovalToken(res.approval_token);
     } catch (err: any) {
@@ -51,6 +71,11 @@ export const CommandExecutionModal: React.FC<CommandExecutionModalProps> = ({
   const handleExecute = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    if (!isPermitted) {
+      setErrorMessage(`Unauthorized: Role '${operator?.role}' lacks '${requiredPermission}' permission.`);
+      return;
+    }
 
     if (requiresJustification && (!justification.trim() || justification.trim().length < 5)) {
       setErrorMessage('Action requires a justification of at least 5 characters.');
@@ -66,7 +91,7 @@ export const CommandExecutionModal: React.FC<CommandExecutionModalProps> = ({
           approval_token: approvalToken || undefined,
         },
         idempotencyKey: crypto.randomUUID(),
-        operatorId,
+        operatorId: effectiveOperatorId,
       });
       onClose();
     } catch (err: any) {
@@ -126,6 +151,16 @@ export const CommandExecutionModal: React.FC<CommandExecutionModalProps> = ({
           </select>
         </div>
 
+        {/* Role Permission Feedback */}
+        {!isPermitted && (
+          <div className="p-2.5 bg-amber-950/60 border border-amber-800/80 rounded-lg text-amber-300 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>
+              Role restriction: <strong>{operator?.role || 'viewer'}</strong> lacks <code>{requiredPermission}</code> to execute this command.
+            </span>
+          </div>
+        )}
+
         {/* Justification Field */}
         {requiresJustification && (
           <div className="space-y-1">
@@ -156,8 +191,8 @@ export const CommandExecutionModal: React.FC<CommandExecutionModalProps> = ({
                 <button
                   type="button"
                   onClick={handlePreview}
-                  disabled={isPreviewing}
-                  className="px-2.5 py-1 rounded bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-300 border border-cyan-500/40 text-[11px] font-medium transition"
+                  disabled={isPreviewing || !isPermitted}
+                  className="px-2.5 py-1 rounded bg-cyan-600/30 hover:bg-cyan-600/50 disabled:opacity-40 disabled:cursor-not-allowed text-cyan-300 border border-cyan-500/40 text-[11px] font-medium transition"
                 >
                   {isPreviewing ? 'Evaluating...' : 'Request Pre-Flight Approval'}
                 </button>
@@ -191,8 +226,8 @@ export const CommandExecutionModal: React.FC<CommandExecutionModalProps> = ({
           <button
             type="button"
             onClick={handleExecute}
-            disabled={executeMutation.isPending || (isLevel3 && !approvalToken)}
-            className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-cyan-900/30"
+            disabled={executeMutation.isPending || !isPermitted || (isLevel3 && !approvalToken)}
+            className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-cyan-900/30"
           >
             {executeMutation.isPending ? (
               <>

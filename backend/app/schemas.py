@@ -1115,3 +1115,62 @@ class ActionCatalogResponse(BaseModel):
 
     total_actions: int = Field(description="Total allowlisted actions")
     actions: list[AllowlistedActionItem] = Field(description="Catalog of allowlisted actions")
+
+
+# ==========================================
+# Operator Authentication & RBAC Schemas (Module 3.5)
+# ==========================================
+
+class LoginRequest(BaseModel):
+    """Credentials payload for operator authentication."""
+
+    username: str = Field(..., min_length=1, max_length=100, description="Operator username")
+    password: str = Field(..., min_length=1, description="Operator plaintext password")
+
+
+class OperatorProfile(BaseModel):
+    """Public operator profile with assigned RBAC permissions."""
+
+    username: str = Field(description="Unique operator username")
+    role: str = Field(description="Assigned SOC operational role tier")
+    email: str = Field(description="Operator email address")
+    permissions: list[str] = Field(description="List of deterministic RBAC permission strings")
+    is_active: bool = Field(description="Whether the account is active")
+
+
+class LoginResponse(BaseModel):
+    """Successful authentication response with bearer session token."""
+
+    token: str = Field(description="Opaque CSPRNG bearer session token")
+    token_type: str = Field(default="bearer", description="Token type")
+    expires_in: int = Field(description="Session lifetime remaining in seconds")
+    operator: OperatorProfile = Field(description="Operator identity profile")
+
+
+class LogoutResponse(BaseModel):
+    """Response payload for session termination."""
+
+    success: bool = Field(description="Whether session was terminated")
+    message: str = Field(description="Status confirmation message")
+
+
+class BreakGlassRequest(BaseModel):
+    """Emergency break-glass procedure request."""
+
+    passphrase: str = Field(..., min_length=1, description="Emergency break-glass passphrase")
+    justification: str = Field(
+        ...,
+        min_length=20,
+        max_length=512,
+        description="Mandatory operational justification (minimum 20 characters)",
+    )
+
+
+class BreakGlassResponse(BaseModel):
+    """Emergency session response."""
+
+    token: str = Field(description="Opaque CSPRNG bearer session token")
+    token_type: str = Field(default="bearer", description="Token type")
+    expires_in: int = Field(description="Session lifetime remaining in seconds (max 1800s)")
+    operator: OperatorProfile = Field(description="Emergency Security Administrator profile")
+    warning: str = Field(description="Operational emergency warning")

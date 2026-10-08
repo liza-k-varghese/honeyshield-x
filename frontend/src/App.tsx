@@ -11,6 +11,8 @@ import { ReplayStudioView } from './components/ReplayStudioView';
 import { SimulationSandboxView } from './components/SimulationSandboxView';
 import { AuditTrailView } from './components/AuditTrailView';
 import { LiveCommandCenterView } from './components/LiveCommandCenterView';
+import { LoginModal } from './components/LoginModal';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { useAlerts, useDashboardStats } from './hooks/useDashboard';
 import { Alert, DetectionRuleSummary } from './types';
 import { Search, Network, ArrowRight, Shield, History, Sliders, FileText } from 'lucide-react';
@@ -31,6 +33,9 @@ function DashboardContent() {
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [investigationIp, setInvestigationIp] = useState<string>('');
   const [searchInput, setSearchInput] = useState<string>('');
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const { sessionExpired } = useAuth();
 
   // Module 3.3 state
   const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
@@ -105,6 +110,7 @@ function DashboardContent() {
         isFetching={isFetching}
         activeView={activeView}
         onViewChange={setActiveView}
+        onOpenLogin={() => setIsLoginModalOpen(true)}
       />
 
       {/* Main Container */}
@@ -307,9 +313,16 @@ function DashboardContent() {
         }}
       />
 
+      {/* Login / Auth Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        isSessionExpired={sessionExpired}
+      />
+
       {/* Footer */}
       <footer className="border-t border-slate-900 py-4 text-center text-xs text-slate-600">
-        HoneyShield-X System 1 SOC Operator Workspace &bull; Phase 3 Modules 3.1, 3.2, 3.3 & 3.4 &bull; Clean-Room Security Console
+        HoneyShield-X System 1 SOC Operator Workspace &bull; Phase 3 Modules 3.1, 3.2, 3.3, 3.4 & 3.5 &bull; Clean-Room Security Console
       </footer>
     </div>
   );
@@ -318,7 +331,9 @@ function DashboardContent() {
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <DashboardContent />
+      <AuthProvider>
+        <DashboardContent />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

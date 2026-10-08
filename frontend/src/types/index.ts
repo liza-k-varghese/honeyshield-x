@@ -437,3 +437,32 @@ export interface ActionCatalogResponse {
   total_actions: number;
   actions: AllowlistedActionItem[];
 }
+
+// =============================================================================
+// Module 3.5: Operator Authentication & RBAC Types
+// =============================================================================
+
+export type OperatorRole = 'viewer' | 'analyst' | 'incident_responder' | 'security_administrator';
+
+export interface OperatorProfile {
+  username: string;
+  role: OperatorRole;
+  email: string;
+  permissions: string[];
+  is_active: boolean;
+}
+
+export interface LoginResponse {
+  token: string;
+  token_type: string;
+  expires_in: number;
+  operator: OperatorProfile;
+}
+
+export interface BreakGlassResponse {
+  token: string;
+  token_type: string;
+  expires_in: number;
+  operator: OperatorProfile;
+  warning: string;
+}

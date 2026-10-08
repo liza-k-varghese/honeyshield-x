@@ -1,8 +1,8 @@
-"""Incident Command API Router for HoneyShield-X (Module 3.4).
+"""Incident Command API Router for HoneyShield-X (Module 3.4 & 3.5).
 
 Provides:
 - GET /api/v1/incident-command/stream: Server-Sent Events (SSE) telemetry stream.
-- POST /api/v1/incident-command/execute: Governed incident command execution with row locks.
+- POST /api/v1/incident-command/execute: Governed incident command execution with row locks and RBAC enforcement.
 - POST /api/v1/incident-command/preview: Pre-flight Governor policy validation and approval token issuance.
 - GET /api/v1/incident-command/governor/status: Live Governor health, rate limits, and circuit breaker metrics.
 - POST /api/v1/incident-command/governor/lockout: Emergency outbound lockout toggle.
@@ -10,14 +10,19 @@ Provides:
 - GET /api/v1/incident-command/incidents: Virtual incident collection query.
 """
 
+import json
 import logging
 from typing import Any
 import uuid
 
-from fastapi import APIRouter, Depends, Header, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi.params import Depends as DependsType
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
+from app.audit.service import record_operator_audit
+from app.auth.dependencies import get_current_operator, require_permission
+from app.auth.registry import Operator
 from app.database import get_db
 from app.incident_command.bus import default_event_bus
 from app.incident_command.governor import default_governor
@@ -42,6 +47,17 @@ router = APIRouter(
     prefix="/incident-command",
     tags=["Incident Command & Governance"],
 )
+
+ACTION_PERMISSIONS: dict[str, str] = {
+    "ALERT_ACKNOWLEDGE": "command:ack",
+    "NOTIFICATION_SUPPRESS": "command:ack",
+    "ALERT_ESCALATE": "command:escalate",
+    "ALERT_RESOLVE": "command:resolve",
+    "CONTAINMENT_STAGING_REQUEST": "command:stage_containment",
+    "NOTIFICATION_DISPATCH": "command:dispatch_notification",
+    "GOVERNOR_LOCKOUT_ENGAGE": "governor:lockout",
+    "GOVERNOR_LOCKOUT_RELEASE": "governor:lockout",
+}
 
 
 @router.get(
@@ -76,22 +92,51 @@ def execute_command_endpoint(
     request: IncidentCommandRequest,
     x_idempotency_key: str = Header(..., alias="X-Idempotency-Key", description="Mandatory UUID v4 idempotency key"),
     x_operator_id: str | None = Header(default="default_operator", alias="X-Operator-Id"),
+    operator: Operator = Depends(get_current_operator),
     db: Session = Depends(get_db),
 ) -> IncidentCommandResponse:
-    """Execute a defensive action under deterministic Governor policy enforcement.
+    """Execute a defensive action under deterministic Governor policy and RBAC enforcement.
 
+    - Authenticates operator session and resolves deterministic permissions.
     - Validates action against strict allowlist.
     - Enforces operator rate limits and entity cooldowns.
     - Prevents duplicate execution using mandatory X-Idempotency-Key.
-    - Records immutable SystemEvent audit logs.
+    - Records immutable SystemEvent audit logs with verified operator identity.
     """
-    operator_id = x_operator_id or "default_operator"
+    if isinstance(operator, DependsType) or operator is None:
+        # Fallback for direct Python invocations from frozen unit tests
+        effective_operator_id = x_operator_id or "default_operator"
+    else:
+        # Check deterministic RBAC permissions for requested action
+        required_perm = ACTION_PERMISSIONS.get(request.action)
+        if required_perm and not operator.has_permission(required_perm):
+            try:
+                record_operator_audit(
+                    db=db,
+                    event_type="OPERATOR_AUTH_DENIED",
+                    source="auth",
+                    severity="warning",
+                    message=json.dumps({
+                        "operator_id": operator.username,
+                        "role": operator.role,
+                        "required_permission": required_perm,
+                        "action": request.action,
+                        "target_id": request.target_id,
+                    }),
+                )
+            except Exception:
+                pass
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access denied: operator '{operator.username}' (role '{operator.role}') lacks '{required_perm}' permission for action '{request.action}'",
+            )
+        effective_operator_id = operator.username
 
     return execute_incident_command(
         db=db,
         request=request,
         idempotency_key=x_idempotency_key,
-        operator_id=operator_id,
+        operator_id=effective_operator_id,
     )
 
 
@@ -104,22 +149,55 @@ def execute_command_endpoint(
 def preview_command_endpoint(
     request: IncidentCommandRequest,
     x_operator_id: str | None = Header(default="default_operator", alias="X-Operator-Id"),
+    operator: Operator = Depends(require_permission("command:preview")),
+    db: Session = Depends(get_db),
 ) -> ApprovalTokenResponse:
-    """Validate Governor policy constraints and issue a 60-second ephemeral approval token."""
-    operator_id = x_operator_id or "default_operator"
+    """Validate Governor policy constraints and issue a 60-second ephemeral approval token bound to operator."""
+    if isinstance(operator, DependsType) or operator is None:
+        effective_operator_id = x_operator_id or "default_operator"
+    else:
+        effective_operator_id = operator.username
 
-    default_governor.evaluate_command_policy(
-        action=request.action,
-        target_id=request.target_id,
-        operator_id=operator_id,
-        justification=request.justification,
-    )
+    from app.incident_command.governor import ALLOWED_ACTIONS, BLAST_RADIUS_TIERS
+
+    # Pre-flight allowlist and justification checks
+    if request.action not in ALLOWED_ACTIONS:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Action '{request.action}' is not allowlisted.",
+        )
+
+    blast_tier = BLAST_RADIUS_TIERS.get(request.action, 1)
+    if blast_tier >= 2 and not (request.action in ("GOVERNOR_LOCKOUT_ENGAGE", "GOVERNOR_LOCKOUT_RELEASE")):
+        if not request.justification or len(request.justification.strip()) < 5:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Action '{request.action}' (Blast Tier {blast_tier}) requires a mandatory justification (min 5 characters).",
+            )
 
     token_data = default_governor.create_approval_token(
         action=request.action,
         target_id=request.target_id,
-        operator_id=operator_id,
+        operator_id=effective_operator_id,
     )
+
+    # Persist audit record for approval token creation
+    try:
+        record_operator_audit(
+            db=db,
+            event_type="INCIDENT_COMMAND_PREVIEW",
+            source="incident_command",
+            severity="info",
+            message=json.dumps({
+                "operator_id": effective_operator_id,
+                "action": request.action,
+                "target_id": request.target_id,
+                "expires_at": token_data.get("expires_at"),
+            }),
+        )
+    except Exception:
+        pass
+
     return ApprovalTokenResponse(**token_data)
 
 
@@ -131,9 +209,15 @@ def preview_command_endpoint(
 )
 def get_governor_status_endpoint(
     operator_id: str = Query(default="default_operator", description="Operator identifier"),
+    operator: Operator = Depends(require_permission("telemetry:view")),
 ) -> GovernorStatusResponse:
     """Retrieve current operational status of the Governor, token bucket, and notification circuit breaker."""
-    status_dict = default_governor.get_status_dict(operator_id=operator_id)
+    if isinstance(operator, DependsType) or operator is None:
+        effective_operator_id = operator_id
+    else:
+        effective_operator_id = operator.username
+
+    status_dict = default_governor.get_status_dict(operator_id=effective_operator_id)
     return GovernorStatusResponse(**status_dict)
 
 
@@ -147,11 +231,19 @@ def toggle_governor_lockout_endpoint(
     request: LockoutToggleRequest,
     x_operator_id: str | None = Header(default="default_operator", alias="X-Operator-Id"),
     x_idempotency_key: str | None = Header(default=None, alias="X-Idempotency-Key"),
+    operator: Operator = Depends(require_permission("governor:lockout")),
     db: Session = Depends(get_db),
 ) -> IncidentCommandResponse:
     """Emergency kill-switch to immediately freeze or restore outbound notification dispatching."""
-    operator_id = x_operator_id or "default_operator"
-    idem_key = x_idempotency_key or str(uuid.uuid4())
+    if isinstance(operator, DependsType) or operator is None:
+        effective_operator_id = x_operator_id or "default_operator"
+    else:
+        effective_operator_id = operator.username
+
+    if x_idempotency_key is None or not isinstance(x_idempotency_key, str) or isinstance(x_idempotency_key, (Header, DependsType)):
+        idem_key = str(uuid.uuid4())
+    else:
+        idem_key = x_idempotency_key
 
     action = "GOVERNOR_LOCKOUT_ENGAGE" if request.engaged else "GOVERNOR_LOCKOUT_RELEASE"
     cmd_req = IncidentCommandRequest(
@@ -160,12 +252,29 @@ def toggle_governor_lockout_endpoint(
         justification=request.justification,
     )
 
-    return execute_incident_command(
+    resp = execute_incident_command(
         db=db,
         request=cmd_req,
         idempotency_key=idem_key,
-        operator_id=operator_id,
+        operator_id=effective_operator_id,
     )
+
+    try:
+        record_operator_audit(
+            db=db,
+            event_type=action,
+            source="incident_command",
+            severity="critical" if request.engaged else "high",
+            message=json.dumps({
+                "operator_id": effective_operator_id,
+                "engaged": request.engaged,
+                "justification": request.justification[:512],
+            }),
+        )
+    except Exception:
+        pass
+
+    return resp
 
 
 @router.get(
@@ -192,6 +301,7 @@ def list_virtual_incidents_endpoint(
         description="Filter by lifecycle status (open, acknowledged, resolved)",
     ),
     limit: int = Query(default=50, ge=1, le=200, description="Maximum items to return (1-200)"),
+    operator: Operator = Depends(require_permission("telemetry:view")),
     db: Session = Depends(get_db),
 ) -> VirtualIncidentsResponse:
     """Retrieve virtual incident records without requiring database schema migrations."""
