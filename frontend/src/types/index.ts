@@ -576,3 +576,82 @@ export interface PostIncidentReport {
   signoff_operator: string;
   generated_at: string;
 }
+
+// =============================================================================
+// Module 3.7: Active Deception Grid & Canary Honeytoken Orchestrator Types
+// =============================================================================
+
+export type CanaryType =
+  | 'AWS_API_KEY'
+  | 'DATABASE_CREDENTIAL'
+  | 'SERVICE_API_TOKEN'
+  | 'WEB_TRIPWIRE_ENDPOINT'
+  | 'CANARY_FILE_BEACON';
+
+export type CanaryStatus = 'active' | 'revoked';
+
+export interface CanaryToken {
+  token_id: string;
+  name: string;
+  canary_type: CanaryType;
+  status: CanaryStatus;
+  created_at: string;
+  created_by: string;
+  environment: string;
+  placement_hint?: string | null;
+  decoy_payload: Record<string, any>;
+  hit_count: number;
+  last_tripped_at?: string | null;
+}
+
+export interface CanaryHitEvent {
+  hit_id: string;
+  token_id: string;
+  source_ip: string;
+  user_agent: string;
+  method: string;
+  headers: Record<string, string>;
+  payload_sample: string;
+  alert_id?: number | null;
+  case_id?: string | null;
+  timestamp: string;
+}
+
+export interface CanaryCreatePayload {
+  name: string;
+  canary_type: CanaryType;
+  environment: string;
+  placement_hint?: string | null;
+}
+
+export interface CanaryUpdatePayload {
+  name?: string | null;
+  placement_hint?: string | null;
+  status?: CanaryStatus | null;
+}
+
+export interface CanaryListResponse {
+  canaries: CanaryToken[];
+  total: number;
+}
+
+export interface CanaryHitListResponse {
+  hits: CanaryHitEvent[];
+  total: number;
+}
+
+export interface CanaryContextResponse {
+  token_id: string;
+  canary_name: string;
+  canary_type: string;
+  environment: string;
+  placement_hint?: string | null;
+  status: string;
+  created_by: string;
+  created_at: string;
+  total_hits: number;
+  recent_hits: CanaryHitEvent[];
+  advisory_summary: string;
+  associated_alert_ids: number[];
+  associated_case_ids: string[];
+}

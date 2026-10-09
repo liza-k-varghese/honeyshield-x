@@ -13,6 +13,7 @@ import { AuditTrailView } from './components/AuditTrailView';
 import { LiveCommandCenterView } from './components/LiveCommandCenterView';
 import { CaseManagementView } from './components/CaseManagementView';
 import { CasePromotionModal } from './components/CasePromotionModal';
+import { DeceptionGridView } from './components/DeceptionGridView';
 import { LoginModal } from './components/LoginModal';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { useAlerts, useDashboardStats } from './hooks/useDashboard';
@@ -29,7 +30,7 @@ const queryClient = new QueryClient({
 });
 
 function DashboardContent() {
-  const [activeView, setActiveView] = useState<'dashboard' | 'command' | 'cases' | 'investigation' | 'rules'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'command' | 'cases' | 'deception' | 'investigation' | 'rules'>('dashboard');
   const [rulesSubTab, setRulesSubTab] = useState<'catalog' | 'replay' | 'simulation' | 'audit'>('catalog');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
@@ -142,6 +143,14 @@ function DashboardContent() {
           /* Module 3.6 Incident Case Management & Playbooks */
           <CaseManagementView
             onInvestigateIp={handleDeepLinkInvestigate}
+          />
+        ) : activeView === 'deception' ? (
+          /* Module 3.7 Active Deception Grid & Canary Orchestrator */
+          <DeceptionGridView
+            onInvestigateIp={handleDeepLinkInvestigate}
+            onStageContainment={(ip) => {
+              handleDeepLinkInvestigate(ip);
+            }}
           />
         ) : activeView === 'investigation' ? (
           <div className="space-y-6">

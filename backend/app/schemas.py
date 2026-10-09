@@ -1311,3 +1311,102 @@ class PostIncidentReportResponse(BaseModel):
     assigned_operator: str | None = Field(default=None, description="Assigned incident handler")
     signoff_operator: str = Field(description="Operator username who signed off on the PIR")
     generated_at: str = Field(description="ISO timestamp of PIR generation")
+
+
+# ==========================================
+# Active Deception Grid & Canary Schemas (Module 3.7)
+# ==========================================
+
+class CanaryToken(BaseModel):
+    """Canary Honeytoken record representing a high-confidence / presumptive-compromise defensive tripwire.
+
+    Security Contract:
+    - Canary tokens are high-confidence security signals, not mathematically guaranteed compromises.
+    - Decoy values are permanently inert and never grant functional access.
+    """
+
+    canary_id: str = Field(description="Unique canary identifier (e.g. CANARY-2026-1234)")
+    name: str = Field(min_length=3, max_length=100, description="Descriptive label for this canary token")
+    canary_type: str = Field(
+        description="Asset class: AWS_API_KEY, DATABASE_CREDENTIAL, SERVICE_API_TOKEN, WEB_TRIPWIRE_ENDPOINT, CANARY_FILE_BEACON"
+    )
+    status: str = Field(default="active", description="Lifecycle state: active or revoked")
+    token_hash: str = Field(description="SHA-256 hash of the secret decoy token identifier")
+    token_id: str = Field(description="Public lookup identifier or tripwire slug")
+    environment: str = Field(default="production", max_length=50, description="Deployment environment tag")
+    placement_hint: str | None = Field(default=None, max_length=200, description="Operational deployment location hint")
+    decoy_payload: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Inert decoy credentials or artifact payload presented to operators",
+    )
+    hit_count: int = Field(default=0, description="Total number of recorded tripwire hits")
+    last_hit_at: str | None = Field(default=None, description="ISO timestamp of most recent tripwire interaction")
+    created_by: str = Field(description="Operator username who minted the canary")
+    created_at: str = Field(description="ISO timestamp of creation")
+    updated_at: str = Field(description="ISO timestamp of last update")
+    revoked_at: str | None = Field(default=None, description="ISO timestamp of decommissioning if revoked")
+    revoked_by: str | None = Field(default=None, description="Operator username who revoked the canary")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CanaryCreateRequest(BaseModel):
+    """Payload for minting a new canary honeytoken."""
+
+    name: str = Field(..., min_length=3, max_length=100, description="Descriptive label for this canary token")
+    canary_type: str = Field(
+        ...,
+        description="Asset class: AWS_API_KEY, DATABASE_CREDENTIAL, SERVICE_API_TOKEN, WEB_TRIPWIRE_ENDPOINT, CANARY_FILE_BEACON",
+    )
+    environment: str = Field(default="production", max_length=50, description="Deployment environment tag")
+    placement_hint: str | None = Field(default=None, max_length=200, description="Deployment location hint")
+    custom_labels: dict[str, str] = Field(default_factory=dict, description="Optional custom key-value metadata tags")
+
+
+class CanaryUpdateRequest(BaseModel):
+    """Payload for updating canary metadata or decommissioning state."""
+
+    name: str | None = Field(default=None, min_length=3, max_length=100, description="Updated name")
+    environment: str | None = Field(default=None, max_length=50, description="Updated environment")
+    placement_hint: str | None = Field(default=None, max_length=200, description="Updated placement hint")
+    status: str | None = Field(default=None, description="Target lifecycle state: active or revoked")
+
+
+class CanaryHitEvent(BaseModel):
+    """Forensic interaction telemetry recorded when an adversary trips a canary honeytoken."""
+
+    hit_id: str = Field(description="Unique hit interaction identifier")
+    canary_id: str = Field(description="Canary token identifier")
+    canary_type: str = Field(description="Canary asset class")
+    source_ip: str = Field(description="Client IP address that interacted with the tripwire")
+    user_agent: str | None = Field(default=None, description="Sanitized client User-Agent")
+    request_method: str = Field(default="GET", description="HTTP request method")
+    headers_captured: dict[str, str] = Field(default_factory=dict, description="Sanitized, bounded headers")
+    payload_preview: str | None = Field(default=None, description="Sanitized preview of request payload")
+    alert_id: int | None = Field(default=None, description="Associated high-fidelity Alert ID if generated")
+    case_id: str | None = Field(default=None, description="Associated Incident Case ID if provisioned")
+    timestamp: str = Field(description="ISO timestamp of interaction")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CanaryListResponse(BaseModel):
+    """List of registered canary tokens."""
+
+    canaries: list[CanaryToken] = Field(description="List of canary tokens")
+    total: int = Field(description="Total count of canary tokens")
+
+
+class CanaryHitListResponse(BaseModel):
+    """List of canary interaction hit events."""
+
+    hits: list[CanaryHitEvent] = Field(description="List of recorded hit events")
+    total: int = Field(description="Total count of recorded hit events")
+
+
+class CanaryValidationResponse(BaseModel):
+    """Decoy response returned to adversary upon hitting the public trap listener."""
+
+    status: str = Field(description="Decoy status message")
+    message: str = Field(description="Decoy error or response message")
+    code: int = Field(default=401, description="Decoy status code")

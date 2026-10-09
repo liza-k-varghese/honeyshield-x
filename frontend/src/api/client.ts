@@ -462,3 +462,108 @@ export async function fetchCaseReport(
   });
   return handleResponse<import('../types').PostIncidentReport>(res);
 }
+
+// ==========================================
+// Module 3.7 Deception Grid Endpoints
+// ==========================================
+
+export async function fetchCanaries(
+  statusFilter?: string,
+  typeFilter?: string
+): Promise<import('../types').CanaryListResponse> {
+  const params = new URLSearchParams();
+  if (statusFilter && statusFilter !== 'all') {
+    params.append('status', statusFilter);
+  }
+  if (typeFilter && typeFilter !== 'all') {
+    params.append('canary_type', typeFilter);
+  }
+  const res = await fetch(`${API_BASE}/deception/canaries?${params.toString()}`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+  return handleResponse<import('../types').CanaryListResponse>(res);
+}
+
+export async function fetchCanary(
+  tokenId: string
+): Promise<import('../types').CanaryToken> {
+  const res = await fetch(`${API_BASE}/deception/canaries/${encodeURIComponent(tokenId)}`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+  return handleResponse<import('../types').CanaryToken>(res);
+}
+
+export async function mintCanary(
+  payload: import('../types').CanaryCreatePayload
+): Promise<import('../types').CanaryToken> {
+  const res = await fetch(`${API_BASE}/deception/canaries`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<import('../types').CanaryToken>(res);
+}
+
+export async function updateCanary(
+  tokenId: string,
+  payload: import('../types').CanaryUpdatePayload
+): Promise<import('../types').CanaryToken> {
+  const res = await fetch(`${API_BASE}/deception/canaries/${encodeURIComponent(tokenId)}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<import('../types').CanaryToken>(res);
+}
+
+export async function revokeCanary(
+  tokenId: string
+): Promise<import('../types').CanaryToken> {
+  const res = await fetch(`${API_BASE}/deception/canaries/${encodeURIComponent(tokenId)}/revoke`, {
+    method: 'POST',
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+  return handleResponse<import('../types').CanaryToken>(res);
+}
+
+export async function fetchCanaryHits(
+  tokenId: string,
+  limit: number = 50
+): Promise<import('../types').CanaryHitListResponse> {
+  const params = new URLSearchParams({ limit: limit.toString() });
+  const res = await fetch(
+    `${API_BASE}/deception/canaries/${encodeURIComponent(tokenId)}/hits?${params.toString()}`,
+    {
+      headers: {
+        ...getAuthHeaders(),
+      },
+    }
+  );
+  return handleResponse<import('../types').CanaryHitListResponse>(res);
+}
+
+export async function fetchCanaryContext(
+  tokenId: string
+): Promise<import('../types').CanaryContextResponse> {
+  const res = await fetch(
+    `${API_BASE}/deception/canaries/${encodeURIComponent(tokenId)}/context`,
+    {
+      headers: {
+        ...getAuthHeaders(),
+      },
+    }
+  );
+  return handleResponse<import('../types').CanaryContextResponse>(res);
+}

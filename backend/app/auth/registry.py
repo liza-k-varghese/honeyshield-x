@@ -86,6 +86,29 @@ CASE_ROLE_PERMISSIONS: dict[str, set[str]] = {
     },
 }
 
+# Module 3.7 Deterministic Active Deception Grid Permissions Mapping
+DECEPTION_ROLE_PERMISSIONS: dict[str, set[str]] = {
+    "viewer": {
+        "deception:view",
+    },
+    "analyst": {
+        "deception:view",
+        "deception:create",
+        "deception:update",
+    },
+    "incident_responder": {
+        "deception:view",
+        "deception:create",
+        "deception:update",
+    },
+    "security_administrator": {
+        "deception:view",
+        "deception:create",
+        "deception:update",
+        "deception:admin",
+    },
+}
+
 MAX_FAILED_LOGIN_ATTEMPTS: int = 5
 LOCKOUT_DURATION_SECONDS: float = 900.0  # 15 minutes
 
@@ -107,7 +130,8 @@ class Operator:
         """Resolve deterministic permission set for current role."""
         base_perms = set(ROLE_PERMISSIONS.get(self.role, set()))
         case_perms = set(CASE_ROLE_PERMISSIONS.get(self.role, set()))
-        return base_perms | case_perms
+        deception_perms = set(DECEPTION_ROLE_PERMISSIONS.get(self.role, set()))
+        return base_perms | case_perms | deception_perms
 
     def has_permission(self, permission: str) -> bool:
         """Check if operator role satisfies permission requirement."""
