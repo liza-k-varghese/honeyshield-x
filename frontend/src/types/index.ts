@@ -450,6 +450,8 @@ export interface OperatorProfile {
   email: string;
   permissions: string[];
   is_active: boolean;
+  full_name?: string;
+  is_break_glass?: boolean;
 }
 
 export interface LoginResponse {
@@ -721,7 +723,7 @@ export interface CampaignCluster {
   last_seen: string;
 }
 
-export interface CampaignListResponse {
+export interface ThreatCampaignListResponse {
   campaigns: CampaignCluster[];
   total: number;
 }
@@ -849,4 +851,180 @@ export interface TestPingResponse {
   latency_ms: number;
   response_preview: string | null;
   error: string | null;
+}
+
+// ==========================================
+// Module 3.10 Campaign Intelligence Types
+// ==========================================
+
+export type CampaignStatus = 'active' | 'dormant' | 'resolved' | 'archived' | 'contained';
+
+export interface CampaignSummary {
+  campaign_id: string;
+  name: string;
+  status: CampaignStatus;
+  severity: SeverityLevel;
+  confidence: number;
+  entity_count: number;
+  attack_count: number;
+  alert_count: number;
+  canary_count: number;
+  ioc_count: number;
+  case_count: number;
+  mitre_tactics: string[];
+  first_seen: string;
+  last_seen: string;
+  tags: string[];
+  source_ips?: string[];
+  anchor_type?: string;
+}
+
+export interface CampaignListResponse {
+  campaigns: CampaignSummary[];
+  total: number;
+  limit: number;
+  offset: number;
+  items?: CampaignSummary[];
+}
+
+export interface CampaignDossier {
+  campaign_id: string;
+  name: string;
+  status: CampaignStatus;
+  severity: SeverityLevel;
+  confidence: number;
+  first_seen: string;
+  last_seen: string;
+  source_ips: string[];
+  destination_ips: string[];
+  user_agents: string[];
+  cves: string[];
+  attack_ids: number[];
+  alert_ids: number[];
+  canary_ids: string[];
+  ioc_ids: string[];
+  case_ids: string[];
+  mitre_tactics: string[];
+  mitre_techniques: string[];
+  notes?: string | null;
+  tags: string[];
+  merged_into?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CampaignGraphNode {
+  id: string;
+  label: string;
+  node_type: string;
+  stage?: string | null;
+  severity?: SeverityLevel | null;
+  confidence?: number | null;
+  first_seen?: string | null;
+  last_seen?: string | null;
+  metadata?: Record<string, any>;
+}
+
+export interface CampaignGraphEdge {
+  id: string;
+  source: string;
+  target: string;
+  label: string;
+  edge_type: string;
+  metadata?: Record<string, any>;
+}
+
+export interface CampaignGraphSummary {
+  total_nodes: number;
+  total_edges: number;
+  stages_observed: number;
+  highest_severity: string;
+  has_canary: boolean;
+  has_ioc: boolean;
+  has_cases: boolean;
+}
+
+export interface TruncationMeta {
+  is_truncated: boolean;
+  total_nodes_discovered: number;
+  rendered_nodes: number;
+  pruned_nodes_count: number;
+  pruned_by_type: Record<string, number>;
+}
+
+export interface CampaignGraphResponse {
+  campaign_id: string;
+  nodes: CampaignGraphNode[];
+  edges: CampaignGraphEdge[];
+  summary: CampaignGraphSummary;
+  truncation: TruncationMeta;
+}
+
+export interface TimelineItem {
+  id: string;
+  timestamp: string;
+  event_type: string;
+  title: string;
+  severity: string;
+  source_ip?: string | null;
+  stage?: string | null;
+  details?: Record<string, any>;
+}
+
+export interface CampaignTimelineResponse {
+  campaign_id: string;
+  events: TimelineItem[];
+  total: number;
+}
+
+export interface CampaignMetrics {
+  active_campaigns: number;
+  critical_campaigns: number;
+  high_campaigns: number;
+  dormant_campaigns: number;
+  resolved_campaigns: number;
+  mean_dwell_time_hours: number;
+  top_mitre_tactics: Array<{ tactic: string; count: number }>;
+}
+
+export interface CampaignClusterRequest {
+  lookback_hours?: number;
+}
+
+export interface CampaignClusterResponse {
+  status: string;
+  campaigns_created: number;
+  campaigns_updated: number;
+  total_active_campaigns: number;
+  duration_ms: number;
+}
+
+export interface CampaignUpdateRequest {
+  name?: string;
+  status?: string;
+  notes?: string;
+  tags?: string[];
+  justification?: string;
+}
+
+export interface CampaignMergeRequest {
+  primary_campaign_id: string;
+  secondary_campaign_id: string;
+  justification: string;
+}
+
+export interface CampaignContainmentRequest {
+  approval_token: string;
+  justification: string;
+  action_type?: string;
+  containment_type?: string;
+  parameters?: Record<string, any>;
+}
+
+export interface CampaignContainmentResponse {
+  status: string;
+  campaign_id: string;
+  contained_entities: string[];
+  governor_eval: Record<string, any>;
+  dispatched_at: string;
 }

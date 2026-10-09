@@ -16,6 +16,7 @@ import { CasePromotionModal } from './components/CasePromotionModal';
 import { DeceptionGridView } from './components/DeceptionGridView';
 import { ThreatIntelView } from './components/ThreatIntelView';
 import { IntegrationsView } from './components/IntegrationsView';
+import { CampaignsView } from './components/CampaignsView';
 import { LoginModal } from './components/LoginModal';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { useAlerts, useDashboardStats } from './hooks/useDashboard';
@@ -32,7 +33,7 @@ const queryClient = new QueryClient({
 });
 
 function DashboardContent() {
-  const [activeView, setActiveView] = useState<'dashboard' | 'command' | 'cases' | 'deception' | 'intel' | 'integrations' | 'investigation' | 'rules'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'command' | 'cases' | 'deception' | 'intel' | 'integrations' | 'campaigns' | 'investigation' | 'rules'>('dashboard');
   const [rulesSubTab, setRulesSubTab] = useState<'catalog' | 'replay' | 'simulation' | 'audit'>('catalog');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
@@ -165,6 +166,9 @@ function DashboardContent() {
         ) : activeView === 'integrations' ? (
           /* Module 3.9 Enterprise Defensive Integration & SIEM-SOAR Gateway */
           <IntegrationsView />
+        ) : activeView === 'campaigns' ? (
+          /* Module 3.10 Cross-Module Attack Campaign Intelligence Core */
+          <CampaignsView onInvestigateIp={handleDeepLinkInvestigate} />
         ) : activeView === 'investigation' ? (
           <div className="space-y-6">
             {/* IP Search / Query Ribbon */}

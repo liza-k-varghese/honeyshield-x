@@ -1678,3 +1678,206 @@ class SoarBlockRequest(BaseModel):
     justification: str = Field(min_length=10, max_length=1000, description="Mandatory operational justification (min 10 chars)")
     approval_token: str = Field(description="Single-use Level-3 Governor preview approval token")
     parameters: dict[str, Any] | None = Field(default=None, description="Optional containment parameters")
+
+
+# ==========================================
+# Module 3.10 Cross-Module Attack Campaign Intelligence & Multi-Entity Correlation Graph Schemas
+# ==========================================
+
+class CampaignSummary(BaseModel):
+    """Aggregated campaign overview for list views and telemetry ribbons."""
+
+    campaign_id: str = Field(description="Unique deterministic campaign ID")
+    name: str = Field(description="Campaign display name")
+    status: str = Field(description="Lifecycle status: active, dormant, resolved, archived")
+    severity: str = Field(description="Peak campaign severity: low, medium, high, critical")
+    confidence: float = Field(description="Peak confidence score (0.0 - 1.0)")
+    entity_count: int = Field(description="Total unique entities linked to campaign")
+    attack_count: int = Field(description="Total attacks linked")
+    alert_count: int = Field(description="Total alerts linked")
+    canary_count: int = Field(description="Total canary tripwires linked")
+    ioc_count: int = Field(description="Total threat intel IOCs linked")
+    case_count: int = Field(description="Total incident cases linked")
+    mitre_tactics: list[str] = Field(default_factory=list, description="Observed MITRE ATT&CK tactics")
+    first_seen: str = Field(description="Earliest observation timestamp (ISO 8601)")
+    last_seen: str = Field(description="Latest observation timestamp (ISO 8601)")
+    tags: list[str] = Field(default_factory=list, description="Operator or auto-assigned tags")
+
+
+class CampaignDossier(BaseModel):
+    """Complete multi-entity attack campaign dossier."""
+
+    campaign_id: str = Field(description="Unique deterministic campaign ID")
+    name: str = Field(description="Campaign display name")
+    status: str = Field(description="Lifecycle status: active, dormant, resolved, archived")
+    severity: str = Field(description="Peak campaign severity: low, medium, high, critical")
+    confidence: float = Field(description="Peak confidence score (0.0 - 1.0)")
+    first_seen: str = Field(description="Earliest observation timestamp (ISO 8601)")
+    last_seen: str = Field(description="Latest observation timestamp (ISO 8601)")
+    notes: str | None = Field(default=None, description="Operator notes and rationale")
+    tags: list[str] = Field(default_factory=list, description="Assigned campaign tags")
+    source_ips: list[str] = Field(default_factory=list, description="Attacker source IPs")
+    destination_ips: list[str] = Field(default_factory=list, description="Targeted internal IPs")
+    attack_ids: list[int] = Field(default_factory=list, description="Associated Attack IDs")
+    alert_ids: list[int] = Field(default_factory=list, description="Associated Alert IDs")
+    canary_ids: list[str] = Field(default_factory=list, description="Associated Canary token IDs")
+    ioc_ids: list[str] = Field(default_factory=list, description="Associated Threat Intel IOC values")
+    case_ids: list[str] = Field(default_factory=list, description="Associated Incident Case IDs")
+    mitre_tactics: list[str] = Field(default_factory=list, description="Observed MITRE tactics")
+    mitre_techniques: list[str] = Field(default_factory=list, description="Observed MITRE techniques")
+    anchor_type: str | None = Field(default=None, description="Anchor feature type that seeded campaign")
+    merged_into: str | None = Field(default=None, description="Target campaign ID if merged and archived")
+    created_at: str = Field(description="Campaign creation timestamp (ISO 8601)")
+    updated_at: str = Field(description="Last update timestamp (ISO 8601)")
+
+
+class CampaignListResponse(BaseModel):
+    """Paginated campaign query response."""
+
+    campaigns: list[CampaignSummary] = Field(description="List of campaigns matching filters")
+    total: int = Field(description="Total campaigns matching query")
+    limit: int = Field(description="Pagination limit")
+    offset: int = Field(description="Pagination offset")
+
+
+class GraphNode(BaseModel):
+    """Derived multi-entity DAG graph node."""
+
+    id: str = Field(description="Unique node identifier")
+    type: str = Field(description="Node type: campaign, source_ip, destination_ip, attack, attack_event, alert, canary, ioc, case, detection_rule, mitre_tactic, integration_delivery")
+    label: str = Field(description="Display label")
+    stage: str | None = Field(default=None, description="Killchain stage or category")
+    severity: str | None = Field(default=None, description="Severity if applicable")
+    confidence: float | None = Field(default=None, description="Confidence score if applicable")
+    first_seen: str | None = Field(default=None, description="Earliest timestamp")
+    last_seen: str | None = Field(default=None, description="Latest timestamp")
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Safe sanitized node attributes")
+
+
+class GraphEdge(BaseModel):
+    """Derived DAG graph edge."""
+
+    id: str = Field(description="Unique edge identifier")
+    source: str = Field(description="Source node ID")
+    target: str = Field(description="Target node ID")
+    label: str = Field(description="Display relationship label")
+    edge_type: str = Field(description="Semantic edge type")
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Edge metadata")
+
+
+class GraphSummary(BaseModel):
+    """Topological graph summary metrics."""
+
+    total_nodes: int = Field(description="Rendered node count")
+    total_edges: int = Field(description="Rendered edge count")
+    stages_observed: int = Field(description="Count of distinct MITRE stages")
+    highest_severity: str = Field(description="Peak severity in graph")
+    has_canary: bool = Field(description="Whether graph contains deception tripwire")
+    has_ioc: bool = Field(description="Whether graph contains threat intel IOC")
+    has_cases: bool = Field(description="Whether graph contains linked incident cases")
+
+
+class TruncationMeta(BaseModel):
+    """Explicit deterministic graph truncation report."""
+
+    is_truncated: bool = Field(description="True if node or edge caps were exceeded")
+    total_nodes_discovered: int = Field(description="Unpruned node count")
+    rendered_nodes: int = Field(description="Nodes included in payload")
+    pruned_nodes_count: int = Field(description="Count of nodes pruned to satisfy bounds")
+    pruned_by_type: dict[str, int] = Field(default_factory=dict, description="Breakdown of pruned nodes by type")
+
+
+class CampaignGraphResponse(BaseModel):
+    """Complete derived multi-entity DAG graph payload."""
+
+    campaign_id: str = Field(description="Campaign ID")
+    nodes: list[GraphNode] = Field(description="Graph nodes")
+    edges: list[GraphEdge] = Field(description="Directed edges")
+    summary: GraphSummary = Field(description="Graph summary")
+    truncation: TruncationMeta = Field(description="Truncation metadata")
+
+
+class TimelineItem(BaseModel):
+    """Chronological event in campaign attack narrative."""
+
+    id: str = Field(description="Timeline item ID")
+    timestamp: str = Field(description="ISO 8601 event time")
+    event_type: str = Field(description="Event type: attack, alert, canary, case, ioc")
+    title: str = Field(description="Event headline")
+    severity: str = Field(description="Event severity")
+    source_ip: str | None = Field(default=None, description="Associated source IP")
+    stage: str | None = Field(default=None, description="MITRE tactic or lifecycle stage")
+    details: dict[str, Any] = Field(default_factory=dict, description="Sanitized event details")
+
+
+class CampaignTimelineResponse(BaseModel):
+    """Campaign chronological timeline response."""
+
+    campaign_id: str = Field(description="Campaign ID")
+    events: list[TimelineItem] = Field(description="Chronologically sorted timeline events")
+    total: int = Field(description="Total event count")
+
+
+class CampaignClusterRequest(BaseModel):
+    """Optional parameters for manual re-clustering trigger."""
+
+    lookback_hours: int | None = Field(default=168, ge=1, le=168, description="Temporal lookback window (max 168h / 7d)")
+
+
+class CampaignClusterResponse(BaseModel):
+    """Result of re-clustering execution."""
+
+    status: str = Field(description="Clustering status")
+    campaigns_created: int = Field(description="Newly synthesized campaigns")
+    campaigns_updated: int = Field(description="Existing campaigns updated with new events")
+    total_active_campaigns: int = Field(description="Current count of active campaigns")
+    duration_ms: float = Field(description="Clustering execution duration in ms")
+
+
+class CampaignUpdateRequest(BaseModel):
+    """Request payload to update campaign metadata or lifecycle status."""
+
+    name: str | None = Field(default=None, max_length=150, description="Optional updated campaign name")
+    status: str | None = Field(default=None, description="Optional status change (active, dormant, resolved)")
+    notes: str | None = Field(default=None, max_length=2000, description="Optional analyst notes")
+    tags: list[str] | None = Field(default=None, description="Optional updated tags")
+    justification: str | None = Field(default=None, max_length=500, description="Required justification for status changes")
+
+
+class CampaignMergeRequest(BaseModel):
+    """Request payload to merge two campaigns."""
+
+    primary_campaign_id: str = Field(min_length=1, max_length=50, description="Surviving target campaign ID")
+    secondary_campaign_id: str = Field(min_length=1, max_length=50, description="Campaign to be absorbed and archived")
+    justification: str = Field(min_length=5, max_length=1000, description="Mandatory operator justification (min 5 chars)")
+
+
+class CampaignContainmentRequest(BaseModel):
+    """Governor-guarded request to dispatch bulk containment across campaign entities."""
+
+    approval_token: str = Field(min_length=1, description="Single-use Level-3 Governor preview approval token")
+    justification: str = Field(min_length=10, max_length=1000, description="Mandatory operational justification (min 10 chars)")
+    containment_type: str = Field(default="network_isolate", description="Containment action: network_isolate, block_ip, revoke_creds")
+    parameters: dict[str, Any] | None = Field(default=None, description="Optional containment parameters")
+
+
+class CampaignContainmentResponse(BaseModel):
+    """Outcome of bulk campaign containment execution."""
+
+    status: str = Field(description="Containment execution status")
+    campaign_id: str = Field(description="Campaign ID")
+    contained_entities: list[str] = Field(description="List of contained entities")
+    governor_eval: dict[str, Any] = Field(description="Governor safety policy audit payload")
+    dispatched_at: str = Field(description="ISO 8601 dispatch timestamp")
+
+
+class CampaignMetricsResponse(BaseModel):
+    """Aggregated campaign metrics for SOC dashboard KPI ribbon."""
+
+    active_campaigns: int = Field(description="Count of currently active campaigns")
+    critical_campaigns: int = Field(description="Count of active critical campaigns")
+    high_campaigns: int = Field(description="Count of active high campaigns")
+    dormant_campaigns: int = Field(description="Count of dormant campaigns")
+    resolved_campaigns: int = Field(description="Count of resolved campaigns")
+    mean_dwell_time_hours: float = Field(description="Average campaign duration in hours")
+    top_mitre_tactics: list[dict[str, Any]] = Field(default_factory=list, description="Most frequent MITRE tactics observed")

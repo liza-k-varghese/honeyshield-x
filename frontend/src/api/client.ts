@@ -679,11 +679,11 @@ export async function promoteCaseObservable(
   return handleResponse<import('../types').ThreatIndicator>(res);
 }
 
-export async function fetchThreatCampaigns(): Promise<import('../types').CampaignListResponse> {
+export async function fetchThreatCampaigns(): Promise<import('../types').ThreatCampaignListResponse> {
   const res = await fetch(`${API_BASE}/threat-intelligence/campaigns`, {
     headers: { ...getAuthHeaders() },
   });
-  return handleResponse<import('../types').CampaignListResponse>(res);
+  return handleResponse<import('../types').ThreatCampaignListResponse>(res);
 }
 
 export function getThreatFeedExportUrl(format: 'json' | 'csv' | 'stix', token?: string): string {
@@ -793,4 +793,149 @@ export async function fetchIntegrationMetrics(): Promise<import('../types').Inte
     headers: { ...getAuthHeaders() },
   });
   return handleResponse<import('../types').IntegrationMetrics>(res);
+}
+
+// ==========================================
+// Module 3.10 Campaign Intelligence Endpoints
+// ==========================================
+
+export async function fetchCampaigns(params?: {
+  status?: string;
+  severity?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<import('../types').CampaignListResponse> {
+  const query = new URLSearchParams();
+  if (params?.status && params.status !== 'all') {
+    query.append('status', params.status);
+  }
+  if (params?.severity && params.severity !== 'all') {
+    query.append('severity', params.severity);
+  }
+  if (params?.limit) {
+    query.append('limit', params.limit.toString());
+  }
+  if (params?.offset) {
+    query.append('offset', params.offset.toString());
+  }
+  const res = await fetch(`${API_BASE}/campaigns?${query.toString()}`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').CampaignListResponse>(res);
+}
+
+export async function fetchCampaign(id: string): Promise<import('../types').CampaignDossier> {
+  const res = await fetch(`${API_BASE}/campaigns/${encodeURIComponent(id)}`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').CampaignDossier>(res);
+}
+
+export async function updateCampaign(
+  id: string,
+  payload: import('../types').CampaignUpdateRequest
+): Promise<import('../types').CampaignDossier> {
+  const res = await fetch(`${API_BASE}/campaigns/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<import('../types').CampaignDossier>(res);
+}
+
+export async function fetchCampaignGraph(id: string): Promise<import('../types').CampaignGraphResponse> {
+  const res = await fetch(`${API_BASE}/campaigns/${encodeURIComponent(id)}/graph`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').CampaignGraphResponse>(res);
+}
+
+export async function fetchCampaignTimeline(
+  id: string,
+  limit: number = 50
+): Promise<import('../types').CampaignTimelineResponse> {
+  const res = await fetch(`${API_BASE}/campaigns/${encodeURIComponent(id)}/timeline?limit=${limit}`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').CampaignTimelineResponse>(res);
+}
+
+export async function fetchCampaignMetrics(): Promise<import('../types').CampaignMetrics> {
+  const res = await fetch(`${API_BASE}/campaigns/metrics`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').CampaignMetrics>(res);
+}
+
+export async function triggerCampaignClustering(
+  payload?: import('../types').CampaignClusterRequest
+): Promise<import('../types').CampaignClusterResponse> {
+  const res = await fetch(`${API_BASE}/campaigns/cluster`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload || {}),
+  });
+  return handleResponse<import('../types').CampaignClusterResponse>(res);
+}
+
+export async function mergeCampaigns(
+  payload: import('../types').CampaignMergeRequest
+): Promise<import('../types').CampaignDossier> {
+  const res = await fetch(`${API_BASE}/campaigns/merge`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<import('../types').CampaignDossier>(res);
+}
+
+export async function containCampaign(
+  id: string,
+  payload: import('../types').CampaignContainmentRequest,
+  idempotencyKey?: string
+): Promise<import('../types').CampaignContainmentResponse> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...getAuthHeaders(),
+  };
+  if (idempotencyKey) {
+    headers['X-HSX-Idempotency-Key'] = idempotencyKey;
+  }
+  const res = await fetch(`${API_BASE}/campaigns/${encodeURIComponent(id)}/contain`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<import('../types').CampaignContainmentResponse>(res);
+}
+
+export async function linkCampaignCase(
+  id: string,
+  caseId: string
+): Promise<{ linked: boolean; campaign_id: string; case_id: string }> {
+  const res = await fetch(`${API_BASE}/campaigns/${encodeURIComponent(id)}/cases/${encodeURIComponent(caseId)}`, {
+    method: 'POST',
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<{ linked: boolean; campaign_id: string; case_id: string }>(res);
+}
+
+export async function unlinkCampaignCase(
+  id: string,
+  caseId: string
+): Promise<{ unlinked: boolean; campaign_id: string; case_id: string }> {
+  const res = await fetch(`${API_BASE}/campaigns/${encodeURIComponent(id)}/cases/${encodeURIComponent(caseId)}`, {
+    method: 'DELETE',
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<{ unlinked: boolean; campaign_id: string; case_id: string }>(res);
 }

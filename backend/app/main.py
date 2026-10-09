@@ -12,6 +12,7 @@ from app.routers import (
     attacks,
     audit,
     auth,
+    campaigns,
     cases,
     correlation,
     dashboard,
@@ -74,6 +75,7 @@ app.include_router(incident_command.router, prefix="/api/v1")
 app.include_router(cases.router, prefix="/api/v1")
 app.include_router(deception.router, prefix="/api/v1")
 app.include_router(integrations.router, prefix="/api/v1")
+app.include_router(campaigns.router, prefix="/api/v1")
 
 POSTGRES_HOST = "127.0.0.1"
 POSTGRES_PORT = 5432

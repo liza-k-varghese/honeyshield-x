@@ -40,6 +40,8 @@ ALLOWED_ACTIONS: set[str] = {
     "IOC_CONTAINMENT_DISPATCH",
     "IOC_FEED_LOCKOUT",
     "SOAR_BLOCK_DISPATCH",
+    "CAMPAIGN_CONTAINMENT_DISPATCH",
+    "CAMPAIGN_STATUS_OVERRIDE",
 }
 
 BLAST_RADIUS_TIERS: dict[str, int] = {
@@ -47,6 +49,7 @@ BLAST_RADIUS_TIERS: dict[str, int] = {
     "NOTIFICATION_SUPPRESS": 1,
     "ALERT_RESOLVE": 2,
     "ALERT_ESCALATE": 2,
+    "CAMPAIGN_STATUS_OVERRIDE": 2,
     "NOTIFICATION_DISPATCH": 3,
     "CONTAINMENT_STAGING_REQUEST": 3,
     "GOVERNOR_LOCKOUT_ENGAGE": 3,
@@ -55,6 +58,7 @@ BLAST_RADIUS_TIERS: dict[str, int] = {
     "IOC_CONTAINMENT_DISPATCH": 3,
     "IOC_FEED_LOCKOUT": 3,
     "SOAR_BLOCK_DISPATCH": 3,
+    "CAMPAIGN_CONTAINMENT_DISPATCH": 3,
 }
 
 MAX_OPERATOR_RATE_LIMIT: int = 10  # Max commands
@@ -398,9 +402,13 @@ class DeterministicGovernor:
             )
 
         # 2. Emergency Lockout Gate (HTTP 503)
-        # Lockout specifically blocks outbound dispatch
+        # Lockout specifically blocks outbound dispatch and containment
         with self._lock:
-            if self._emergency_lockout and action in ("NOTIFICATION_DISPATCH", "SOAR_BLOCK_DISPATCH"):
+            if self._emergency_lockout and action in (
+                "NOTIFICATION_DISPATCH",
+                "SOAR_BLOCK_DISPATCH",
+                "CAMPAIGN_CONTAINMENT_DISPATCH",
+            ):
                 raise HTTPException(
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                     detail="Governor emergency lockout is actively engaged. Outbound notification and containment dispatches are blocked.",
