@@ -109,6 +109,34 @@ DECEPTION_ROLE_PERMISSIONS: dict[str, set[str]] = {
     },
 }
 
+# Module 3.8 Deterministic Threat Intelligence Permissions Mapping
+THREAT_INTEL_ROLE_PERMISSIONS: dict[str, set[str]] = {
+    "viewer": {
+        "threat_intel:view",
+    },
+    "analyst": {
+        "threat_intel:view",
+        "threat_intel:create",
+        "threat_intel:update",
+        "threat_intel:export",
+    },
+    "incident_responder": {
+        "threat_intel:view",
+        "threat_intel:create",
+        "threat_intel:update",
+        "threat_intel:revoke",
+        "threat_intel:export",
+    },
+    "security_administrator": {
+        "threat_intel:view",
+        "threat_intel:create",
+        "threat_intel:update",
+        "threat_intel:revoke",
+        "threat_intel:admin",
+        "threat_intel:export",
+    },
+}
+
 MAX_FAILED_LOGIN_ATTEMPTS: int = 5
 LOCKOUT_DURATION_SECONDS: float = 900.0  # 15 minutes
 
@@ -131,7 +159,8 @@ class Operator:
         base_perms = set(ROLE_PERMISSIONS.get(self.role, set()))
         case_perms = set(CASE_ROLE_PERMISSIONS.get(self.role, set()))
         deception_perms = set(DECEPTION_ROLE_PERMISSIONS.get(self.role, set()))
-        return base_perms | case_perms | deception_perms
+        intel_perms = set(THREAT_INTEL_ROLE_PERMISSIONS.get(self.role, set()))
+        return base_perms | case_perms | deception_perms | intel_perms
 
     def has_permission(self, permission: str) -> bool:
         """Check if operator role satisfies permission requirement."""

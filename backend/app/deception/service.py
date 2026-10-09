@@ -14,6 +14,7 @@ import hashlib
 import hmac
 import json
 import logging
+import os
 import re
 import secrets
 from typing import Any
@@ -518,6 +519,20 @@ class DeceptionGridService:
             )
         except Exception:
             pass
+
+        # G. Promote to Module 3.8 Threat Intelligence (if auto-promote enabled)
+        if os.getenv("HONEYSHIELD_AUTO_PROMOTE_CANARY", "false").lower() in ("true", "1"):
+            try:
+                from app.threat_intelligence.service import threat_intel_service
+                threat_intel_service.promote_canary_hit(
+                    db=db,
+                    source_ip=client_ip,
+                    canary_id=canary.canary_id,
+                    canary_type=canary.canary_type,
+                    custom_campaign=canary.custom_labels.get("campaign") if hasattr(canary, "custom_labels") and canary.custom_labels else None,
+                )
+            except Exception as e:
+                logger.error("Failed promoting canary hit to threat intelligence: %s", str(e))
 
         # Return benign decoy response
         return CanaryValidationResponse(

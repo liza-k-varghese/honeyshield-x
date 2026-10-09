@@ -567,3 +567,129 @@ export async function fetchCanaryContext(
   );
   return handleResponse<import('../types').CanaryContextResponse>(res);
 }
+
+// =============================================================================
+// Module 3.8: Threat Intelligence & IOC Fusion Engine API
+// =============================================================================
+
+export async function fetchThreatIndicators(params?: {
+  status?: string;
+  type?: string;
+  threat_level?: string;
+  campaign?: string;
+  search?: string;
+  min_confidence?: number;
+  skip?: number;
+  limit?: number;
+}): Promise<import('../types').ThreatIndicatorListResponse> {
+  const query = new URLSearchParams();
+  if (params?.status) query.append('status', params.status);
+  if (params?.type) query.append('indicator_type', params.type);
+  if (params?.threat_level) query.append('threat_level', params.threat_level);
+  if (params?.campaign) query.append('campaign', params.campaign);
+  if (params?.search) query.append('search', params.search);
+  if (params?.min_confidence !== undefined) query.append('min_confidence', params.min_confidence.toString());
+  if (params?.skip !== undefined) query.append('skip', params.skip.toString());
+  if (params?.limit !== undefined) query.append('limit', params.limit.toString());
+
+  const res = await fetch(`${API_BASE}/threat-intelligence/indicators?${query.toString()}`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').ThreatIndicatorListResponse>(res);
+}
+
+export async function fetchThreatIndicator(id: number): Promise<import('../types').ThreatIndicator> {
+  const res = await fetch(`${API_BASE}/threat-intelligence/indicators/${id}`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').ThreatIndicator>(res);
+}
+
+export async function fetchIndicatorContext(id: number): Promise<import('../types').IndicatorContextResponse> {
+  const res = await fetch(`${API_BASE}/threat-intelligence/indicators/${id}/context`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').IndicatorContextResponse>(res);
+}
+
+export async function createThreatIndicator(
+  payload: import('../types').ThreatIndicatorCreatePayload
+): Promise<import('../types').ThreatIndicator> {
+  const res = await fetch(`${API_BASE}/threat-intelligence/indicators`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<import('../types').ThreatIndicator>(res);
+}
+
+export async function updateThreatIndicator(
+  id: number,
+  payload: import('../types').ThreatIndicatorUpdatePayload
+): Promise<import('../types').ThreatIndicator> {
+  const res = await fetch(`${API_BASE}/threat-intelligence/indicators/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<import('../types').ThreatIndicator>(res);
+}
+
+export async function revokeThreatIndicator(
+  id: number,
+  reason: string = 'Adversary abandoned or deprecated infrastructure'
+): Promise<import('../types').ThreatIndicator> {
+  const query = new URLSearchParams({ reason });
+  const res = await fetch(`${API_BASE}/threat-intelligence/indicators/${id}/revoke?${query.toString()}`, {
+    method: 'POST',
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').ThreatIndicator>(res);
+}
+
+export async function whitelistThreatIndicator(
+  id: number,
+  reason: string = 'Verified authorized internal entity'
+): Promise<import('../types').ThreatIndicator> {
+  const query = new URLSearchParams({ reason });
+  const res = await fetch(`${API_BASE}/threat-intelligence/indicators/${id}/whitelist?${query.toString()}`, {
+    method: 'POST',
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').ThreatIndicator>(res);
+}
+
+export async function promoteCaseObservable(
+  payload: import('../types').PromoteCaseObservablePayload
+): Promise<import('../types').ThreatIndicator> {
+  const res = await fetch(`${API_BASE}/threat-intelligence/indicators/promote-case`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<import('../types').ThreatIndicator>(res);
+}
+
+export async function fetchThreatCampaigns(): Promise<import('../types').CampaignListResponse> {
+  const res = await fetch(`${API_BASE}/threat-intelligence/campaigns`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').CampaignListResponse>(res);
+}
+
+export function getThreatFeedExportUrl(format: 'json' | 'csv' | 'stix', token?: string): string {
+  const base = `${API_BASE}/threat-intelligence/export/${format}`;
+  if (token) {
+    return `${base}?token=${encodeURIComponent(token)}`;
+  }
+  return base;
+}

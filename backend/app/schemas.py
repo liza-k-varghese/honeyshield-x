@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -1410,3 +1411,131 @@ class CanaryValidationResponse(BaseModel):
     status: str = Field(description="Decoy status message")
     message: str = Field(description="Decoy error or response message")
     code: int = Field(default=401, description="Decoy status code")
+
+
+# ==========================================
+# Module 3.8 Threat Intelligence & IOC Fusion Schemas
+# ==========================================
+
+class IndicatorType(str, Enum):
+    IP = "ip"
+    CIDR = "cidr"
+    DOMAIN = "domain"
+    HASH = "hash"
+    USER_AGENT = "user_agent"
+    CANARY_TOKEN = "canary_token"
+
+
+class IndicatorStatus(str, Enum):
+    ACTIVE = "active"
+    DECAYING = "decaying"
+    RETIRED = "retired"
+    REVOKED = "revoked"
+    WHITELISTED = "whitelisted"
+
+
+class ThreatIndicatorCreate(BaseModel):
+    """Schema for creating a new threat indicator."""
+
+    indicator_type: IndicatorType = Field(description="Indicator type (ip, cidr, domain, hash, user_agent, canary_token)")
+    indicator_value: str = Field(min_length=1, max_length=255, description="Indicator value")
+    threat_level: str = Field(default="high", pattern="^(low|medium|high|critical)$", description="Threat level")
+    source: str = Field(default="manual_analyst", max_length=100, description="Intelligence source")
+    confidence: float = Field(default=0.85, ge=0.0, le=1.0, description="Initial base confidence")
+    half_life_days: int = Field(default=14, ge=1, le=365, description="Decay half-life in days")
+    campaign: str | None = Field(default=None, max_length=100, description="Campaign identifier")
+    tags: list[str] = Field(default_factory=list, description="Categorization tags")
+    description: str | None = Field(default=None, max_length=1000, description="Analyst context or notes")
+
+
+class ThreatIndicatorUpdate(BaseModel):
+    """Schema for updating an existing threat indicator."""
+
+    threat_level: str | None = Field(default=None, pattern="^(low|medium|high|critical)$", description="Updated threat level")
+    campaign: str | None = Field(default=None, max_length=100, description="Updated campaign")
+    tags: list[str] | None = Field(default=None, description="Updated tags")
+    description: str | None = Field(default=None, max_length=1000, description="Updated notes")
+    half_life_days: int | None = Field(default=None, ge=1, le=365, description="Updated decay half-life")
+    status: str | None = Field(default=None, pattern="^(active|decaying|retired|revoked|whitelisted)$", description="Target status")
+
+
+class ThreatIndicatorResponse(BaseModel):
+    """Detailed response model for a threat intelligence indicator."""
+
+    id: int = Field(description="Unique indicator record ID")
+    indicator_type: str = Field(description="Indicator type")
+    indicator_value: str = Field(description="Normalized indicator value")
+    threat_level: str = Field(description="Current effective threat level")
+    source: str | None = Field(default=None, description="Reporting source")
+    base_confidence: float = Field(description="Initial base confidence before decay")
+    decayed_confidence: float = Field(description="Current calculated decayed confidence")
+    status: str = Field(description="Lifecycle status: active, decaying, retired, revoked, whitelisted")
+    half_life_days: int = Field(description="Decay half life in days")
+    hit_count: int = Field(description="Number of recorded adversary observations")
+    first_seen: str = Field(description="ISO timestamp when first observed")
+    last_seen: str = Field(description="ISO timestamp when most recently observed")
+    campaign: str | None = Field(default=None, description="Associated threat campaign")
+    tags: list[str] = Field(default_factory=list, description="Associated tags")
+    description: str | None = Field(default=None, description="Analyst notes")
+    created_at: str = Field(description="ISO timestamp of record creation")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ThreatIndicatorListResponse(BaseModel):
+    """Paginated response containing threat indicators."""
+
+    indicators: list[ThreatIndicatorResponse] = Field(description="List of indicators")
+    total: int = Field(description="Total count of matching indicators")
+    page: int = Field(default=1, description="Current page number")
+    page_size: int = Field(default=50, description="Items per page")
+
+
+class PromoteCaseObservableRequest(BaseModel):
+    """Payload to promote an observable from an incident case to threat intelligence."""
+
+    case_id: str = Field(description="Case identifier to link provenance")
+    observable_type: IndicatorType = Field(description="Indicator type")
+    observable_value: str = Field(min_length=1, max_length=255, description="Observable value")
+    threat_level: str = Field(default="high", pattern="^(low|medium|high|critical)$", description="Threat level")
+    campaign: str | None = Field(default=None, max_length=100, description="Optional campaign tag")
+    tags: list[str] = Field(default_factory=list, description="Optional tags")
+    notes: str | None = Field(default=None, max_length=1000, description="Forensic notes")
+
+
+class PromoteCanaryHitRequest(BaseModel):
+    """Payload to promote a canary tripwire hit to threat intelligence."""
+
+    canary_id: str = Field(description="Canary token identifier")
+    source_ip: str = Field(description="Attacker source IP")
+    campaign: str | None = Field(default=None, max_length=100, description="Optional campaign")
+    tags: list[str] = Field(default_factory=list, description="Optional tags")
+
+
+class CampaignCluster(BaseModel):
+    """Aggregated campaign information and infrastructure attribution."""
+
+    campaign_id: str = Field(description="Unique campaign identifier")
+    name: str = Field(description="Campaign display name")
+    indicator_count: int = Field(description="Number of indicators in this campaign")
+    highest_severity: str = Field(description="Highest threat level in campaign")
+    highest_confidence: float = Field(description="Peak indicator confidence")
+    indicator_types: list[str] = Field(description="List of indicator types observed")
+    first_seen: str = Field(description="Earliest observation timestamp")
+    last_seen: str = Field(description="Most recent observation timestamp")
+
+
+class CampaignListResponse(BaseModel):
+    """List of tracked threat campaigns."""
+
+    campaigns: list[CampaignCluster] = Field(description="Tracked campaigns")
+    total: int = Field(description="Total campaign count")
+
+
+class DefensiveFeedResponse(BaseModel):
+    """Defensive blocklist feed metadata and payload."""
+
+    feed_name: str = Field(description="Feed title")
+    generated_at: str = Field(description="ISO timestamp of generation")
+    count: int = Field(description="Total indicators included")
+    indicators: list[dict[str, Any]] = Field(description="Exported indicator objects")

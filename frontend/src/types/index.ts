@@ -655,3 +655,109 @@ export interface CanaryContextResponse {
   associated_alert_ids: number[];
   associated_case_ids: string[];
 }
+
+// =============================================================================
+// Module 3.8: Threat Intelligence & IOC Fusion Types
+// =============================================================================
+
+export type IndicatorType = 'ip' | 'cidr' | 'domain' | 'hash' | 'user_agent' | 'canary_token';
+export type IndicatorStatus = 'active' | 'decaying' | 'retired' | 'revoked' | 'whitelisted';
+
+export interface ThreatIndicator {
+  id: number;
+  indicator_type: IndicatorType;
+  indicator_value: string;
+  threat_level: 'critical' | 'high' | 'medium' | 'low';
+  source: string;
+  base_confidence: number;
+  decayed_confidence: number;
+  status: IndicatorStatus;
+  half_life_days: number;
+  hit_count: number;
+  first_seen: string;
+  last_seen: string;
+  campaign?: string | null;
+  tags: string[];
+  description?: string | null;
+  created_at: string;
+}
+
+export interface ThreatIndicatorCreatePayload {
+  indicator_type: IndicatorType;
+  indicator_value: string;
+  threat_level: 'critical' | 'high' | 'medium' | 'low';
+  source?: string;
+  confidence: number;
+  half_life_days: number;
+  campaign?: string | null;
+  tags: string[];
+  description?: string | null;
+}
+
+export interface ThreatIndicatorUpdatePayload {
+  threat_level?: string | null;
+  campaign?: string | null;
+  tags?: string[] | null;
+  description?: string | null;
+  half_life_days?: number | null;
+  status?: IndicatorStatus | null;
+}
+
+export interface ThreatIndicatorListResponse {
+  indicators: ThreatIndicator[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface CampaignCluster {
+  campaign_id: string;
+  name: string;
+  indicator_count: number;
+  highest_severity: string;
+  highest_confidence: number;
+  indicator_types: string[];
+  first_seen: string;
+  last_seen: string;
+}
+
+export interface CampaignListResponse {
+  campaigns: CampaignCluster[];
+  total: number;
+}
+
+export interface PromoteCaseObservablePayload {
+  case_id: string;
+  observable_type: IndicatorType;
+  observable_value: string;
+  threat_level: string;
+  campaign?: string | null;
+  tags: string[];
+  notes?: string | null;
+}
+
+export interface DefensiveFeedResponse {
+  feed_name: string;
+  generated_at: string;
+  count: number;
+  indicators: Array<{
+    indicator_value: string;
+    indicator_type: string;
+    threat_level: string;
+    confidence: number;
+    campaign?: string | null;
+    last_seen: string;
+  }>;
+}
+
+export interface IndicatorContextResponse {
+  advisory: boolean;
+  authoritative: boolean;
+  generated_at: string;
+  indicator_value: string;
+  indicator_type: string;
+  threat_posture: string;
+  narrative: string;
+  tags_annotated: string[];
+  recommended_actions: string[];
+}

@@ -6,8 +6,8 @@ import { useAuth } from '../context/AuthContext';
 interface HeaderProps {
   health?: SystemHealth;
   isFetching?: boolean;
-  activeView?: 'dashboard' | 'investigation' | 'rules' | 'command' | 'cases' | 'deception';
-  onViewChange?: (view: 'dashboard' | 'investigation' | 'rules' | 'command' | 'cases' | 'deception') => void;
+  activeView?: 'dashboard' | 'investigation' | 'rules' | 'command' | 'cases' | 'deception' | 'intel';
+  onViewChange?: (view: 'dashboard' | 'investigation' | 'rules' | 'command' | 'cases' | 'deception' | 'intel') => void;
   onOpenLogin?: () => void;
 }
 
@@ -111,6 +111,16 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               Deception Grid
+            </button>
+            <button
+              onClick={() => onViewChange?.('intel')}
+              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                activeView === 'intel'
+                  ? 'bg-rose-600 text-white shadow-sm font-semibold'
+                  : 'text-rose-400/80 hover:text-rose-300'
+              }`}
+            >
+              Threat Intel
             </button>
             <button
               onClick={() => onViewChange?.('investigation')}
