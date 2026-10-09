@@ -56,6 +56,8 @@ class EventBus:
         self._lock = threading.Lock()
         # Set of active in-process async subscriber queues
         self._subscribers: set[asyncio.Queue[str]] = set()
+        # Set of synchronous in-process callbacks
+        self._listeners: set[Any] = set()
         self._redis_client: redis.Redis | None = None
         self._init_redis()
 
@@ -124,7 +126,30 @@ class EventBus:
             for dead in dead_queues:
                 self._subscribers.discard(dead)
 
+        # 3. Fan-out to registered synchronous in-process callbacks
+        with self._lock:
+            listeners = list(self._listeners)
+        for listener in listeners:
+            try:
+                listener(event_type, clean_payload)
+            except Exception as e:
+                logger.warning("Listener callback failed for event %s: %s", event_type, e)
+
         return event_data
+
+    def register_listener(self, callback: Any) -> None:
+        """Register a synchronous callback for event bus dispatches."""
+        with self._lock:
+            self._listeners.add(callback)
+
+    def unregister_listener(self, callback: Any) -> None:
+        """Remove a synchronous callback."""
+        with self._lock:
+            self._listeners.discard(callback)
+
+    def publish(self, event_type: str, payload: dict[str, Any]) -> dict[str, Any]:
+        """Publish event alias to maintain consistent interface across modules."""
+        return self.publish_event(event_type, payload)
 
     def register_subscriber(self, queue: asyncio.Queue[str]) -> None:
         """Register an async queue for in-process telemetry fan-out."""

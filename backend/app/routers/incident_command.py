@@ -57,6 +57,7 @@ ACTION_PERMISSIONS: dict[str, str] = {
     "NOTIFICATION_DISPATCH": "command:dispatch_notification",
     "GOVERNOR_LOCKOUT_ENGAGE": "governor:lockout",
     "GOVERNOR_LOCKOUT_RELEASE": "governor:lockout",
+    "SOAR_BLOCK_DISPATCH": "integration:admin",
 }
 
 

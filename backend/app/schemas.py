@@ -1539,3 +1539,142 @@ class DefensiveFeedResponse(BaseModel):
     generated_at: str = Field(description="ISO timestamp of generation")
     count: int = Field(description="Total indicators included")
     indicators: list[dict[str, Any]] = Field(description="Exported indicator objects")
+
+
+# ==========================================
+# Module 3.9 Enterprise Defensive Integration & SIEM-SOAR Webhook Gateway Schemas
+# ==========================================
+
+class WebhookFormat(str, Enum):
+    HONEYSHIELD_JSON = "honeyshield_json"
+    CEF = "cef"
+    LEEF = "leef"
+    SYSLOG_JSON = "syslog_json"
+
+
+class WebhookEndpointCreate(BaseModel):
+    """Schema for registering a new webhook endpoint."""
+
+    name: str = Field(min_length=1, max_length=100, description="Endpoint display name")
+    target_url: str = Field(min_length=8, max_length=2048, description="Target destination URL")
+    description: str | None = Field(default=None, max_length=1000, description="Optional description")
+    enabled: bool = Field(default=True, description="Whether endpoint is active")
+    events: list[str] = Field(
+        default_factory=lambda: ["alert.triggered"],
+        description="Event types to subscribe to (e.g. alert.triggered, canary.tripped, case.escalated, *)",
+    )
+    format: str = Field(
+        default="honeyshield_json",
+        pattern="^(honeyshield_json|cef|leef|syslog_json)$",
+        description="Payload format serializer preset",
+    )
+    custom_headers: dict[str, str] = Field(
+        default_factory=dict,
+        description="Optional custom HTTP headers to include in dispatches",
+    )
+
+
+class WebhookEndpointUpdate(BaseModel):
+    """Schema for updating an existing webhook endpoint."""
+
+    name: str | None = Field(default=None, min_length=1, max_length=100, description="Updated name")
+    target_url: str | None = Field(default=None, min_length=8, max_length=2048, description="Updated URL")
+    description: str | None = Field(default=None, max_length=1000, description="Updated description")
+    enabled: bool | None = Field(default=None, description="Updated enabled state")
+    events: list[str] | None = Field(default=None, description="Updated subscribed events")
+    format: str | None = Field(
+        default=None,
+        pattern="^(honeyshield_json|cef|leef|syslog_json)$",
+        description="Updated payload format",
+    )
+    custom_headers: dict[str, str] | None = Field(default=None, description="Updated custom headers")
+
+
+class WebhookEndpointResponse(BaseModel):
+    """Schema for webhook endpoint details with masked secret."""
+
+    id: str = Field(description="Unique endpoint identifier")
+    name: str = Field(description="Endpoint name")
+    target_url: str = Field(description="Target destination URL")
+    description: str | None = Field(default=None, description="Description")
+    enabled: bool = Field(description="Whether endpoint is enabled")
+    events: list[str] = Field(description="Subscribed event types")
+    format: str = Field(description="Payload format serializer preset")
+    custom_headers: dict[str, str] = Field(default_factory=dict, description="Custom headers")
+    secret: str = Field(description="Masked webhook secret")
+    created_at: str = Field(description="ISO creation timestamp")
+    updated_at: str = Field(description="ISO update timestamp")
+    circuit_state: str = Field(default="closed", description="Circuit breaker state (closed, open, half_open)")
+    consecutive_failures: int = Field(default=0, description="Consecutive failure count")
+    total_sent: int = Field(default=0, description="Total successful deliveries")
+    total_failed: int = Field(default=0, description="Total failed deliveries")
+    last_delivery_at: str | None = Field(default=None, description="Last delivery timestamp")
+    last_status_code: int | None = Field(default=None, description="Last HTTP status code")
+
+
+class WebhookEndpointCreateResponse(WebhookEndpointResponse):
+    """Schema returned strictly upon endpoint creation containing plaintext secret."""
+
+    secret: str = Field(description="Plaintext secret (returned strictly once on creation)")
+
+
+class DlqRecord(BaseModel):
+    """Dead-Letter Queue record for permanently failed deliveries."""
+
+    delivery_id: str = Field(description="Unique delivery UUID")
+    endpoint_id: str = Field(description="Destination endpoint ID")
+    endpoint_name: str = Field(description="Destination endpoint name")
+    target_url: str = Field(description="Target destination URL")
+    event_type: str = Field(description="Event type")
+    payload: dict[str, Any] = Field(description="Original event payload")
+    attempts: int = Field(description="Delivery attempt count")
+    last_error: str = Field(description="Last error explanation")
+    status_code: int | None = Field(default=None, description="Last HTTP status code received")
+    created_at: str = Field(description="ISO failure timestamp")
+
+
+class DlqListResponse(BaseModel):
+    """List of dead-letter queue entries."""
+
+    items: list[DlqRecord] = Field(description="DLQ records")
+    total: int = Field(description="Total count in DLQ")
+
+
+class IntegrationMetricsResponse(BaseModel):
+    """Aggregated gateway metrics."""
+
+    total_endpoints: int = Field(description="Total registered endpoints")
+    active_endpoints: int = Field(description="Active/enabled endpoints")
+    total_dispatched: int = Field(description="Total dispatched payloads")
+    total_delivered: int = Field(description="Total successfully delivered payloads")
+    total_failed: int = Field(description="Total failed deliveries")
+    dlq_count: int = Field(description="Total items currently in DLQ")
+    average_latency_ms: float = Field(description="Average delivery latency in ms")
+    circuits_open: int = Field(description="Number of tripped circuit breakers")
+
+
+class TestPingRequest(BaseModel):
+    """Request payload to trigger a test ping to an endpoint."""
+
+    event_type: str = Field(default="test.ping", max_length=100, description="Event type for test")
+    sample_data: dict[str, Any] | None = Field(default=None, description="Optional custom test payload")
+
+
+class TestPingResponse(BaseModel):
+    """Result of a test ping dispatch."""
+
+    delivery_id: str = Field(description="Test delivery UUID")
+    status: str = Field(description="Delivery status (success/failed)")
+    status_code: int | None = Field(default=None, description="HTTP status code received")
+    latency_ms: float = Field(description="Roundtrip latency in milliseconds")
+    response_preview: str | None = Field(default=None, description="Preview of remote response")
+    error: str | None = Field(default=None, description="Error message if delivery failed")
+
+
+class SoarBlockRequest(BaseModel):
+    """Governor-guarded request to dispatch external containment via SOAR."""
+
+    target_entity_id: str = Field(min_length=1, max_length=255, description="Target entity to contain (IP, domain, hash)")
+    justification: str = Field(min_length=10, max_length=1000, description="Mandatory operational justification (min 10 chars)")
+    approval_token: str = Field(description="Single-use Level-3 Governor preview approval token")
+    parameters: dict[str, Any] | None = Field(default=None, description="Optional containment parameters")

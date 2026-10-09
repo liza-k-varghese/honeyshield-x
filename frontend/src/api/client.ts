@@ -693,3 +693,104 @@ export function getThreatFeedExportUrl(format: 'json' | 'csv' | 'stix', token?: 
   }
   return base;
 }
+
+// =============================================================================
+// Module 3.9: Enterprise Defensive Integration & SIEM-SOAR Webhook Gateway API
+// =============================================================================
+
+export async function fetchEndpoints(): Promise<import('../types').WebhookEndpoint[]> {
+  const res = await fetch(`${API_BASE}/integrations/endpoints`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').WebhookEndpoint[]>(res);
+}
+
+export async function fetchEndpoint(id: string): Promise<import('../types').WebhookEndpoint> {
+  const res = await fetch(`${API_BASE}/integrations/endpoints/${encodeURIComponent(id)}`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').WebhookEndpoint>(res);
+}
+
+export async function createEndpoint(
+  payload: import('../types').WebhookEndpointCreatePayload
+): Promise<import('../types').WebhookEndpoint> {
+  const res = await fetch(`${API_BASE}/integrations/endpoints`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<import('../types').WebhookEndpoint>(res);
+}
+
+export async function updateEndpoint(
+  id: string,
+  payload: import('../types').WebhookEndpointUpdatePayload
+): Promise<import('../types').WebhookEndpoint> {
+  const res = await fetch(`${API_BASE}/integrations/endpoints/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<import('../types').WebhookEndpoint>(res);
+}
+
+export async function deleteEndpoint(id: string): Promise<{ deleted: boolean; endpoint_id: string }> {
+  const res = await fetch(`${API_BASE}/integrations/endpoints/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<{ deleted: boolean; endpoint_id: string }>(res);
+}
+
+export async function testEndpoint(
+  id: string,
+  payload?: import('../types').TestPingPayload
+): Promise<import('../types').TestPingResponse> {
+  const res = await fetch(`${API_BASE}/integrations/endpoints/${encodeURIComponent(id)}/test`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(payload || {}),
+  });
+  return handleResponse<import('../types').TestPingResponse>(res);
+}
+
+export async function fetchDlq(limit: number = 50, offset: number = 0): Promise<import('../types').DlqListResponse> {
+  const query = new URLSearchParams({ limit: limit.toString(), offset: offset.toString() });
+  const res = await fetch(`${API_BASE}/integrations/dlq?${query.toString()}`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').DlqListResponse>(res);
+}
+
+export async function retryDlqItem(id: string): Promise<Record<string, any>> {
+  const res = await fetch(`${API_BASE}/integrations/dlq/${encodeURIComponent(id)}/retry`, {
+    method: 'POST',
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<Record<string, any>>(res);
+}
+
+export async function deleteDlqRecord(id: string): Promise<{ deleted: boolean; delivery_id: string }> {
+  const res = await fetch(`${API_BASE}/integrations/dlq/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<{ deleted: boolean; delivery_id: string }>(res);
+}
+
+export async function fetchIntegrationMetrics(): Promise<import('../types').IntegrationMetrics> {
+  const res = await fetch(`${API_BASE}/integrations/metrics`, {
+    headers: { ...getAuthHeaders() },
+  });
+  return handleResponse<import('../types').IntegrationMetrics>(res);
+}

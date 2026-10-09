@@ -171,6 +171,11 @@ def dispatch_alert_notification(
         if sent:
             final_alert.notification_status = "delivered"
             final_alert.notified_at = datetime.now(timezone.utc).replace(tzinfo=None)
+            try:
+                from app.integrations.dispatcher import default_dispatcher
+                default_dispatcher.fanout_legacy_alert(final_alert)
+            except Exception:
+                pass
         else:
             final_alert.notification_status = "failed"
             final_alert.notified_at = None
@@ -182,3 +187,27 @@ def dispatch_alert_notification(
         "sent": sent,
         "message": message,
     }
+
+
+def fanout_legacy_alert(
+    alert_id: int,
+    severity: str = "medium",
+    attack_type: str = "UNKNOWN",
+    source_ip: str | None = None,
+    details: dict | None = None,
+) -> list[str]:
+    """Helper for programmatic fanout of legacy-style alerts to Module 3.9 endpoints."""
+    from app.integrations.dispatcher import default_dispatcher
+
+    class _MockAlert:
+        def __init__(self):
+            self.id = alert_id
+            self.title = f"Alert: {attack_type}"
+            self.severity = severity
+            self.status = "open"
+            self.notification_status = "delivered"
+            self.attack_type = attack_type
+            self.source_ip = source_ip
+            self.details = details or {}
+
+    return default_dispatcher.fanout_legacy_alert(_MockAlert())

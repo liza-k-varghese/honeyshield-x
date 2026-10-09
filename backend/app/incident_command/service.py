@@ -48,6 +48,7 @@ ACTION_DESCRIPTIONS: dict[str, str] = {
     "CONTAINMENT_STAGING_REQUEST": "Stages an IP containment recommendation and audit record without kernel tampering.",
     "GOVERNOR_LOCKOUT_ENGAGE": "Engages system-wide emergency freeze on all outbound notification dispatches.",
     "GOVERNOR_LOCKOUT_RELEASE": "Releases emergency outbound dispatch freeze.",
+    "SOAR_BLOCK_DISPATCH": "Dispatches external containment action to configured SOAR platform with Tier-3 Governor governance.",
 }
 
 def _circuit_breaker_transition_listener(prev: str, curr: str, reason: str) -> None:
@@ -307,6 +308,22 @@ def execute_incident_command(
             new_status = "lockout_released"
             msg = f"Emergency outbound lockout released by {operator_id}"
             default_event_bus.publish_event("governor.lockout", {"engaged": False, "operator_id": operator_id})
+
+        elif action == "SOAR_BLOCK_DISPATCH":
+            previous_state = {"containment": "uncontained"}
+            new_status = "soar_containment_staged"
+            msg = (
+                f"External SOAR containment dispatch executed for target '{target_id}' "
+                f"by {operator_id}. (Tier-3 Governor validated, host kernel routing untouched)."
+            )
+            default_event_bus.publish_event(
+                "soar.containment.dispatched",
+                {
+                    "target_id": str(target_id),
+                    "operator_id": operator_id,
+                    "justification": request.justification,
+                },
+            )
 
     except HTTPException as e:
         default_governor.release_idempotency_key(clean_idem_key)

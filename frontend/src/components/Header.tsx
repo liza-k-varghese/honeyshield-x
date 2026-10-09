@@ -6,8 +6,8 @@ import { useAuth } from '../context/AuthContext';
 interface HeaderProps {
   health?: SystemHealth;
   isFetching?: boolean;
-  activeView?: 'dashboard' | 'investigation' | 'rules' | 'command' | 'cases' | 'deception' | 'intel';
-  onViewChange?: (view: 'dashboard' | 'investigation' | 'rules' | 'command' | 'cases' | 'deception' | 'intel') => void;
+  activeView?: 'dashboard' | 'investigation' | 'rules' | 'command' | 'cases' | 'deception' | 'intel' | 'integrations';
+  onViewChange?: (view: 'dashboard' | 'investigation' | 'rules' | 'command' | 'cases' | 'deception' | 'intel' | 'integrations') => void;
   onOpenLogin?: () => void;
 }
 
@@ -141,6 +141,16 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               Detection & Replay
+            </button>
+            <button
+              onClick={() => onViewChange?.('integrations')}
+              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                activeView === 'integrations'
+                  ? 'bg-purple-600 text-white shadow-sm font-semibold'
+                  : 'text-purple-400/80 hover:text-purple-300'
+              }`}
+            >
+              Integrations
             </button>
           </div>
         </div>

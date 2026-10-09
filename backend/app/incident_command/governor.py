@@ -39,6 +39,7 @@ ALLOWED_ACTIONS: set[str] = {
     "IOC_BULK_REVOKE",
     "IOC_CONTAINMENT_DISPATCH",
     "IOC_FEED_LOCKOUT",
+    "SOAR_BLOCK_DISPATCH",
 }
 
 BLAST_RADIUS_TIERS: dict[str, int] = {
@@ -53,6 +54,7 @@ BLAST_RADIUS_TIERS: dict[str, int] = {
     "IOC_BULK_REVOKE": 3,
     "IOC_CONTAINMENT_DISPATCH": 3,
     "IOC_FEED_LOCKOUT": 3,
+    "SOAR_BLOCK_DISPATCH": 3,
 }
 
 MAX_OPERATOR_RATE_LIMIT: int = 10  # Max commands
@@ -398,10 +400,10 @@ class DeterministicGovernor:
         # 2. Emergency Lockout Gate (HTTP 503)
         # Lockout specifically blocks outbound dispatch
         with self._lock:
-            if self._emergency_lockout and action == "NOTIFICATION_DISPATCH":
+            if self._emergency_lockout and action in ("NOTIFICATION_DISPATCH", "SOAR_BLOCK_DISPATCH"):
                 raise HTTPException(
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    detail="Governor emergency lockout is actively engaged. Outbound notification dispatches are blocked.",
+                    detail="Governor emergency lockout is actively engaged. Outbound notification and containment dispatches are blocked.",
                 )
 
         # 3. Circuit Breaker Gate for Outbound Actions (HTTP 503)
@@ -539,7 +541,7 @@ class DeterministicGovernor:
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Approval token has expired. Please request a new preview token.",
                 )
-            if info["action"] != action or info["target_id"] != target_id:
+            if info["action"] != action or str(info["target_id"]) != str(target_id):
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Approval token mismatch for requested action or target.",

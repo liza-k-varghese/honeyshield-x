@@ -761,3 +761,92 @@ export interface IndicatorContextResponse {
   tags_annotated: string[];
   recommended_actions: string[];
 }
+
+// =============================================================================
+// Module 3.9: Enterprise Defensive Integration & SIEM-SOAR Webhook Gateway Types
+// =============================================================================
+
+export type WebhookFormat = 'honeyshield_json' | 'cef' | 'leef' | 'syslog_json';
+
+export interface WebhookEndpoint {
+  id: string;
+  name: string;
+  target_url: string;
+  description: string | null;
+  enabled: boolean;
+  events: string[];
+  format: WebhookFormat;
+  custom_headers: Record<string, string>;
+  secret: string;
+  created_at: string;
+  updated_at: string;
+  circuit_state: 'closed' | 'open' | 'half_open';
+  consecutive_failures: number;
+  total_sent: number;
+  total_failed: number;
+  last_delivery_at: string | null;
+  last_status_code: number | null;
+}
+
+export interface WebhookEndpointCreatePayload {
+  name: string;
+  target_url: string;
+  description?: string | null;
+  enabled?: boolean;
+  events?: string[];
+  format?: WebhookFormat;
+  custom_headers?: Record<string, string>;
+}
+
+export interface WebhookEndpointUpdatePayload {
+  name?: string | null;
+  target_url?: string | null;
+  description?: string | null;
+  enabled?: boolean | null;
+  events?: string[] | null;
+  format?: WebhookFormat | null;
+  custom_headers?: Record<string, string> | null;
+}
+
+export interface DlqRecord {
+  delivery_id: string;
+  endpoint_id: string;
+  endpoint_name: string;
+  target_url: string;
+  event_type: string;
+  payload: Record<string, any>;
+  attempts: number;
+  last_error: string;
+  status_code: number | null;
+  created_at: string;
+}
+
+export interface DlqListResponse {
+  items: DlqRecord[];
+  total: number;
+}
+
+export interface IntegrationMetrics {
+  total_endpoints: number;
+  active_endpoints: number;
+  total_dispatched: number;
+  total_delivered: number;
+  total_failed: number;
+  dlq_count: number;
+  average_latency_ms: number;
+  circuits_open: number;
+}
+
+export interface TestPingPayload {
+  event_type?: string;
+  sample_data?: Record<string, any> | null;
+}
+
+export interface TestPingResponse {
+  delivery_id: string;
+  status: 'success' | 'failed';
+  status_code: number | null;
+  latency_ms: number;
+  response_preview: string | null;
+  error: string | null;
+}

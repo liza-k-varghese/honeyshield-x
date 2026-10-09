@@ -137,6 +137,28 @@ THREAT_INTEL_ROLE_PERMISSIONS: dict[str, set[str]] = {
     },
 }
 
+# Module 3.9 Deterministic Enterprise Integration Permissions Mapping
+INTEGRATION_ROLE_PERMISSIONS: dict[str, set[str]] = {
+    "viewer": {
+        "integration:view",
+    },
+    "analyst": {
+        "integration:view",
+        "integration:test",
+    },
+    "incident_responder": {
+        "integration:view",
+        "integration:test",
+        "integration:retry",
+    },
+    "security_administrator": {
+        "integration:view",
+        "integration:test",
+        "integration:retry",
+        "integration:admin",
+    },
+}
+
 MAX_FAILED_LOGIN_ATTEMPTS: int = 5
 LOCKOUT_DURATION_SECONDS: float = 900.0  # 15 minutes
 
@@ -160,7 +182,8 @@ class Operator:
         case_perms = set(CASE_ROLE_PERMISSIONS.get(self.role, set()))
         deception_perms = set(DECEPTION_ROLE_PERMISSIONS.get(self.role, set()))
         intel_perms = set(THREAT_INTEL_ROLE_PERMISSIONS.get(self.role, set()))
-        return base_perms | case_perms | deception_perms | intel_perms
+        integration_perms = set(INTEGRATION_ROLE_PERMISSIONS.get(self.role, set()))
+        return base_perms | case_perms | deception_perms | intel_perms | integration_perms
 
     def has_permission(self, permission: str) -> bool:
         """Check if operator role satisfies permission requirement."""
