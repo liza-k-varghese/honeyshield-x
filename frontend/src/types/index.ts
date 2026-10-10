@@ -1028,3 +1028,147 @@ export interface CampaignContainmentResponse {
   governor_eval: Record<string, any>;
   dispatched_at: string;
 }
+
+// ==========================================
+// Module 3.11 Threat Hunting Types
+// ==========================================
+
+export type HuntStatus = 'draft' | 'scheduled' | 'running' | 'completed' | 'concluded' | 'archived';
+export type HuntVerdict = 'malicious_confirmed' | 'benign_activity' | 'inconclusive';
+
+export interface HuntQuerySpec {
+  time_range_start?: string | null;
+  time_range_end?: string | null;
+  source_ips?: string[];
+  destination_ips?: string[];
+  attack_types?: string[];
+  severities?: string[];
+  alert_statuses?: string[];
+  payload_substring?: string | null;
+  ioc_values?: string[];
+  canary_ids?: string[];
+  campaign_ids?: string[];
+  regex_pattern?: string | null;
+  limit?: number;
+}
+
+export interface HuntEvidenceRecord {
+  evidence_id: string;
+  entity_type: string;
+  entity_id: string;
+  timestamp: string;
+  summary: string;
+  source_ip?: string | null;
+  destination_ip?: string | null;
+  technique?: string | null;
+  attributes: Record<string, any>;
+}
+
+export interface HuntNote {
+  note_id: string;
+  operator_id: string;
+  role: string;
+  message: string;
+  created_at: string;
+}
+
+export interface HuntDossier {
+  hunt_id: string;
+  title: string;
+  description: string;
+  status: HuntStatus;
+  severity: SeverityLevel;
+  mitre_tactics: string[];
+  mitre_techniques: string[];
+  query_spec: HuntQuerySpec;
+  evidence: HuntEvidenceRecord[];
+  forensic_notes: HuntNote[];
+  conclusion_summary?: string | null;
+  verdict?: HuntVerdict | null;
+  promoted_rule_ids: string[];
+  promoted_case_ids: string[];
+  execution_count: number;
+  last_executed_at?: string | null;
+  is_automated_suggestion?: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HuntSummary {
+  hunt_id: string;
+  title: string;
+  status: HuntStatus;
+  severity: SeverityLevel;
+  mitre_tactics: string[];
+  evidence_count: number;
+  verdict?: HuntVerdict | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  last_executed_at?: string | null;
+  is_automated_suggestion?: boolean;
+}
+
+export interface ListHuntResponse {
+  hunts: HuntSummary[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface HuntMetrics {
+  total_hunts: number;
+  active_hunts: number;
+  concluded_hunts: number;
+  archived_hunts: number;
+  malicious_confirmed: number;
+  benign_activity: number;
+  inconclusive: number;
+  promoted_rules_count: number;
+  promoted_cases_count: number;
+}
+
+export interface HuntCreatePayload {
+  title: string;
+  description: string;
+  severity?: SeverityLevel;
+  mitre_tactics?: string[];
+  mitre_techniques?: string[];
+  query_spec?: HuntQuerySpec;
+}
+
+export interface HuntUpdatePayload {
+  title?: string;
+  description?: string;
+  severity?: SeverityLevel;
+  mitre_tactics?: string[];
+  mitre_techniques?: string[];
+  query_spec?: HuntQuerySpec;
+  conclusion_summary?: string;
+  verdict?: HuntVerdict;
+  note?: string;
+}
+
+export interface HuntExecutionResponse {
+  hunt_id: string;
+  status: HuntStatus;
+  matched_count: number;
+  duration_ms: number;
+  evidence: HuntEvidenceRecord[];
+  execution_count: number;
+  executed_at: string;
+}
+
+export interface HuntPromotionPayload {
+  justification: string;
+  approval_token?: string;
+}
+
+export interface HuntPromotionResponse {
+  hunt_id: string;
+  promotion_type: 'rule' | 'case';
+  target_id: string;
+  message: string;
+  promoted_at: string;
+}

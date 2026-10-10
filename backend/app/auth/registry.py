@@ -179,6 +179,35 @@ CAMPAIGN_ROLE_PERMISSIONS: dict[str, set[str]] = {
     },
 }
 
+# Module 3.11 Deterministic Retrospective Threat Hunting Permissions Mapping
+HUNT_ROLE_PERMISSIONS: dict[str, set[str]] = {
+    "viewer": {
+        "hunt:view",
+    },
+    "analyst": {
+        "hunt:view",
+        "hunt:create",
+        "hunt:update",
+        "hunt:execute",
+        "hunt:promote",
+    },
+    "incident_responder": {
+        "hunt:view",
+        "hunt:create",
+        "hunt:update",
+        "hunt:execute",
+        "hunt:promote",
+    },
+    "security_administrator": {
+        "hunt:view",
+        "hunt:create",
+        "hunt:update",
+        "hunt:execute",
+        "hunt:promote",
+        "hunt:admin",
+    },
+}
+
 MAX_FAILED_LOGIN_ATTEMPTS: int = 5
 LOCKOUT_DURATION_SECONDS: float = 900.0  # 15 minutes
 
@@ -204,7 +233,8 @@ class Operator:
         intel_perms = set(THREAT_INTEL_ROLE_PERMISSIONS.get(self.role, set()))
         integration_perms = set(INTEGRATION_ROLE_PERMISSIONS.get(self.role, set()))
         campaign_perms = set(CAMPAIGN_ROLE_PERMISSIONS.get(self.role, set()))
-        return base_perms | case_perms | deception_perms | intel_perms | integration_perms | campaign_perms
+        hunt_perms = set(HUNT_ROLE_PERMISSIONS.get(self.role, set()))
+        return base_perms | case_perms | deception_perms | intel_perms | integration_perms | campaign_perms | hunt_perms
 
     def has_permission(self, permission: str) -> bool:
         """Check if operator role satisfies permission requirement."""

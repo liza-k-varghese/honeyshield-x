@@ -1881,3 +1881,168 @@ class CampaignMetricsResponse(BaseModel):
     resolved_campaigns: int = Field(description="Count of resolved campaigns")
     mean_dwell_time_hours: float = Field(description="Average campaign duration in hours")
     top_mitre_tactics: list[dict[str, Any]] = Field(default_factory=list, description="Most frequent MITRE tactics observed")
+
+
+# ==========================================
+# Module 3.11 Retrospective Threat Hunting & Adversary Hypothesis Engine Schemas
+# ==========================================
+
+class HuntQuerySpec(BaseModel):
+    """Filter specifications for deterministic retrospective historical scan."""
+
+    time_range_start: str | None = Field(default=None, description="ISO 8601 UTC start timestamp")
+    time_range_end: str | None = Field(default=None, description="ISO 8601 UTC end timestamp")
+    source_ips: list[str] = Field(default_factory=list, description="Target attacker source IPs or subnets")
+    destination_ips: list[str] = Field(default_factory=list, description="Target destination/decoy IPs")
+    attack_types: list[str] = Field(default_factory=list, description="Attack classification types")
+    severities: list[str] = Field(default_factory=list, description="Severity bands (low, medium, high, critical)")
+    alert_statuses: list[str] = Field(default_factory=list, description="Alert statuses (open, acknowledged, resolved)")
+    payload_substring: str | None = Field(default=None, max_length=255, description="Case-insensitive substring match")
+    ioc_values: list[str] = Field(default_factory=list, description="Specific threat indicator values")
+    canary_ids: list[str] = Field(default_factory=list, description="Deception canary identifiers")
+    campaign_ids: list[str] = Field(default_factory=list, description="Campaign identifiers")
+    regex_pattern: str | None = Field(default=None, max_length=64, description="Safe AST-validated regex pattern")
+    limit: int = Field(default=50, ge=1, le=200, description="Maximum evidence records to return (cap 200)")
+
+
+class HuntEvidenceRecord(BaseModel):
+    """Structured evidence item discovered during retrospective hunt."""
+
+    evidence_id: str = Field(description="Deterministic ID: ev-[12 hex]")
+    entity_type: str = Field(description="attack, alert, attack_event, canary_hit, ioc_match, campaign")
+    entity_id: str = Field(description="Underlying entity identifier")
+    timestamp: str = Field(description="ISO 8601 UTC observation timestamp")
+    summary: str = Field(max_length=255, description="Brief narrative of evidence")
+    source_ip: str | None = Field(default=None, max_length=45)
+    destination_ip: str | None = Field(default=None, max_length=45)
+    technique: str | None = Field(default=None, max_length=50)
+    attributes: dict[str, Any] = Field(default_factory=dict, description="Sanitized key-value attributes")
+
+
+class HuntNote(BaseModel):
+    """Forensic journal entry added to hunt dossier."""
+
+    note_id: str = Field(description="Unique note identifier")
+    operator_id: str = Field(description="Author operator username")
+    role: str = Field(description="Author operator SOC role")
+    message: str = Field(min_length=1, max_length=2000, description="Analyst investigative note")
+    created_at: str = Field(description="ISO 8601 timestamp")
+
+
+class HuntDossier(BaseModel):
+    """Complete investigative threat hunt dossier."""
+
+    hunt_id: str = Field(description="Format: hunt-[12 hex]")
+    title: str = Field(min_length=10, max_length=150, description="Hypothesis title")
+    description: str = Field(max_length=2000, description="Hypothesis narrative")
+    status: str = Field(description="draft, scheduled, running, completed, concluded, archived")
+    severity: str = Field(default="medium", description="low, medium, high, critical")
+    mitre_tactics: list[str] = Field(default_factory=list)
+    mitre_techniques: list[str] = Field(default_factory=list)
+    query_spec: HuntQuerySpec = Field(default_factory=HuntQuerySpec)
+    evidence: list[HuntEvidenceRecord] = Field(default_factory=list)
+    forensic_notes: list[HuntNote] = Field(default_factory=list)
+    conclusion_summary: str | None = Field(default=None, max_length=1000)
+    verdict: str | None = Field(default=None, description="malicious_confirmed, benign_activity, inconclusive")
+    promoted_rule_ids: list[str] = Field(default_factory=list)
+    promoted_case_ids: list[str] = Field(default_factory=list)
+    execution_count: int = Field(default=0)
+    last_executed_at: str | None = Field(default=None)
+    is_automated_suggestion: bool = Field(default=False)
+    created_by: str = Field(description="Operator username")
+    created_at: str = Field(description="ISO 8601 creation timestamp")
+    updated_at: str = Field(description="ISO 8601 update timestamp")
+
+
+class HuntCreateRequest(BaseModel):
+    """Payload for creating a new threat hunt hypothesis."""
+
+    title: str = Field(min_length=10, max_length=150, description="Hypothesis title")
+    description: str = Field(max_length=2000, description="Hypothesis narrative description")
+    severity: str = Field(default="medium", pattern="^(low|medium|high|critical)$")
+    mitre_tactics: list[str] = Field(default_factory=list)
+    mitre_techniques: list[str] = Field(default_factory=list)
+    query_spec: HuntQuerySpec | None = Field(default=None)
+
+
+class HuntUpdateRequest(BaseModel):
+    """Payload for updating hunt metadata, hypothesis, or concluding verdict."""
+
+    title: str | None = Field(default=None, min_length=10, max_length=150)
+    description: str | None = Field(default=None, max_length=2000)
+    severity: str | None = Field(default=None, pattern="^(low|medium|high|critical)$")
+    mitre_tactics: list[str] | None = Field(default=None)
+    mitre_techniques: list[str] | None = Field(default=None)
+    query_spec: HuntQuerySpec | None = Field(default=None)
+    conclusion_summary: str | None = Field(default=None, max_length=1000)
+    verdict: str | None = Field(default=None, pattern="^(malicious_confirmed|benign_activity|inconclusive)$")
+    note: str | None = Field(default=None, max_length=2000, description="Optional note to append")
+
+
+class HuntExecutionResponse(BaseModel):
+    """Response payload for retrospective hunt query execution."""
+
+    hunt_id: str = Field(description="Hunt identifier")
+    status: str = Field(description="Status after execution")
+    matched_count: int = Field(ge=0, description="Number of evidence records matched")
+    duration_ms: float = Field(ge=0.0, description="Execution duration in milliseconds")
+    evidence: list[HuntEvidenceRecord] = Field(default_factory=list)
+    execution_count: int = Field(ge=1)
+    executed_at: str = Field(description="ISO 8601 execution timestamp")
+
+
+class HuntPromotionRequest(BaseModel):
+    """Request payload for promoting hunt findings to Rule or Case."""
+
+    justification: str = Field(min_length=10, max_length=1000, description="Mandatory operator justification (min 10 chars)")
+    approval_token: str | None = Field(default=None, description="Optional pre-flight token")
+
+
+class HuntPromotionResponse(BaseModel):
+    """Response payload following successful hunt promotion."""
+
+    hunt_id: str = Field(description="Originating hunt identifier")
+    promotion_type: str = Field(description="rule or case")
+    target_id: str = Field(description="Minted detection rule ID or incident case ID")
+    message: str = Field(description="Summary message")
+    promoted_at: str = Field(description="ISO 8601 timestamp")
+
+
+class HuntSummary(BaseModel):
+    """Lightweight projection of a hunt for table listing."""
+
+    hunt_id: str = Field(description="Format: hunt-[12 hex]")
+    title: str = Field(description="Hypothesis title")
+    status: str = Field(description="Lifecycle status")
+    severity: str = Field(description="Severity classification")
+    mitre_tactics: list[str] = Field(default_factory=list)
+    evidence_count: int = Field(default=0)
+    verdict: str | None = Field(default=None)
+    created_by: str = Field(description="Operator username")
+    created_at: str = Field(description="ISO 8601 timestamp")
+    updated_at: str = Field(description="ISO 8601 timestamp")
+    last_executed_at: str | None = Field(default=None)
+    is_automated_suggestion: bool = Field(default=False)
+
+
+class ListHuntResponse(BaseModel):
+    """Paginated list of threat hunts."""
+
+    hunts: list[HuntSummary] = Field(description="Collection of hunt summaries")
+    total: int = Field(ge=0, description="Total matching hunts")
+    limit: int = Field(ge=1)
+    offset: int = Field(ge=0)
+
+
+class HuntMetricsResponse(BaseModel):
+    """Operational KPI metrics for threat hunting console ribbon."""
+
+    total_hunts: int = Field(ge=0)
+    active_hunts: int = Field(ge=0)
+    concluded_hunts: int = Field(ge=0)
+    archived_hunts: int = Field(ge=0)
+    malicious_confirmed: int = Field(ge=0)
+    benign_activity: int = Field(ge=0)
+    inconclusive: int = Field(ge=0)
+    promoted_rules_count: int = Field(ge=0)
+    promoted_cases_count: int = Field(ge=0)

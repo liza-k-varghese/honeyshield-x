@@ -19,6 +19,7 @@ from app.routers import (
     deception,
     detection,
     detection_rules,
+    hunts,
     incident_command,
     ingestion,
     integrations,
@@ -76,6 +77,7 @@ app.include_router(cases.router, prefix="/api/v1")
 app.include_router(deception.router, prefix="/api/v1")
 app.include_router(integrations.router, prefix="/api/v1")
 app.include_router(campaigns.router, prefix="/api/v1")
+app.include_router(hunts.router, prefix="/api/v1")
 
 POSTGRES_HOST = "127.0.0.1"
 POSTGRES_PORT = 5432

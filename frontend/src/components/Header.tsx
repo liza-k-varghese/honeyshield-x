@@ -6,8 +6,8 @@ import { useAuth } from '../context/AuthContext';
 interface HeaderProps {
   health?: SystemHealth;
   isFetching?: boolean;
-  activeView?: 'dashboard' | 'investigation' | 'rules' | 'command' | 'cases' | 'deception' | 'intel' | 'integrations' | 'campaigns';
-  onViewChange?: (view: 'dashboard' | 'investigation' | 'rules' | 'command' | 'cases' | 'deception' | 'intel' | 'integrations' | 'campaigns') => void;
+  activeView?: 'dashboard' | 'investigation' | 'rules' | 'command' | 'cases' | 'deception' | 'intel' | 'integrations' | 'campaigns' | 'hunts';
+  onViewChange?: (view: 'dashboard' | 'investigation' | 'rules' | 'command' | 'cases' | 'deception' | 'intel' | 'integrations' | 'campaigns' | 'hunts') => void;
   onOpenLogin?: () => void;
 }
 
@@ -161,6 +161,16 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               Campaigns
+            </button>
+            <button
+              onClick={() => onViewChange?.('hunts')}
+              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                activeView === 'hunts'
+                  ? 'bg-teal-600 text-white shadow-sm font-semibold'
+                  : 'text-teal-400/80 hover:text-teal-300'
+              }`}
+            >
+              Threat Hunting
             </button>
           </div>
         </div>

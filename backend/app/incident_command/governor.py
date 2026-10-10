@@ -42,6 +42,7 @@ ALLOWED_ACTIONS: set[str] = {
     "SOAR_BLOCK_DISPATCH",
     "CAMPAIGN_CONTAINMENT_DISPATCH",
     "CAMPAIGN_STATUS_OVERRIDE",
+    "HUNT_PROMOTION_DISPATCH",
 }
 
 BLAST_RADIUS_TIERS: dict[str, int] = {
@@ -50,6 +51,7 @@ BLAST_RADIUS_TIERS: dict[str, int] = {
     "ALERT_RESOLVE": 2,
     "ALERT_ESCALATE": 2,
     "CAMPAIGN_STATUS_OVERRIDE": 2,
+    "HUNT_PROMOTION_DISPATCH": 2,
     "NOTIFICATION_DISPATCH": 3,
     "CONTAINMENT_STAGING_REQUEST": 3,
     "GOVERNOR_LOCKOUT_ENGAGE": 3,
@@ -408,10 +410,11 @@ class DeterministicGovernor:
                 "NOTIFICATION_DISPATCH",
                 "SOAR_BLOCK_DISPATCH",
                 "CAMPAIGN_CONTAINMENT_DISPATCH",
+                "HUNT_PROMOTION_DISPATCH",
             ):
                 raise HTTPException(
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    detail="Governor emergency lockout is actively engaged. Outbound notification and containment dispatches are blocked.",
+                    detail="Governor emergency lockout is actively engaged. Outbound notification, containment, and promotion dispatches are blocked.",
                 )
 
         # 3. Circuit Breaker Gate for Outbound Actions (HTTP 503)
