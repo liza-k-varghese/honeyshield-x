@@ -63,6 +63,9 @@ class TestModule33(unittest.TestCase):
         self.created_attack_ids: list[int] = []
         self.created_event_ids: list[int] = []
         self.created_sys_event_ids: list[int] = []
+        # Isolate in-memory rule registry against cross-test pollution from other suites
+        from app.multi_vector_detection.registry import SEEDED_RULES
+        default_registry._rules = {r.rule_id: r for r in SEEDED_RULES}
 
     def tearDown(self):
         # Clean up test records
@@ -91,6 +94,8 @@ class TestModule33(unittest.TestCase):
             self.db.rollback()
         finally:
             self.db.close()
+            from app.multi_vector_detection.registry import SEEDED_RULES
+            default_registry._rules = {r.rule_id: r for r in SEEDED_RULES}
 
     def test_1_rule_catalog_seeded_rules(self):
         """Verify the rule catalog returns all 5 seeded rules with complete criteria."""
@@ -517,3 +522,202 @@ class TestModule33(unittest.TestCase):
         r7 = get_audit_events_endpoint(limit=20, db=self.db)
         self.assertIsInstance(r7, AuditEventsResponse)
         self.assertIsInstance(r7.events, list)
+
+    def test_13_replay_risk_score_dual_scale_boundaries(self):
+        """Verify raw_rule_risk_score bounds (0-10) and composite_operational_risk bounds (0-100)."""
+        from pydantic import ValidationError
+        from app.schemas import ReplayDetectionSummary
+
+        base = {
+            "detected": True,
+            "is_multi_vector": False,
+            "vectors_detected": ["web"],
+            "rules_triggered": ["WEB_SQL_INJECTION"],
+            "severity": "critical",
+            "suggested_risk_score": 9.5,
+        }
+
+        # Valid boundaries
+        m1 = ReplayDetectionSummary(**base, raw_rule_risk_score=0.0, composite_operational_risk=0.0)
+        self.assertEqual(m1.raw_rule_risk_score, 0.0)
+        self.assertEqual(m1.composite_operational_risk, 0.0)
+
+        m2 = ReplayDetectionSummary(**base, raw_rule_risk_score=10.0, composite_operational_risk=100.0)
+        self.assertEqual(m2.raw_rule_risk_score, 10.0)
+        self.assertEqual(m2.composite_operational_risk, 100.0)
+
+        # Invalid raw_rule_risk_score (< 0.0 or > 10.0)
+        with self.assertRaises(ValidationError):
+            ReplayDetectionSummary(**base, raw_rule_risk_score=-0.1)
+        with self.assertRaises(ValidationError):
+            ReplayDetectionSummary(**base, raw_rule_risk_score=10.1)
+
+        # Invalid composite_operational_risk (< 0.0 or > 100.0)
+        with self.assertRaises(ValidationError):
+            ReplayDetectionSummary(**base, composite_operational_risk=-0.1)
+        with self.assertRaises(ValidationError):
+            ReplayDetectionSummary(**base, composite_operational_risk=100.1)
+
+    def test_14_orchestrated_attack_replay_operational_reconstruction(self):
+        """Verify replay of orchestrated attack correctly reconstructs baseline_score and correlation boost."""
+        now = datetime.now(timezone.utc)
+        atk = Attack(
+            attack_type="web_probe",
+            source_ip="203.0.113.199",
+            protocol="http",
+            severity="critical",
+            risk_score=100.0,
+            status="detected",
+            detected_at=now,
+        )
+        self.db.add(atk)
+        self.db.commit()
+        self.created_attack_ids.append(atk.id)
+
+        # Seed events: SQLi probe matching WEB_SQL_INJECTION (9.5)
+        ev1 = AttackEvent(
+            attack_id=atk.id,
+            event_type="web_access",
+            source_ip="203.0.113.199",
+            message="GET /search.php?q=admin' UNION SELECT 1,2,3-- HTTP/1.1",
+            event_time=now - timedelta(seconds=10),
+        )
+        self.db.add(ev1)
+
+        # Seed multi_vector_detection SystemEvent
+        mv_ev = SystemEvent(
+            event_type="multi_vector_detection",
+            source="multi_vector_detection_engine",
+            severity="critical",
+            message=f"Multi-vector detection: attack_id={atk.id}, multi_vector=False, vectors=['web'], rules=['WEB_SQL_INJECTION'], score=9.5",
+            created_at=now - timedelta(seconds=5),
+        )
+        self.db.add(mv_ev)
+
+        # Seed unified_security_processing SystemEvent with correlation boost (+10.0)
+        uni_ev = SystemEvent(
+            event_type="unified_security_processing",
+            source="unified_orchestrator",
+            severity="critical",
+            message=f"Unified processing for Attack #{atk.id} (source_ip=203.0.113.199): detections=['web'], correlation=multi_vector (conf=0.9), baseline_risk=0.0, operational_risk=100.0 (critical), alert_id=None, notification=sent",
+            created_at=now,
+        )
+        self.db.add(uni_ev)
+        self.db.commit()
+
+        # Replay the orchestrated attack
+        res = replay_attack_events(self.db, atk.id, window_minutes=15, record_audit=False)
+        self.assertTrue(res["deterministic_pass"])
+        self.assertEqual(res["match_status"], "identical")
+        self.assertEqual(res["detection_diff"]["detection_equivalence"], "equivalent")
+        self.assertEqual(res["detection_diff"]["operational_equivalence"], "equivalent")
+        self.assertEqual(res["detection_diff"]["rule_risk_delta"], 0.0)
+        self.assertEqual(res["detection_diff"]["operational_risk_delta"], 0.0)
+        self.assertEqual(res["replayed_detection"]["composite_operational_risk"], 100.0)
+        self.assertEqual(res["replayed_detection"]["raw_rule_risk_score"], 9.5)
+
+    def test_15_unorchestrated_attack_fair_comparison(self):
+        """Verify un-orchestrated attack without audit provenance reports context_unavailable, not false zero delta."""
+        now = datetime.now(timezone.utc)
+        atk = Attack(
+            attack_type="port_scan",
+            source_ip="198.51.100.222",
+            protocol="tcp",
+            severity="medium",
+            risk_score=70.0,
+            status="detected",
+            detected_at=now,
+        )
+        self.db.add(atk)
+        self.db.commit()
+        self.created_attack_ids.append(atk.id)
+
+        # Seed 6 network events to trigger PORT_SCAN_SWEEP
+        for i in range(6):
+            ev = AttackEvent(
+                attack_id=atk.id,
+                event_type="network_scan",
+                source_ip="198.51.100.222",
+                message=f"TCP connection attempt to port {8000 + i}",
+                event_time=now - timedelta(seconds=(6 - i) * 10),
+            )
+            self.db.add(ev)
+        self.db.commit()
+
+        # Replay un-orchestrated attack (no SystemEvents present)
+        res = replay_attack_events(self.db, atk.id, window_minutes=15, record_audit=False)
+        self.assertTrue(res["deterministic_pass"])
+        # Should certify detection equivalence but mark operational equivalence as unavailable
+        self.assertEqual(res["match_status"], "detection_equivalent_only")
+        self.assertEqual(res["detection_diff"]["detection_equivalence"], "equivalent")
+        self.assertEqual(res["detection_diff"]["operational_equivalence"], "unavailable")
+        self.assertIsNone(res["detection_diff"]["operational_risk_delta"])
+        self.assertIsNone(res["replayed_detection"]["composite_operational_risk"])
+        self.assertEqual(res["replayed_detection"]["raw_rule_risk_score"], 7.0)
+
+    def test_16_strict_db_side_effect_isolation(self):
+        """Verify target row xmin, updated_at, and table states are completely unmodified during replay."""
+        from sqlalchemy import text
+        now = datetime.now(timezone.utc)
+        atk = Attack(
+            attack_type="ssh_login_failed",
+            source_ip="198.51.100.77",
+            protocol="ssh",
+            severity="high",
+            risk_score=60.0,
+            status="detected",
+            detected_at=now,
+        )
+        self.db.add(atk)
+        self.db.commit()
+        self.created_attack_ids.append(atk.id)
+
+        # Fetch initial system metadata: xmin (PostgreSQL transaction ID)
+        row_before = self.db.execute(
+            text("SELECT xmin, risk_score, severity, status FROM attacks WHERE id = :aid"),
+            {"aid": atk.id}
+        ).fetchone()
+        sys_count_before = self.db.query(SystemEvent).count()
+
+        # Execute replay with record_audit=False
+        res = replay_attack_events(self.db, atk.id, window_minutes=15, record_audit=False)
+        self.assertTrue(res["deterministic_pass"])
+
+        # Fetch post-replay system metadata
+        row_after = self.db.execute(
+            text("SELECT xmin, risk_score, severity, status FROM attacks WHERE id = :aid"),
+            {"aid": atk.id}
+        ).fetchone()
+        sys_count_after = self.db.query(SystemEvent).count()
+
+        # Strict side-effect assertions: row version xmin must be identical (no update/write occurred)
+        self.assertEqual(row_before[0], row_after[0], "Attack row xmin modified during replay!")
+        self.assertEqual(row_before[1], row_after[1], "Attack risk_score modified during replay!")
+        self.assertEqual(row_before[2], row_after[2], "Attack severity modified during replay!")
+        self.assertEqual(sys_count_before, sys_count_after, "SystemEvent created when record_audit=False!")
+
+    def test_17_backward_compatibility_serialization(self):
+        """Verify legacy clients reading suggested_risk_score receive expected values on attack and IP scopes."""
+        now = datetime.now(timezone.utc)
+        atk = Attack(
+            attack_type="web_access",
+            source_ip="198.51.100.88",
+            protocol="http",
+            severity="critical",
+            risk_score=95.0,
+            status="detected",
+            detected_at=now,
+        )
+        self.db.add(atk)
+        self.db.commit()
+        self.created_attack_ids.append(atk.id)
+
+        r_atk = replay_attack_endpoint(attack_id=atk.id, db=self.db)
+        self.assertIsInstance(r_atk, ReplayExecutionResponse)
+        self.assertIsInstance(r_atk.replayed_detection.suggested_risk_score, float)
+        self.assertIsInstance(r_atk.detection_diff.risk_score_delta, float)
+
+        r_ip = replay_ip_endpoint(source_ip="127.0.0.1", request=ReplayRequest(window_minutes=15), db=self.db)
+        self.assertIsInstance(r_ip, ReplayExecutionResponse)
+        self.assertIsInstance(r_ip.replayed_detection.suggested_risk_score, float)
+        self.assertIsInstance(r_ip.detection_diff.risk_score_delta, float)

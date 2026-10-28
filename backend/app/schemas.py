@@ -913,22 +913,82 @@ class ReplayDetectionSummary(BaseModel):
     is_multi_vector: bool = Field(description="Whether triggers span >= 2 vectors")
     vectors_detected: list[str] = Field(default_factory=list, description="Distinct vectors triggered")
     rules_triggered: list[str] = Field(default_factory=list, description="List of rule IDs triggered")
-    suggested_risk_score: float = Field(ge=0.0, le=10.0, description="Computed risk score")
     severity: str = Field(description="Highest severity observed")
+
+    # Explicit Semantic Fields (Version 2)
+    raw_rule_risk_score: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=10.0,
+        description="Intrinsic detection engine rule score from Module 2.9 (0.0–10.0 scale). None if uncalculated.",
+    )
+    composite_operational_risk: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=100.0,
+        description="Synthesized operational risk from Module 2.10 (0.0–100.0 scale). None if context unavailable.",
+    )
+
+    # Preserved Legacy Compatibility Field
+    suggested_risk_score: float = Field(
+        ge=0.0,
+        le=100.0,
+        description="LEGACY COMPATIBILITY FIELD: in baseline carries Attack.risk_score (0-100); in replayed carries rule score (0-10).",
+    )
 
 
 class DetectionDiff(BaseModel):
     """Comparison delta between baseline findings and replayed findings."""
 
     match_status: str = Field(
-        description="Comparison outcome: 'identical', 'expanded_coverage', 'reduced_coverage', or 'drift_detected'"
+        description="Composite replay verdict: 'identical', 'detection_equivalent_only', 'coverage_drift', 'score_drift', or 'divergent'"
+    )
+    detection_equivalence: str = Field(
+        default="equivalent",
+        description="Detection reproducibility: 'equivalent', 'expanded_coverage', 'reduced_coverage', 'divergent_coverage', 'rule_score_drift', or 'event_population_mismatch'",
+    )
+    operational_equivalence: str = Field(
+        default="unavailable",
+        description="Operational reproducibility: 'equivalent', 'operational_risk_drift', 'severity_drift', or 'unavailable'",
     )
     historical_rules_triggered: list[str] = Field(default_factory=list, description="Rules originally triggered")
     replayed_rules_triggered: list[str] = Field(default_factory=list, description="Rules triggered during replay")
     new_rules_triggered: list[str] = Field(default_factory=list, description="Rules triggered during replay but not baseline")
     suppressed_rules: list[str] = Field(default_factory=list, description="Rules in baseline that did not trigger in replay")
-    risk_score_delta: float = Field(description="Difference in risk score (replayed - baseline)")
-    severity_changed: bool = Field(description="Whether severity level differs between baseline and replay")
+
+    # Explicit Semantic Deltas
+    rule_risk_delta: float | None = Field(
+        default=None,
+        description="Difference in raw rule risk score: replayed - baseline (0.0–10.0 scale). None if baseline unavailable.",
+    )
+    operational_risk_delta: float | None = Field(
+        default=None,
+        description="Difference in composite operational risk: replayed - baseline (0.0–100.0 scale). None if operational context unavailable.",
+    )
+
+    # Severity Tracking
+    severity_changed: bool = Field(
+        description="Legacy boolean flag: evaluates whether detection severity differed between baseline and replay."
+    )
+    operational_severity_changed: bool | None = Field(
+        default=None,
+        description="Explicit operational severity change flag. None when operational context is unavailable.",
+    )
+
+    # Event Population & Window Integrity
+    event_population_matched: bool = Field(
+        default=True,
+        description="Whether replayed event count and time window cover the exact baseline population.",
+    )
+    baseline_events_evaluated: int = Field(default=0, ge=0, description="Total events in baseline population")
+    replayed_events_evaluated: int = Field(default=0, ge=0, description="Total events evaluated in replay sandbox")
+
+    # Legacy Compatibility Field (Deprecated)
+    risk_score_delta: float = Field(
+        default=0.0,
+        deprecated=True,
+        description="LEGACY COMPATIBILITY FIELD. Maintained solely for backward compatibility with v1 API clients. Do not use for match_status or new UI views.",
+    )
 
 
 class ReplayExecutionResponse(BaseModel):

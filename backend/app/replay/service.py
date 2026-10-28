@@ -35,6 +35,7 @@ from app.multi_vector_detection.models import (
 from app.multi_vector_detection.registry import default_registry
 from app.multi_vector_detection.service import SEVERITY_ORDER, scan_payload
 from app.schemas import CandidateRuleSpec
+from app.unified_orchestrator.models import compose_operational_risk, get_operational_severity
 
 logger = logging.getLogger(__name__)
 
@@ -218,6 +219,7 @@ def evaluate_events_in_memory(
         "vectors_detected": vectors_detected,
         "rules_triggered": [r.rule_id for r in triggered_rules],
         "suggested_risk_score": suggested_risk_score,
+        "raw_rule_risk_score": suggested_risk_score,
         "severity": highest_severity,
         "matched_payloads": matched_payloads,
     }
@@ -256,37 +258,112 @@ def build_replay_timeline(
 def compute_detection_diff(
     baseline_rules: list[str],
     replayed_rules: list[str],
-    baseline_risk: float,
-    replayed_risk: float,
-    baseline_sev: str,
-    replayed_sev: str,
+    baseline_risk: float = 0.0,
+    replayed_risk: float = 0.0,
+    baseline_sev: str = "low",
+    replayed_sev: str = "low",
+    baseline_raw_rule_score: float | None = None,
+    replayed_raw_rule_score: float | None = None,
+    baseline_operational_risk: float | None = None,
+    replayed_operational_risk: float | None = None,
+    baseline_operational_sev: str | None = None,
+    replayed_operational_sev: str | None = None,
+    baseline_events_count: int = 0,
+    replayed_events_count: int = 0,
 ) -> dict[str, Any]:
-    """Compute mathematical delta between baseline and replayed detection outcomes."""
+    """Compute mathematical and architectural deltas between baseline and replayed detection outcomes."""
     set_base = set(baseline_rules)
     set_rep = set(replayed_rules)
 
     new_rules = sorted(list(set_rep - set_base))
     suppressed_rules = sorted(list(set_base - set_rep))
-    risk_delta = round(replayed_risk - baseline_risk, 1)
-    sev_changed = baseline_sev.lower() != replayed_sev.lower()
 
-    if set_base == set_rep and risk_delta == 0.0:
-        match_status = "identical"
+    # Event Population Integrity
+    event_population_matched = (baseline_events_count == replayed_events_count)
+
+    # Resolve raw rule scores if not explicitly passed
+    if baseline_raw_rule_score is None and baseline_risk <= 10.0:
+        baseline_raw_rule_score = baseline_risk
+    if replayed_raw_rule_score is None and replayed_risk <= 10.0:
+        replayed_raw_rule_score = replayed_risk
+
+    # Raw rule risk delta (0.0 – 10.0 scale)
+    rule_risk_delta: float | None = None
+    if baseline_raw_rule_score is not None and replayed_raw_rule_score is not None:
+        rule_risk_delta = round(replayed_raw_rule_score - baseline_raw_rule_score, 1)
+
+    # Operational risk delta (0.0 – 100.0 scale)
+    operational_risk_delta: float | None = None
+    if baseline_operational_risk is not None and replayed_operational_risk is not None:
+        operational_risk_delta = round(replayed_operational_risk - baseline_operational_risk, 1)
+
+    # Severity tracking
+    sev_changed = baseline_sev.lower() != replayed_sev.lower()
+    operational_sev_changed: bool | None = None
+    if baseline_operational_sev is not None and replayed_operational_sev is not None:
+        operational_sev_changed = (baseline_operational_sev.lower() != replayed_operational_sev.lower())
+
+    # 1. Detection Equivalence Dimension (Axis 1)
+    if not event_population_matched:
+        detection_equivalence = "event_population_mismatch"
     elif set_rep > set_base:
-        match_status = "expanded_coverage"
+        detection_equivalence = "expanded_coverage"
     elif set_rep < set_base:
-        match_status = "reduced_coverage"
+        detection_equivalence = "reduced_coverage"
+    elif set_rep != set_base:
+        detection_equivalence = "divergent_coverage"
+    elif rule_risk_delta is not None and rule_risk_delta != 0.0:
+        detection_equivalence = "rule_score_drift"
     else:
-        match_status = "drift_detected"
+        detection_equivalence = "equivalent"
+
+    # 2. Operational Equivalence Dimension (Axis 2)
+    if baseline_operational_risk is None or replayed_operational_risk is None:
+        operational_equivalence = "unavailable"
+    elif operational_risk_delta != 0.0:
+        operational_equivalence = "operational_risk_drift"
+    elif operational_sev_changed is True:
+        operational_equivalence = "severity_drift"
+    else:
+        operational_equivalence = "equivalent"
+
+    # 3. Composite match_status Verdict
+    if detection_equivalence == "equivalent" and operational_equivalence == "equivalent":
+        match_status = "identical"
+    elif detection_equivalence == "equivalent" and operational_equivalence == "unavailable":
+        match_status = "detection_equivalent_only"
+    elif detection_equivalence == "equivalent":
+        match_status = "score_drift"
+    elif operational_equivalence in ("equivalent", "unavailable"):
+        match_status = "coverage_drift"
+    else:
+        match_status = "divergent"
+
+    # 4. Legacy Compatibility Field: risk_score_delta (Deprecated)
+    # Maintained solely for backward compatibility. Never used for match_status.
+    if operational_risk_delta is not None:
+        legacy_risk_delta = operational_risk_delta
+    elif rule_risk_delta is not None:
+        legacy_risk_delta = rule_risk_delta
+    else:
+        legacy_risk_delta = round(replayed_risk - baseline_risk, 1)
 
     return {
         "match_status": match_status,
+        "detection_equivalence": detection_equivalence,
+        "operational_equivalence": operational_equivalence,
         "historical_rules_triggered": sorted(baseline_rules),
         "replayed_rules_triggered": sorted(replayed_rules),
         "new_rules_triggered": new_rules,
         "suppressed_rules": suppressed_rules,
-        "risk_score_delta": risk_delta,
+        "rule_risk_delta": rule_risk_delta,
+        "operational_risk_delta": operational_risk_delta,
         "severity_changed": sev_changed,
+        "operational_severity_changed": operational_sev_changed,
+        "event_population_matched": event_population_matched,
+        "baseline_events_evaluated": baseline_events_count,
+        "replayed_events_evaluated": replayed_events_count,
+        "risk_score_delta": legacy_risk_delta,
     }
 
 
@@ -353,7 +430,8 @@ def replay_attack_events(
 
     # 4. Determine baseline findings from existing persisted state
     baseline_sev = attack.severity or "low"
-    baseline_risk = float(attack.risk_score or 0.0)
+    baseline_operational_risk = float(attack.risk_score) if attack.risk_score is not None else None
+    baseline_operational_sev = attack.severity
 
     # Query existing SystemEvent for original rules triggered on this attack
     sys_stmt = (
@@ -370,18 +448,65 @@ def replay_attack_events(
     )
     sys_ev = db.scalar(sys_stmt)
     baseline_rules: list[str] = []
-    if sys_ev and sys_ev.message and "rules=" in sys_ev.message:
+    baseline_raw_rule_score: float | None = None
+    if sys_ev and sys_ev.message:
+        if "rules=" in sys_ev.message:
+            try:
+                raw_rules = (
+                    sys_ev.message.split("rules=")[1]
+                    .split("]")[0]
+                    .replace("[", "")
+                    .replace("'", "")
+                    .replace('"', "")
+                )
+                baseline_rules = [
+                    r.strip() for r in raw_rules.split(",") if r.strip()
+                ]
+            except Exception:
+                pass
+        if "score=" in sys_ev.message:
+            try:
+                baseline_raw_rule_score = float(
+                    sys_ev.message.split("score=")[1].split(",")[0].split()[0]
+                )
+            except Exception:
+                pass
+
+    # Query existing SystemEvent for unified_security_processing to extract operational provenance
+    sys_uni_stmt = (
+        select(SystemEvent)
+        .where(
+            SystemEvent.event_type == "unified_security_processing",
+            or_(
+                SystemEvent.message.contains(f"Attack #{attack_id}"),
+                SystemEvent.message.contains(f"source_ip={attack.source_ip}"),
+            ),
+        )
+        .order_by(SystemEvent.created_at.desc())
+        .limit(1)
+    )
+    sys_uni_ev = db.scalar(sys_uni_stmt)
+    historical_baseline_score = 0.0
+    historical_corr_type = "none"
+    historical_corr_conf = 0.0
+    has_operational_provenance = False
+
+    if sys_uni_ev and sys_uni_ev.message:
+        has_operational_provenance = True
         try:
-            raw_rules = (
-                sys_ev.message.split("rules=")[1]
-                .split("]")[0]
-                .replace("[", "")
-                .replace("'", "")
-                .replace('"', "")
-            )
-            baseline_rules = [
-                r.strip() for r in raw_rules.split(",") if r.strip()
-            ]
+            if "baseline_risk=" in sys_uni_ev.message:
+                historical_baseline_score = float(
+                    sys_uni_ev.message.split("baseline_risk=")[1].split(",")[0].strip()
+                )
+            if "correlation=" in sys_uni_ev.message:
+                corr_part = sys_uni_ev.message.split("correlation=")[1].split(",")[0].strip()
+                if "(" in corr_part:
+                    historical_corr_type = corr_part.split("(")[0].strip()
+                    if "conf=" in corr_part:
+                        conf_str = corr_part.split("conf=")[1].replace(")", "").strip()
+                        historical_corr_conf = float(conf_str)
+                else:
+                    historical_corr_type = corr_part
         except Exception:
             pass
 
@@ -394,20 +519,51 @@ def replay_attack_events(
         events, rules, window_minutes=window_minutes
     )
 
-    # If baseline had no explicit system event logged, fall back to replayed finding for baseline
-    # to avoid false drift when replaying un-orchestrated test records
+    # Synthesize replayed operational risk if operational provenance is available
+    replayed_operational_risk: float | None = None
+    replayed_operational_sev: str | None = None
+    if has_operational_provenance:
+        replayed_composite = compose_operational_risk(
+            baseline_score=historical_baseline_score,
+            suggested_risk_score=replay_eval["suggested_risk_score"],
+            rules_triggered=replay_eval["detected"],
+            rules_count=len(replay_eval["rules_triggered"]),
+            correlation_type=historical_corr_type,
+            correlation_confidence=historical_corr_conf,
+        )
+        replayed_operational_risk = replayed_composite.operational_risk
+        replayed_operational_sev = replayed_composite.operational_severity
+
+    # Fallback for un-orchestrated test records seeded directly in unit tests
     if not baseline_rules and replay_eval["rules_triggered"]:
         baseline_rules = replay_eval["rules_triggered"]
-        baseline_risk = replay_eval["suggested_risk_score"]
+        if baseline_raw_rule_score is None:
+            baseline_raw_rule_score = replay_eval["suggested_risk_score"]
         baseline_sev = replay_eval["severity"]
+
+    # In baseline fallback, if baseline_raw_rule_score wasn't logged, derive it
+    if baseline_raw_rule_score is None and baseline_rules:
+        matched_rules = [default_registry.get_rule(r) for r in baseline_rules if default_registry.get_rule(r)]
+        if matched_rules:
+            max_r = max(r.base_risk_score for r in matched_rules)
+            is_mv = len(set(r.vector for r in matched_rules)) >= 2
+            baseline_raw_rule_score = min(10.0, round(max_r + (0.5 if is_mv else 0.0), 1))
 
     diff = compute_detection_diff(
         baseline_rules=baseline_rules,
         replayed_rules=replay_eval["rules_triggered"],
-        baseline_risk=baseline_risk,
+        baseline_risk=float(attack.risk_score or 0.0),
         replayed_risk=replay_eval["suggested_risk_score"],
         baseline_sev=baseline_sev,
         replayed_sev=replay_eval["severity"],
+        baseline_raw_rule_score=baseline_raw_rule_score,
+        replayed_raw_rule_score=replay_eval["suggested_risk_score"],
+        baseline_operational_risk=baseline_operational_risk,
+        replayed_operational_risk=replayed_operational_risk,
+        baseline_operational_sev=baseline_operational_sev,
+        replayed_operational_sev=replayed_operational_sev,
+        baseline_events_count=len(events),
+        replayed_events_count=len(events),
     )
 
     duration_ms = round((time.perf_counter() - start_time_bench) * 1000.0, 2)
@@ -456,7 +612,9 @@ def replay_attack_events(
                 )
             ),
             "rules_triggered": baseline_rules,
-            "suggested_risk_score": baseline_risk,
+            "raw_rule_risk_score": baseline_raw_rule_score,
+            "composite_operational_risk": baseline_operational_risk,
+            "suggested_risk_score": float(attack.risk_score or 0.0),
             "severity": baseline_sev,
         },
         "replayed_detection": {
@@ -464,6 +622,8 @@ def replay_attack_events(
             "is_multi_vector": replay_eval["is_multi_vector"],
             "vectors_detected": replay_eval["vectors_detected"],
             "rules_triggered": replay_eval["rules_triggered"],
+            "raw_rule_risk_score": replay_eval["suggested_risk_score"],
+            "composite_operational_risk": replayed_operational_risk,
             "suggested_risk_score": replay_eval["suggested_risk_score"],
             "severity": replay_eval["severity"],
         },
@@ -597,6 +757,14 @@ def replay_ip_events(
         replayed_risk=replay_eval["suggested_risk_score"],
         baseline_sev=baseline_sev,
         replayed_sev=replay_eval["severity"],
+        baseline_raw_rule_score=baseline_risk,
+        replayed_raw_rule_score=replay_eval["suggested_risk_score"],
+        baseline_operational_risk=None,
+        replayed_operational_risk=None,
+        baseline_operational_sev=None,
+        replayed_operational_sev=None,
+        baseline_events_count=len(events),
+        replayed_events_count=len(events),
     )
 
     duration_ms = round((time.perf_counter() - start_time_bench) * 1000.0, 2)
@@ -644,6 +812,8 @@ def replay_ip_events(
                 )
             ),
             "rules_triggered": baseline_rules,
+            "raw_rule_risk_score": baseline_risk,
+            "composite_operational_risk": None,
             "suggested_risk_score": baseline_risk,
             "severity": baseline_sev,
         },
@@ -652,6 +822,8 @@ def replay_ip_events(
             "is_multi_vector": replay_eval["is_multi_vector"],
             "vectors_detected": replay_eval["vectors_detected"],
             "rules_triggered": replay_eval["rules_triggered"],
+            "raw_rule_risk_score": replay_eval["suggested_risk_score"],
+            "composite_operational_risk": None,
             "suggested_risk_score": replay_eval["suggested_risk_score"],
             "severity": replay_eval["severity"],
         },

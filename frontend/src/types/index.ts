@@ -266,18 +266,28 @@ export interface ReplayDetectionSummary {
   is_multi_vector: boolean;
   vectors_detected: string[];
   rules_triggered: string[];
-  suggested_risk_score: number;
   severity: string;
+  suggested_risk_score: number;
+  raw_rule_risk_score?: number | null;
+  composite_operational_risk?: number | null;
 }
 
 export interface DetectionDiff {
-  match_status: 'identical' | 'expanded_coverage' | 'reduced_coverage' | 'drift_detected' | string;
+  match_status: 'identical' | 'detection_equivalent_only' | 'expanded_coverage' | 'reduced_coverage' | 'coverage_drift' | 'score_drift' | 'divergent' | string;
+  detection_equivalence?: string;
+  operational_equivalence?: string;
   historical_rules_triggered: string[];
   replayed_rules_triggered: string[];
   new_rules_triggered: string[];
   suppressed_rules: string[];
-  risk_score_delta: number;
+  rule_risk_delta?: number | null;
+  operational_risk_delta?: number | null;
   severity_changed: boolean;
+  operational_severity_changed?: boolean | null;
+  event_population_matched?: boolean;
+  baseline_events_evaluated?: number;
+  replayed_events_evaluated?: number;
+  risk_score_delta: number;
 }
 
 export interface ReplayExecutionResponse {

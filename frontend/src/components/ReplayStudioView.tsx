@@ -196,10 +196,16 @@ export const ReplayStudioView: React.FC<ReplayStudioViewProps> = ({
                   className={`text-xs font-mono font-bold px-2.5 py-1 rounded border uppercase ${
                     replayResult.detection_diff.match_status === 'identical'
                       ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                      : replayResult.detection_diff.match_status === 'detection_equivalent_only'
+                      ? 'bg-sky-500/10 text-sky-400 border-sky-500/30'
                       : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
                   }`}
                 >
-                  {replayResult.detection_diff.match_status.replace('_', ' ')}
+                  {replayResult.detection_diff.match_status === 'identical'
+                    ? 'DETERMINISTICALLY IDENTICAL'
+                    : replayResult.detection_diff.match_status === 'detection_equivalent_only'
+                    ? 'DETECTION EQUIVALENT (Operational Context Missing)'
+                    : replayResult.detection_diff.match_status.replace(/_/g, ' ')}
                 </span>
                 <span className="text-xs text-slate-400 font-mono ml-2">
                   Duration: <strong className="text-slate-200">{replayResult.execution_duration_ms} ms</strong>
@@ -228,9 +234,19 @@ export const ReplayStudioView: React.FC<ReplayStudioViewProps> = ({
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Risk Score:</span>
+                    <span className="text-slate-500">Operational Risk:</span>
                     <span className="text-amber-400 font-mono font-bold">
-                      {replayResult.baseline_detection?.suggested_risk_score.toFixed(1) || '0.0'} pts
+                      {replayResult.baseline_detection?.composite_operational_risk !== undefined && replayResult.baseline_detection?.composite_operational_risk !== null
+                        ? `${replayResult.baseline_detection.composite_operational_risk.toFixed(1)} / 100 pts`
+                        : `${replayResult.baseline_detection?.suggested_risk_score.toFixed(1) || '0.0'} pts`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Rule Risk Score:</span>
+                    <span className="text-sky-300 font-mono font-semibold">
+                      {replayResult.baseline_detection?.raw_rule_risk_score !== undefined && replayResult.baseline_detection?.raw_rule_risk_score !== null
+                        ? `${replayResult.baseline_detection.raw_rule_risk_score.toFixed(1)} / 10 pts`
+                        : 'N/A'}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -259,9 +275,19 @@ export const ReplayStudioView: React.FC<ReplayStudioViewProps> = ({
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Risk Score:</span>
+                    <span className="text-slate-500">Operational Risk:</span>
                     <span className="text-amber-400 font-mono font-bold">
-                      {replayResult.replayed_detection.suggested_risk_score.toFixed(1)} pts
+                      {replayResult.replayed_detection.composite_operational_risk !== undefined && replayResult.replayed_detection.composite_operational_risk !== null
+                        ? `${replayResult.replayed_detection.composite_operational_risk.toFixed(1)} / 100 pts`
+                        : 'Context Unavailable'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Rule Risk Score:</span>
+                    <span className="text-sky-300 font-mono font-semibold">
+                      {replayResult.replayed_detection.raw_rule_risk_score !== undefined && replayResult.replayed_detection.raw_rule_risk_score !== null
+                        ? `${replayResult.replayed_detection.raw_rule_risk_score.toFixed(1)} / 10 pts`
+                        : `${replayResult.replayed_detection.suggested_risk_score.toFixed(1)} pts`}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -294,8 +320,13 @@ export const ReplayStudioView: React.FC<ReplayStudioViewProps> = ({
                   </span>
                 ))}
 
-              <span className="ml-auto text-slate-400">
-                Risk Delta: <strong className="text-white">{replayResult.detection_diff.risk_score_delta > 0 ? `+${replayResult.detection_diff.risk_score_delta}` : replayResult.detection_diff.risk_score_delta}</strong>
+              <span className="ml-auto flex items-center space-x-3 text-slate-400">
+                <span>
+                  Rule &Delta;: <strong className="text-white">{replayResult.detection_diff.rule_risk_delta !== undefined && replayResult.detection_diff.rule_risk_delta !== null ? (replayResult.detection_diff.rule_risk_delta > 0 ? `+${replayResult.detection_diff.rule_risk_delta}` : `${replayResult.detection_diff.rule_risk_delta}`) : 'N/A'}</strong>
+                </span>
+                <span>
+                  Ops &Delta;: <strong className="text-white">{replayResult.detection_diff.operational_risk_delta !== undefined && replayResult.detection_diff.operational_risk_delta !== null ? (replayResult.detection_diff.operational_risk_delta > 0 ? `+${replayResult.detection_diff.operational_risk_delta}` : `${replayResult.detection_diff.operational_risk_delta}`) : 'Unavailable'}</strong>
+                </span>
               </span>
             </div>
           </div>
