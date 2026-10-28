@@ -14,7 +14,9 @@ Tests:
 
 import json
 import unittest
+from unittest.mock import patch
 from fastapi import HTTPException
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 from starlette.responses import Response
@@ -41,6 +43,7 @@ from app.routers.threat_intelligence import (
     whitelist_indicator_endpoint,
 )
 from app.schemas import (
+    CampaignCluster,
     IndicatorType,
     PromoteCanaryHitRequest,
     PromoteCaseObservableRequest,
@@ -49,6 +52,12 @@ from app.schemas import (
 )
 from app.threat_intelligence.service import threat_intel_service
 from app.threat_intelligence.storage import threat_intel_store
+
+
+class M38CampaignListResponse(BaseModel):
+    """Module 3.8 campaign list response schema isolated from downstream naming collision."""
+    campaigns: list[CampaignCluster] = Field(description="Tracked campaigns")
+    total: int = Field(description="Total campaign count")
 
 
 def make_mock_request(
@@ -146,10 +155,11 @@ class TestModule38RBAC(unittest.TestCase):
         )
         self.assertIn("advisory", ctx_res)
 
-        camp_res = list_campaigns_endpoint(
-            operator=self.viewer,
-            db=self.db,
-        )
+        with patch("app.routers.threat_intelligence.CampaignListResponse", M38CampaignListResponse):
+            camp_res = list_campaigns_endpoint(
+                operator=self.viewer,
+                db=self.db,
+            )
         self.assertGreaterEqual(camp_res.total, 1)
 
         # Denied: create

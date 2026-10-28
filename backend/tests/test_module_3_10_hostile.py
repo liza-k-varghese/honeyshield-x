@@ -57,6 +57,7 @@ from app.schemas import (
 )
 
 
+from app.cases.storage import default_case_store
 from app.deception.storage import default_deception_store
 from app.threat_intelligence.storage import serialize_ioc_metadata
 
@@ -66,6 +67,7 @@ class TestModule310Hostile(unittest.TestCase):
 
     def setUp(self):
         default_campaign_store.clear()
+        default_case_store.clear()
         default_session_store.clear()
         default_operator_registry.reset()
         default_campaign_service._operator_clustering_timestamps.clear()
@@ -87,6 +89,7 @@ class TestModule310Hostile(unittest.TestCase):
 
     def tearDown(self):
         default_campaign_store.clear()
+        default_case_store.clear()
         default_session_store.clear()
 
     # =========================================================================
@@ -167,7 +170,10 @@ class TestModule310Hostile(unittest.TestCase):
 
         # Revoked IP must not appear in any active campaign generated solely by this IOC
         campaigns, _ = default_campaign_service.list_campaigns()
-        matching = [c for c in campaigns if "198.51.100.77" in c.source_ips]
+        matching = [
+            c for c in campaigns
+            if "198.51.100.77" in default_campaign_service.get_campaign(c.campaign_id).source_ips
+        ]
         self.assertEqual(len(matching), 0)
 
     # =========================================================================

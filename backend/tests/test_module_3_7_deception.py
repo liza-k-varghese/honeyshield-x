@@ -269,9 +269,13 @@ class TestModule37Deception(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(updated_canary.last_hit_at)
 
         # 3. Verify Alert generated in database
-        alerts = self.db.query(Alert).filter(Alert.alert_type == "CANARY_TRIPWIRE_TRIGGERED").all()
-        self.assertTrue(len(alerts) >= 1)
-        latest_alert = alerts[-1]
+        latest_alert = (
+            self.db.query(Alert)
+            .filter(Alert.alert_type == "CANARY_TRIPWIRE_TRIGGERED", Alert.message.contains("203.0.113.88"))
+            .order_by(Alert.id.desc())
+            .first()
+        )
+        self.assertIsNotNone(latest_alert)
         self.created_alert_ids.append(latest_alert.id)
         self.assertIn("203.0.113.88", latest_alert.message)
 
@@ -282,7 +286,8 @@ class TestModule37Deception(unittest.IsolatedAsyncioTestCase):
         # 5. Verify Incident Case provisioned via Module 3.6
         cases_list, total_cases = default_case_service.list_cases()
         self.assertTrue(total_cases >= 1)
-        latest_case = cases_list[0]
+        latest_case = next((c for c in cases_list if c.source_ip == "203.0.113.88"), None)
+        self.assertIsNotNone(latest_case)
         self.assertIn("High-Confidence Canary Breach", latest_case.title)
         self.assertEqual(latest_case.source_ip, "203.0.113.88")
         self.assertEqual(latest_case.severity, "critical")

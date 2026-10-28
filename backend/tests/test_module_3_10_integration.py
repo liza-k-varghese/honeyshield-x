@@ -21,6 +21,7 @@ from app.auth.registry import default_operator_registry, Operator
 from app.auth.session import default_session_store
 from app.campaigns.service import default_campaign_service
 from app.campaigns.storage import default_campaign_store
+from app.cases.storage import default_case_store
 from app.incident_command.bus import default_event_bus
 from app.incident_command.governor import default_governor
 from app.models import Alert, Attack, ThreatIntelligence
@@ -34,6 +35,7 @@ class TestModule310Integration(unittest.TestCase):
 
     def setUp(self):
         default_campaign_store.clear()
+        default_case_store.clear()
         default_session_store.clear()
         default_operator_registry.reset()
 
@@ -52,6 +54,7 @@ class TestModule310Integration(unittest.TestCase):
 
     def tearDown(self):
         default_campaign_store.clear()
+        default_case_store.clear()
         default_session_store.clear()
 
     def test_1_multi_vector_telemetry_clustering_fusion(self):
@@ -128,9 +131,11 @@ class TestModule310Integration(unittest.TestCase):
         campaigns, total = default_campaign_service.list_campaigns()
         self.assertGreaterEqual(total, 1)
 
-        dossier = default_campaign_service.get_campaign(campaigns[0].campaign_id)
-        self.assertIn(shared_ip, dossier.source_ips)
-        self.assertEqual(dossier.severity, "critical")
+        dossiers = [default_campaign_service.get_campaign(c.campaign_id) for c in campaigns]
+        target_dossier = next((d for d in dossiers if shared_ip in d.source_ips), None)
+        self.assertIsNotNone(target_dossier)
+        self.assertIn(shared_ip, target_dossier.source_ips)
+        self.assertEqual(target_dossier.severity, "critical")
 
     def test_2_eventbus_subscription_and_loop_prevention(self):
         """Subscriber ignores campaign.* events preventing recursive event storms."""

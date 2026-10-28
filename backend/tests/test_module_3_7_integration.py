@@ -114,15 +114,20 @@ class TestModule37Integration(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(decoy_resp.code, 401)
 
         # 3. Check that Alert was created
-        alerts = self.db.query(Alert).filter(Alert.alert_type == "CANARY_TRIPWIRE_TRIGGERED").all()
-        self.assertTrue(len(alerts) >= 1)
-        canary_alert = alerts[-1]
+        canary_alert = (
+            self.db.query(Alert)
+            .filter(Alert.alert_type == "CANARY_TRIPWIRE_TRIGGERED", Alert.message.contains(adversary_ip))
+            .order_by(Alert.id.desc())
+            .first()
+        )
+        self.assertIsNotNone(canary_alert)
         self.created_alert_ids.append(canary_alert.id)
 
         # 4. Check that Incident Case was provisioned
         cases_list, total_cases = default_case_service.list_cases()
         self.assertTrue(total_cases >= 1)
-        incident_case = cases_list[0]
+        incident_case = next((c for c in cases_list if c.source_ip == adversary_ip), None)
+        self.assertIsNotNone(incident_case)
         self.assertEqual(incident_case.source_ip, adversary_ip)
         self.assertIn(canary_alert.id, incident_case.alert_ids)
 
