@@ -20,7 +20,7 @@ export const KpiRibbon: React.FC<KpiRibbonProps> = ({ stats, isLoading }) => {
     },
     {
       label: 'Critical Alerts',
-      value: stats?.active_alerts_by_severity.critical ?? 0,
+      value: stats?.active_alerts_by_severity?.critical ?? 0,
       icon: AlertTriangle,
       color: 'text-red-400',
       bgColor: 'bg-red-500/10',
@@ -29,7 +29,7 @@ export const KpiRibbon: React.FC<KpiRibbonProps> = ({ stats, isLoading }) => {
     },
     {
       label: 'High Alerts',
-      value: stats?.active_alerts_by_severity.high ?? 0,
+      value: stats?.active_alerts_by_severity?.high ?? 0,
       icon: AlertCircle,
       color: 'text-orange-400',
       bgColor: 'bg-orange-500/10',
@@ -38,7 +38,7 @@ export const KpiRibbon: React.FC<KpiRibbonProps> = ({ stats, isLoading }) => {
     },
     {
       label: 'Medium Alerts',
-      value: stats?.active_alerts_by_severity.medium ?? 0,
+      value: stats?.active_alerts_by_severity?.medium ?? 0,
       icon: Shield,
       color: 'text-yellow-400',
       bgColor: 'bg-yellow-500/10',
@@ -47,7 +47,7 @@ export const KpiRibbon: React.FC<KpiRibbonProps> = ({ stats, isLoading }) => {
     },
     {
       label: 'Low Alerts',
-      value: stats?.active_alerts_by_severity.low ?? 0,
+      value: stats?.active_alerts_by_severity?.low ?? 0,
       icon: Info,
       color: 'text-emerald-400',
       bgColor: 'bg-emerald-500/10',

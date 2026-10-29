@@ -21,7 +21,7 @@ export const AlertTable: React.FC<AlertTableProps> = ({
   const [severityFilter, setSeverityFilter] = useState<string>('all');
 
   const filteredAlerts = alerts.filter((alert) => {
-    if (severityFilter !== 'all' && alert.severity.toLowerCase() !== severityFilter) {
+    if (severityFilter !== 'all' && (alert.severity || '').toLowerCase() !== severityFilter) {
       return false;
     }
     return true;
@@ -137,7 +137,7 @@ export const AlertTable: React.FC<AlertTableProps> = ({
                     {alert.attack_id ? `#${alert.attack_id}` : 'None'}
                   </td>
                   <td className="py-3 px-4 font-mono text-[11px] text-slate-400 whitespace-nowrap">
-                    {new Date(alert.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    {alert.created_at ? new Date(alert.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'N/A'}
                   </td>
                   <td className="py-3 px-4">
                     <StatusBadge status={alert.status as AlertLifecycleStatus} />

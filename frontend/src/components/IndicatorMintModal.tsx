@@ -7,8 +7,6 @@ import {
   Hash,
   Cpu,
   Radio,
-  FileCode,
-  CheckCircle,
 } from 'lucide-react';
 import { useCreateIndicator } from '../hooks/useThreatIntel';
 import { IndicatorType, ThreatIndicator } from '../types';

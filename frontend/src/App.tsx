@@ -69,7 +69,7 @@ function DashboardContent() {
   const suggestedIps = useMemo(() => {
     const ips = new Set<string>();
     alerts.forEach((a) => {
-      const ipMatch = a.message.match(/\b(?:\d{1,3}\.){3}\d{1,3}\b/);
+      const ipMatch = a.message?.match(/\b(?:\d{1,3}\.){3}\d{1,3}\b/);
       if (ipMatch) ips.add(ipMatch[0]);
     });
     return Array.from(ips);
@@ -364,7 +364,7 @@ function DashboardContent() {
       <RuleDetailDrawer
         ruleId={selectedRuleId}
         onClose={() => setSelectedRuleId(null)}
-        onSimulateCandidate={(rId) => {
+        onSimulateCandidate={(_rId) => {
           setSelectedRuleId(null);
           setRulesSubTab('simulation');
         }}

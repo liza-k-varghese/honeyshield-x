@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import {
-  Shield,
   Filter,
   Eye,
   Sliders,
-  CheckCircle2,
   Lock,
-  Zap,
 } from 'lucide-react';
 import { useDetectionRules } from '../hooks/useDetectionRules';
 import { DetectionRuleSummary } from '../types';

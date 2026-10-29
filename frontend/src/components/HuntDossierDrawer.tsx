@@ -25,7 +25,7 @@ import {
   useHuntDossier,
   useUpdateHunt,
 } from '../hooks/useThreatHunting';
-import { HuntDossier, HuntEvidenceRecord, HuntVerdict } from '../types';
+import { HuntDossier, HuntVerdict } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 interface HuntDossierDrawerProps {

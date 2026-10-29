@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CrossAttackEvent } from '../types';
-import { Clock, Hash, Search, Tag, ShieldAlert } from 'lucide-react';
+import { Clock, Hash, Search } from 'lucide-react';
 
 interface CrossAttackTimelineProps {
   events: CrossAttackEvent[];

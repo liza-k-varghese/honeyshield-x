@@ -1,6 +1,6 @@
 import React from 'react';
 import { MitreCatalogEntry, CrossAttackEvent, AttackGraphResponse } from '../types';
-import { ShieldCheck, Target, AlertTriangle, Cpu, Key, Eye, ArrowRight, Shield } from 'lucide-react';
+import { Shield } from 'lucide-react';
 
 interface MitreMatrixViewProps {
   catalog?: MitreCatalogEntry[];

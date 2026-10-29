@@ -6,19 +6,13 @@ import {
   Activity,
   Layers,
   Clock,
-  Tag,
   Link,
   Edit3,
-  CheckCircle2,
-  AlertTriangle,
   Radio,
-  FileCode,
   Flame,
   Globe,
-  Hash,
   ExternalLink,
   Save,
-  Lock,
 } from 'lucide-react';
 import { CampaignDossier, CampaignStatus, SeverityLevel } from '../types';
 import {
@@ -30,7 +24,6 @@ import {
   useUnlinkCase,
 } from '../hooks/useCampaigns';
 import { CampaignGraphView } from './CampaignGraphView';
-import { useAuth } from '../context/AuthContext';
 
 interface CampaignDossierDrawerProps {
   campaignId: string | null;
@@ -45,7 +38,6 @@ export const CampaignDossierDrawer: React.FC<CampaignDossierDrawerProps> = ({
   onInvestigateIp,
   onStageContainment,
 }) => {
-  const { hasPermission } = useAuth();
   const [activeTab, setActiveTab] = useState<'dossier' | 'graph' | 'timeline'>('dossier');
 
   // Edit State

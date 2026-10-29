@@ -5,8 +5,6 @@ import {
   Code,
   Activity,
   BarChart3,
-  AlertTriangle,
-  Clock,
   ShieldCheck,
   Zap,
 } from 'lucide-react';

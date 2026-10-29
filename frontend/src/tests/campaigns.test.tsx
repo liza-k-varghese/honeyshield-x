@@ -369,4 +369,24 @@ describe('Module 3.10: Attack Campaign Intelligence Frontend Console', () => {
       expect(screen.getByText('Campaign Containment Dispatched Successfully')).toBeDefined();
     });
   });
+
+  it('renders CampaignsView gracefully when campaign has undefined source_ips', async () => {
+    const summaryNoIps: CampaignSummary = {
+      ...mockSummary1,
+      campaign_id: 'camp-no-ips-999',
+      name: 'Campaign Without IPs',
+      source_ips: undefined,
+    };
+    (client.fetchCampaigns as any).mockResolvedValue({
+      items: [summaryNoIps],
+      total: 1,
+    });
+
+    renderWithClient(<CampaignsView />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Campaign Without IPs')).toBeDefined();
+      expect(screen.getByText(/0 IPs/)).toBeDefined();
+    });
+  });
 });

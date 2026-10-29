@@ -2,16 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { AttackGraphResponse, GraphNode, SeverityLevel } from '../types';
 import { SeverityBadge } from './Badge';
 import {
-  ShieldAlert,
-  Terminal,
-  AlertTriangle,
   Layers,
   Flame,
   CheckCircle2,
-  XCircle,
-  Clock,
   Database,
-  ExternalLink
 } from 'lucide-react';
 
 interface AttackChainGraphProps {
@@ -19,7 +13,7 @@ interface AttackChainGraphProps {
   onSelectAttack?: (attackId: number) => void;
 }
 
-export const AttackChainGraph: React.FC<AttackChainGraphProps> = ({ graph, onSelectAttack }) => {
+export const AttackChainGraph: React.FC<AttackChainGraphProps> = ({ graph, onSelectAttack: _onSelectAttack }) => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   // Layout calculation for SVG DAG

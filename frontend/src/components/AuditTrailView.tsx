@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import {
-  FileText,
   Filter,
-  Clock,
-  ShieldAlert,
   RotateCw,
-  Terminal,
 } from 'lucide-react';
 import { useAuditEvents } from '../hooks/useDetectionRules';
 import { SeverityBadge } from './Badge';
@@ -13,7 +9,7 @@ import { SeverityBadge } from './Badge';
 export const AuditTrailView: React.FC = () => {
   const [limit, setLimit] = useState<number>(50);
   const [sourceFilter, setSourceFilter] = useState<string>('all');
-  const [eventTypeFilter, setEventTypeFilter] = useState<string>('all');
+  const [eventTypeFilter] = useState<string>('all');
 
   const { data, isLoading, refetch, isFetching } = useAuditEvents(
     limit,

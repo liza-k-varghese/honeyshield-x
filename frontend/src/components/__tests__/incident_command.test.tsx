@@ -156,4 +156,20 @@ describe('Module 3.4 Live Incident Command & Governance Components', () => {
       ).toBeDefined();
     });
   });
+
+  it('renders CommandExecutionModal and checks permission for GOVERNOR_LOCKOUT_ENGAGE', () => {
+    const onClose = vi.fn();
+    render(
+      <CommandExecutionModal
+        incident={mockIncidents[0]}
+        defaultAction="GOVERNOR_LOCKOUT_ENGAGE"
+        onClose={onClose}
+      />,
+      { wrapper: createWrapper() }
+    );
+
+    expect(screen.getByText('Live Incident Command Execution')).toBeDefined();
+    expect(screen.getByText('INC-101')).toBeDefined();
+    expect(screen.getByText('Execute Governed Action')).toBeDefined();
+  });
 });

@@ -77,6 +77,7 @@ export const IntegrationsView: React.FC = () => {
     }
   };
 
+
   const getCircuitBadge = (state: string) => {
     switch (state) {
       case 'open':
@@ -224,11 +225,18 @@ export const IntegrationsView: React.FC = () => {
                     <td className="py-3.5 px-4">
                       <div className="flex items-center space-x-2">
                         <span className="font-bold font-sans text-white text-xs">{ep.name}</span>
-                        {!ep.enabled && (
-                          <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-sans">
-                            Disabled
-                          </span>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleEnabled(ep)}
+                          className={`text-[10px] px-1.5 py-0.5 rounded font-sans cursor-pointer transition-colors ${
+                            ep.enabled
+                              ? 'bg-emerald-950/70 text-emerald-400 border border-emerald-800/60 hover:bg-emerald-900/80'
+                              : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700'
+                          }`}
+                          title={`Click to ${ep.enabled ? 'disable' : 'enable'} endpoint`}
+                        >
+                          {ep.enabled ? 'Active' : 'Disabled'}
+                        </button>
                       </div>
                       <div className="text-[11px] text-sky-400/90 truncate max-w-xs mt-0.5" title={ep.target_url}>
                         {ep.target_url}

@@ -19,6 +19,8 @@ const ACTION_PERMISSIONS: Record<IncidentCommandAction, string> = {
   NOTIFICATION_DISPATCH: 'command:dispatch',
   NOTIFICATION_SUPPRESS: 'command:suppress',
   CONTAINMENT_STAGING_REQUEST: 'command:contain',
+  GOVERNOR_LOCKOUT_ENGAGE: 'governor:lockout',
+  GOVERNOR_LOCKOUT_RELEASE: 'governor:lockout',
 };
 
 export const CommandExecutionModal: React.FC<CommandExecutionModalProps> = ({

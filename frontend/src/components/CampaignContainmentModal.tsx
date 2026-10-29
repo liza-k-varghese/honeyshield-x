@@ -2,17 +2,13 @@ import React, { useState } from 'react';
 import {
   ShieldAlert,
   AlertTriangle,
-  Lock,
   Key,
   CheckCircle2,
   XCircle,
-  HelpCircle,
-  Shield,
   Send,
 } from 'lucide-react';
 import { CampaignDossier } from '../types';
 import { useContainCampaign } from '../hooks/useCampaigns';
-import { useAuth } from '../context/AuthContext';
 
 interface CampaignContainmentModalProps {
   isOpen: boolean;
@@ -27,7 +23,6 @@ export const CampaignContainmentModal: React.FC<CampaignContainmentModalProps> =
   campaign,
   onSuccess,
 }) => {
-  const { operator } = useAuth();
   const containMutation = useContainCampaign();
 
   const [actionType, setActionType] = useState<string>('BLOCK_IP');

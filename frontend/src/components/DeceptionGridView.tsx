@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  ShieldAlert,
   Shield,
   Plus,
   RefreshCw,
@@ -10,17 +9,15 @@ import {
   FileCode,
   Globe,
   FileText,
-  AlertTriangle,
   ArrowRight,
   Radio,
   Flame,
-  CheckCircle2,
 } from 'lucide-react';
 import { useCanaries } from '../hooks/useDeception';
 import { useAuth } from '../context/AuthContext';
 import { CanaryMintModal } from './CanaryMintModal';
 import { CanaryDetailDossier } from './CanaryDetailDossier';
-import { CanaryToken, CanaryType } from '../types';
+import { CanaryType } from '../types';
 
 interface DeceptionGridViewProps {
   onInvestigateIp?: (ip: string) => void;

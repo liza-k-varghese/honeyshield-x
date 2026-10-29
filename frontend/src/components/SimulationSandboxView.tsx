@@ -3,13 +3,7 @@ import {
   Sliders,
   Play,
   RotateCcw,
-  CheckCircle2,
-  AlertTriangle,
   Zap,
-  ShieldAlert,
-  Layers,
-  Code,
-  Flame,
 } from 'lucide-react';
 import { useSimulateRule } from '../hooks/useDetectionRules';
 import { CandidateRuleSpec, DetectionRuleSummary, SimulationExecutionResponse } from '../types';

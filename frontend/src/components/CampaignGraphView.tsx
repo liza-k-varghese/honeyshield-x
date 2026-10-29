@@ -6,11 +6,6 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize2,
-  Globe,
-  Radio,
-  ShieldAlert,
-  Briefcase,
-  Key,
 } from 'lucide-react';
 import { CampaignGraphResponse, CampaignGraphNode, CampaignGraphEdge } from '../types';
 

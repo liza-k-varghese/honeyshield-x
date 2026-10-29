@@ -1,10 +1,38 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
 import { SeverityBadge, StatusBadge, NotificationBadge } from '../Badge';
 import { KpiRibbon } from '../KpiRibbon';
 import { EventTimeline } from '../EventTimeline';
 import { AlertTable } from '../AlertTable';
+import { AlertDetailDrawer } from '../AlertDetailDrawer';
 import { Alert, DashboardStats } from '../../types';
+
+vi.mock('../../api/client', () => ({
+  fetchAttack: vi.fn().mockResolvedValue({
+    id: 5,
+    attack_type: 'WEB_SQL_INJECTION',
+    source_ip: '198.51.100.99',
+    destination_ip: '10.0.0.1',
+    protocol: 'TCP',
+    risk_score: 85,
+    detected_at: '2026-10-07T12:00:00Z',
+  }),
+  fetchAttackEvents: vi.fn().mockResolvedValue([]),
+  updateAlertStatus: vi.fn().mockResolvedValue({}),
+}));
+
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+}
 
 describe('Badge Components', () => {
   it('renders severity badges correctly', () => {
@@ -19,6 +47,14 @@ describe('Badge Components', () => {
 
     const { container: low } = render(<SeverityBadge severity="low" />);
     expect(low.textContent).toContain('LOW');
+  });
+
+  it('handles undefined and custom string severity gracefully', () => {
+    const { container: undef } = render(<SeverityBadge severity={undefined} />);
+    expect(undef.textContent).toContain('LOW');
+
+    const { container: custom } = render(<SeverityBadge severity="tier_3_danger" />);
+    expect(custom.textContent).toContain('TIER_3_DANGER');
   });
 
   it('renders status badges correctly', () => {
@@ -124,5 +160,40 @@ describe('AlertTable Component', () => {
 
     expect(screen.getByText('#101')).toBeDefined();
     expect(screen.getByText('WEB_SQL_INJECTION')).toBeDefined();
+  });
+});
+
+describe('AlertDetailDrawer Component', () => {
+  it('renders promotion button and triggers onPromoteToCase with alert entity', async () => {
+    const mockAlert: Alert = {
+      id: 101,
+      attack_id: 5,
+      alert_type: 'WEB_SQL_INJECTION',
+      severity: 'critical',
+      message: 'SQL Injection in /api/login',
+      status: 'open',
+      notified_at: null,
+      notification_status: 'pending',
+      created_at: '2026-10-07T12:00:00Z',
+    };
+    const onPromoteToCase = vi.fn();
+    const onClose = vi.fn();
+
+    render(
+      <AlertDetailDrawer
+        alert={mockAlert}
+        onClose={onClose}
+        onPromoteToCase={onPromoteToCase}
+      />,
+      { wrapper: createWrapper() }
+    );
+
+    const promoteBtn = await screen.findByText('Promote Alert to Incident Case');
+    expect(promoteBtn).toBeDefined();
+
+    fireEvent.click(promoteBtn);
+
+    expect(onPromoteToCase).toHaveBeenCalledWith(mockAlert);
+    expect(onClose).toHaveBeenCalled();
   });
 });

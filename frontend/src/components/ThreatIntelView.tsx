@@ -1,31 +1,18 @@
 import React, { useState } from 'react';
 import {
-  ShieldAlert,
-  Shield,
   Plus,
   RefreshCw,
   Search,
   Download,
   Flame,
-  Globe,
-  Hash,
-  Cpu,
-  Radio,
-  FileCode,
-  Tag,
-  Clock,
-  Activity,
   ArrowRight,
-  TrendingDown,
-  CheckCircle2,
-  AlertTriangle,
 } from 'lucide-react';
 import { useThreatIndicators, useThreatCampaigns } from '../hooks/useThreatIntel';
 import { useAuth } from '../context/AuthContext';
 import { IndicatorMintModal } from './IndicatorMintModal';
 import { FeedExportModal } from './FeedExportModal';
 import { IndicatorDossierDrawer } from './IndicatorDossierDrawer';
-import { ThreatIndicator, IndicatorType, IndicatorStatus } from '../types';
+import { IndicatorStatus } from '../types';
 
 interface ThreatIntelViewProps {
   onInvestigateIp?: (ip: string) => void;
@@ -33,7 +20,7 @@ interface ThreatIntelViewProps {
 }
 
 export const ThreatIntelView: React.FC<ThreatIntelViewProps> = ({
-  onInvestigateIp,
+  onInvestigateIp: _onInvestigateIp,
   onStageContainment,
 }) => {
   const { hasPermission } = useAuth();

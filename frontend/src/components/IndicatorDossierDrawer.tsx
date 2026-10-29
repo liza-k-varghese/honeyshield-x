@@ -11,9 +11,6 @@ import {
   Check,
   Ban,
   ShieldCheck,
-  TrendingDown,
-  Info,
-  ExternalLink,
   Flame,
 } from 'lucide-react';
 import {

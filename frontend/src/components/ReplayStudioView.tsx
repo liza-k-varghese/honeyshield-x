@@ -3,14 +3,8 @@ import {
   Play,
   RotateCcw,
   CheckCircle2,
-  AlertTriangle,
   History,
-  ShieldAlert,
-  ArrowRight,
   Clock,
-  Layers,
-  Network,
-  Cpu,
 } from 'lucide-react';
 import { useReplayAttack, useReplayIp } from '../hooks/useDetectionRules';
 import { ReplayExecutionResponse } from '../types';
@@ -25,7 +19,7 @@ interface ReplayStudioViewProps {
 export const ReplayStudioView: React.FC<ReplayStudioViewProps> = ({
   initialTarget = '',
   initialScope = 'attack',
-  onSimulateCandidate,
+  onSimulateCandidate: _onSimulateCandidate,
 }) => {
   const [scope, setScope] = useState<'attack' | 'ip'>(initialScope);
   const [targetId, setTargetId] = useState<string>(initialTarget);

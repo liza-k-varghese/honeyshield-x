@@ -3,14 +3,11 @@ import {
   Target,
   Plus,
   Search,
-  Filter,
   Layers,
   ShieldCheck,
   ShieldAlert,
-  Clock,
   Sparkles,
   ChevronRight,
-  AlertCircle,
   FileCheck,
 } from 'lucide-react';
 import { useHuntMetrics, useHunts } from '../hooks/useThreatHunting';

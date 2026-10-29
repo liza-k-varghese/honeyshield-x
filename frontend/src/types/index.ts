@@ -30,8 +30,8 @@ export interface Alert {
   severity: SeverityLevel;
   message: string;
   status: AlertLifecycleStatus;
-  notified_at: string | null;
-  notification_status: NotificationDeliveryStatus;
+  notified_at?: string | null;
+  notification_status?: NotificationDeliveryStatus | string;
   created_at: string;
 }
 

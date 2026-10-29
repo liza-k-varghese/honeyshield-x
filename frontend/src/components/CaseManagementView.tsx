@@ -4,20 +4,13 @@ import {
   Plus,
   RefreshCw,
   Search,
-  Filter,
-  Shield,
-  Clock,
-  User,
   ArrowRight,
-  CheckCircle2,
-  AlertTriangle,
 } from 'lucide-react';
 import { useCases } from '../hooks/useIncidentCases';
 import { useAuth } from '../context/AuthContext';
 import { SeverityBadge } from './Badge';
 import { CasePromotionModal } from './CasePromotionModal';
 import { CaseDetailDossier } from './CaseDetailDossier';
-import { CaseStatus, IncidentCase, SeverityLevel } from '../types';
 
 interface CaseManagementViewProps {
   onInvestigateIp?: (ip: string) => void;
@@ -26,7 +19,7 @@ interface CaseManagementViewProps {
 export const CaseManagementView: React.FC<CaseManagementViewProps> = ({
   onInvestigateIp,
 }) => {
-  const { operator, hasPermission } = useAuth();
+  const { hasPermission } = useAuth();
 
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');

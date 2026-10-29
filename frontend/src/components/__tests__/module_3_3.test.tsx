@@ -12,8 +12,6 @@ import {
   DetectionRuleSummary,
   RuleCatalogResponse,
   RuleEfficacyResponse,
-  ReplayExecutionResponse,
-  SimulationExecutionResponse,
   AuditEventsResponse,
 } from '../../types';
 

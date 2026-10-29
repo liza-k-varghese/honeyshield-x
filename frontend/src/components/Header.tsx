@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, Activity, Database, Server, RefreshCw, User, LogOut, Key } from 'lucide-react';
+import { ShieldAlert, Activity, Database, Server, RefreshCw, User, LogOut } from 'lucide-react';
 import { SystemHealth } from '../types';
 import { useAuth } from '../context/AuthContext';
 

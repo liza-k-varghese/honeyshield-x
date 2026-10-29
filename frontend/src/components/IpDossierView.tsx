@@ -3,7 +3,6 @@ import {
   IpDossier,
   AttackGraphResponse,
   CrossAttackEvent,
-  SeverityLevel,
   Alert
 } from '../types';
 import {
@@ -18,18 +17,15 @@ import { MitreMatrixView } from './MitreMatrixView';
 import { CrossAttackTimeline } from './CrossAttackTimeline';
 import {
   ShieldAlert,
-  Search,
   Clock,
   Copy,
   Check,
   Activity,
   Network,
   AlertOctagon,
-  CheckCircle2,
   RotateCcw,
   Layers,
   Sparkles,
-  Server,
   Zap,
   Globe
 } from 'lucide-react';
@@ -40,7 +36,7 @@ interface IpDossierViewProps {
   onReplayIp?: (sourceIp: string) => void;
 }
 
-export const IpDossierView: React.FC<IpDossierViewProps> = ({ sourceIp, onSelectAlert, onReplayIp }) => {
+export const IpDossierView: React.FC<IpDossierViewProps> = ({ sourceIp, onSelectAlert: _onSelectAlert, onReplayIp }) => {
   const [windowHours, setWindowHours] = useState<number>(24);
   const [activeTab, setActiveTab] = useState<'graph' | 'matrix' | 'timeline' | 'alerts'>('graph');
   const [copied, setCopied] = useState(false);

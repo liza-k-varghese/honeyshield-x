@@ -1,11 +1,10 @@
-import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LoginModal } from '../LoginModal';
 import { Header } from '../Header';
 import { CommandExecutionModal } from '../CommandExecutionModal';
-import { AuthProvider } from '../../context/AuthContext';
+import { AuthProvider, useAuth } from '../../context/AuthContext';
 import * as client from '../../api/client';
 import { VirtualIncidentItem } from '../../types';
 
@@ -176,5 +175,23 @@ describe('Module 3.5 Operator Authentication & RBAC Components', () => {
     // Execute button must be disabled
     const execBtn = screen.getByRole('button', { name: /Execute Governed Action/i });
     expect((execBtn as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('provides a valid fallback operator profile satisfying OperatorProfile interface', () => {
+    let capturedAuth: any;
+    const TestConsumer = () => {
+      capturedAuth = useAuth();
+      return <div>Consumer</div>;
+    };
+
+    render(<TestConsumer />);
+
+    expect(capturedAuth.isAuthenticated).toBe(true);
+    expect(capturedAuth.operator).toBeDefined();
+    expect(capturedAuth.operator.username).toBe('responder_alex');
+    expect(capturedAuth.operator.email).toBe('responder_alex@honeyshield.local');
+    expect(capturedAuth.operator.is_active).toBe(true);
+    expect(capturedAuth.operator.role).toBe('incident_responder');
+    expect(Array.isArray(capturedAuth.operator.permissions)).toBe(true);
   });
 });

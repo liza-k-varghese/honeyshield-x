@@ -131,8 +131,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 const defaultFallbackAuth: AuthContextType = {
   operator: {
     username: 'responder_alex',
+    email: 'responder_alex@honeyshield.local',
     full_name: 'Alex Mercer (SOC Lead)',
     role: 'incident_responder',
+    is_active: true,
     is_break_glass: false,
     permissions: [
       'read:telemetry',

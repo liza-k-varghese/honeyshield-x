@@ -2,11 +2,11 @@ import React from 'react';
 import { AlertLifecycleStatus, NotificationDeliveryStatus, SeverityLevel } from '../types';
 
 interface SeverityBadgeProps {
-  severity: SeverityLevel | string;
+  severity?: SeverityLevel | string;
 }
 
 export const SeverityBadge: React.FC<SeverityBadgeProps> = ({ severity }) => {
-  const norm = severity.toLowerCase();
+  const norm = (severity || 'low').toLowerCase();
   switch (norm) {
     case 'critical':
       return (
@@ -35,18 +35,18 @@ export const SeverityBadge: React.FC<SeverityBadgeProps> = ({ severity }) => {
     default:
       return (
         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-          {severity.toUpperCase()}
+          {severity ? severity.toUpperCase() : 'UNKNOWN'}
         </span>
       );
   }
 };
 
 interface StatusBadgeProps {
-  status: AlertLifecycleStatus | string;
+  status?: AlertLifecycleStatus | string;
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
-  const norm = status.toLowerCase();
+  const norm = (status || 'open').toLowerCase();
   switch (norm) {
     case 'open':
       return (
@@ -77,11 +77,11 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
 };
 
 interface NotificationBadgeProps {
-  status: NotificationDeliveryStatus | string;
+  status?: NotificationDeliveryStatus | string | null;
 }
 
 export const NotificationBadge: React.FC<NotificationBadgeProps> = ({ status }) => {
-  const norm = status.toLowerCase();
+  const norm = (status || 'pending').toLowerCase();
   switch (norm) {
     case 'delivered':
       return (

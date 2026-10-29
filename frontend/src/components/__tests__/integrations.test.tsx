@@ -1,4 +1,3 @@
-import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { IntegrationsView } from '../IntegrationsView';
@@ -222,6 +221,28 @@ describe('Module 3.9: Enterprise Integrations Frontend Console', () => {
     await waitFor(() => {
       expect(client.retryDlqItem).toHaveBeenCalledWith('del_uuid_fail_1');
       expect(screen.getByText(/Delivery replayed successfully/i)).toBeDefined();
+    });
+  });
+
+  it('toggles webhook endpoint enabled state when clicking status toggle button', async () => {
+    (client.updateEndpoint as any).mockResolvedValue({
+      ...mockEndpoint1,
+      enabled: false,
+    });
+
+    render(<IntegrationsView />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Splunk HEC Production')).toBeDefined();
+    });
+
+    const activeToggle = screen.getAllByRole('button', { name: /active/i })[0];
+    fireEvent.click(activeToggle);
+
+    await waitFor(() => {
+      expect(client.updateEndpoint).toHaveBeenCalledWith('ep_123456789abc', {
+        enabled: false,
+      });
     });
   });
 });

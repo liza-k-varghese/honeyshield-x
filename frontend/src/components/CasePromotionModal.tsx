@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import {
   FolderPlus,
   X,
-  ShieldAlert,
   AlertTriangle,
   CheckCircle2,
-  ListPlus,
 } from 'lucide-react';
 import { useCreateCase } from '../hooks/useIncidentCases';
 import { useAuth } from '../context/AuthContext';

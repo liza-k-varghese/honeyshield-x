@@ -1,37 +1,25 @@
 import React, { useState, useMemo } from 'react';
 import {
-  ShieldAlert,
-  Shield,
   Layers,
-  Activity,
   Search,
   RefreshCw,
   Play,
-  Clock,
-  Flame,
-  Globe,
-  Radio,
-  ExternalLink,
-  Filter,
   CheckCircle2,
-  AlertTriangle,
 } from 'lucide-react';
 import {
   useCampaigns,
   useCampaignMetrics,
   useTriggerClustering,
 } from '../hooks/useCampaigns';
-import { CampaignSummary, CampaignDossier, CampaignStatus, SeverityLevel } from '../types';
+import { CampaignDossier, CampaignStatus, SeverityLevel } from '../types';
 import { CampaignDossierDrawer } from './CampaignDossierDrawer';
 import { CampaignContainmentModal } from './CampaignContainmentModal';
-import { useAuth } from '../context/AuthContext';
 
 interface CampaignsViewProps {
   onInvestigateIp?: (ip: string) => void;
 }
 
 export const CampaignsView: React.FC<CampaignsViewProps> = ({ onInvestigateIp }) => {
-  const { hasPermission } = useAuth();
 
   // Filters & Search
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -347,7 +335,7 @@ export const CampaignsView: React.FC<CampaignsViewProps> = ({ onInvestigateIp })
 
                     {/* Entities in Scope */}
                     <td className="py-3.5 px-3 font-mono text-[11px] text-slate-300">
-                      <span>{c.source_ips.length} IPs &bull; </span>
+                      <span>{(c.source_ips || []).length} IPs &bull; </span>
                       <span>{c.canary_count} Canaries &bull; </span>
                       <span>{c.ioc_count} IOCs</span>
                     </td>
@@ -396,7 +384,7 @@ export const CampaignsView: React.FC<CampaignsViewProps> = ({ onInvestigateIp })
                               confidence: c.confidence,
                               first_seen: c.first_seen,
                               last_seen: c.last_seen,
-                              source_ips: c.source_ips,
+                              source_ips: c.source_ips || [],
                               destination_ips: [],
                               user_agents: [],
                               cves: [],

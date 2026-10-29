@@ -32,7 +32,7 @@ vi.mock('../../context/AuthContext', () => ({
       role: 'analyst',
       permissions: ['threat_intel:view', 'threat_intel:create', 'threat_intel:update', 'threat_intel:revoke', 'threat_intel:admin', 'threat_intel:export'],
     },
-    hasPermission: (perm: string) => true,
+    hasPermission: (_perm: string) => true,
     logout: vi.fn(),
     sessionExpired: false,
   }),

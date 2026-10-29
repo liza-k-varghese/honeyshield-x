@@ -19,7 +19,8 @@ export const AlertDetailDrawer: React.FC<AlertDetailDrawerProps> = ({
   onClose,
   onInvestigateIp,
   onReplayAttack,
-  onInspectRule,
+  onInspectRule: _onInspectRule,
+  onPromoteToCase,
 }) => {
   const updateMutation = useUpdateAlertStatus();
 
