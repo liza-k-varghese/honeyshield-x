@@ -87,7 +87,10 @@ export interface AttackEvent {
 }
 
 export type AlertSeverity = 'low' | 'medium' | 'high' | 'critical' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-export type AlertStatus = 'open' | 'acknowledged' | 'resolved' | 'investigating' | 'closed';
+export type AlertStatus = 'open' | 'acknowledged' | 'resolved' | 'investigating' | 'closed' | 'NEW' | 'INVESTIGATING' | 'CONTAINED' | 'CLOSED';
+export type AuditLogEntry = AuditEventItem;
+export type Campaign = CampaignCluster;
+export type HuntHypothesis = HuntSummary;
 
 export interface AlertItem {
   id: number;
