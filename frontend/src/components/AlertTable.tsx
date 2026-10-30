@@ -76,8 +76,8 @@ export const AlertTable: React.FC<AlertTableProps> = ({
         </div>
       </div>
 
-      {/* Table Content */}
-      <div className="overflow-x-auto">
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-slate-800/80 bg-slate-950/20 text-[11px] font-mono text-slate-400 uppercase tracking-wider">
@@ -155,6 +155,62 @@ export const AlertTable: React.FC<AlertTableProps> = ({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Touch-Friendly Card View (screens < md) */}
+      <div className="md:hidden divide-y divide-slate-800/60">
+        {isLoading ? (
+          [...Array(4)].map((_, i) => (
+            <div key={i} className="p-4 space-y-2 animate-pulse">
+              <div className="flex justify-between items-center">
+                <div className="h-4 bg-slate-800 rounded w-16" />
+                <div className="h-4 bg-slate-800 rounded w-20" />
+              </div>
+              <div className="h-4 bg-slate-800 rounded w-3/4" />
+              <div className="h-3 bg-slate-800 rounded w-1/2" />
+            </div>
+          ))
+        ) : filteredAlerts.length === 0 ? (
+          <div className="py-10 text-center text-slate-500 px-4">
+            <ShieldAlert className="w-8 h-8 mx-auto mb-2 text-slate-600" />
+            <p className="font-medium text-sm">No security alerts matching filter.</p>
+          </div>
+        ) : (
+          filteredAlerts.map((alert) => (
+            <div
+              key={alert.id}
+              onClick={() => onSelectAlert(alert)}
+              className="p-3.5 hover:bg-slate-800/40 active:bg-slate-800/70 transition-colors cursor-pointer flex items-center justify-between gap-3 min-h-[56px]"
+            >
+              <div className="min-w-0 flex-1 space-y-1">
+                <div className="flex items-center space-x-2">
+                  <span className="font-mono text-xs font-bold text-slate-400">ID #{alert.id}</span>
+                  <SeverityBadge severity={alert.severity as SeverityLevel} />
+                  <StatusBadge status={alert.status as AlertLifecycleStatus} />
+                </div>
+                <div className="font-semibold text-xs text-white truncate font-mono">
+                  Vector: {alert.alert_type}
+                </div>
+                <p className="text-[11px] text-slate-400 truncate">
+                  {alert.message}
+                </p>
+                <div className="flex items-center space-x-2 text-[10px] font-mono text-slate-500">
+                  <span>{alert.created_at ? new Date(alert.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</span>
+                  {alert.attack_id && (
+                    <>
+                      <span>&bull;</span>
+                      <span className="text-cyan-400">Attack #{alert.attack_id}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="shrink-0 p-1 rounded text-slate-500">
+                <ChevronRight className="w-5 h-5 text-cyan-400" />
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

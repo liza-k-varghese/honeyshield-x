@@ -3,6 +3,7 @@ import {
   fetchAlert,
   fetchAlerts,
   fetchAttack,
+  fetchAttacks,
   fetchAttackEvents,
   fetchDashboardStats,
   updateAlertStatus,
@@ -40,6 +41,15 @@ export function useAttackDetail(attackId: number | null) {
     queryKey: ['attack', attackId],
     queryFn: () => (attackId ? fetchAttack(attackId) : null),
     enabled: attackId !== null,
+  });
+}
+
+export function useAttacks(skip: number = 0, limit: number = 50) {
+  return useQuery({
+    queryKey: ['attacks', skip, limit],
+    queryFn: () => fetchAttacks(skip, limit),
+    refetchInterval: 5000,
+    refetchOnWindowFocus: true,
   });
 }
 

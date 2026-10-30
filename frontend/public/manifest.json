@@ -1,0 +1,22 @@
+{
+  "name": "HoneyShield X — SOC Command Centre",
+  "short_name": "HoneyShield X",
+  "description": "Autonomous Honeypot & Intrusion Defense Platform",
+  "start_url": "/",
+  "id": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#060913",
+  "theme_color": "#060913",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["security", "productivity", "utilities"]
+}
+

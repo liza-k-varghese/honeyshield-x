@@ -9,25 +9,128 @@
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #0a0d14;
+  background-color: #060913;
   color: #f1f5f9;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Background Cyber Grid */
+.cyber-grid-bg {
+  background-color: #060913;
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* NEXUS Command Panel Styling */
+.nexus-panel {
+  position: relative;
+  background: rgba(10, 16, 32, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.14);
+  box-shadow: 0 0 20px -5px rgba(0, 240, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nexus-panel:hover {
+  border-color: rgba(0, 240, 255, 0.28);
+  box-shadow: 0 0 25px -4px rgba(0, 240, 255, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.nexus-panel-purple {
+  position: relative;
+  background: rgba(13, 16, 36, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(168, 85, 247, 0.18);
+  box-shadow: 0 0 20px -5px rgba(168, 85, 247, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nexus-panel-purple:hover {
+  border-color: rgba(168, 85, 247, 0.35);
+  box-shadow: 0 0 25px -4px rgba(168, 85, 247, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Angular Corner Notches */
+.corner-notch-tl::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #00f0ff;
+  border-left: 2px solid #00f0ff;
+  pointer-events: none;
+}
+
+.corner-notch-br::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-bottom: 2px solid #00f0ff;
+  border-right: 2px solid #00f0ff;
+  pointer-events: none;
+}
+
+.corner-notch-purple-tl::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #a855f7;
+  border-left: 2px solid #a855f7;
+  pointer-events: none;
+}
+
+.corner-notch-purple-br::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-bottom: 2px solid #a855f7;
+  border-right: 2px solid #a855f7;
+  pointer-events: none;
+}
+
+/* Neon Text Glow */
+.neon-glow-cyan {
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+.neon-glow-purple {
+  text-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+}
+
+.neon-glow-red {
+  text-shadow: 0 0 8px rgba(244, 63, 94, 0.5);
 }
 
 /* Custom scrollbars for high-density SOC tables and timelines */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #070b15;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 3px;
+  background: #1e293b;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #0284c7;
 }

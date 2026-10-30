@@ -63,6 +63,15 @@ export async function fetchAttack(attackId: number): Promise<Attack> {
   return handleResponse<Attack>(res);
 }
 
+export async function fetchAttacks(skip: number = 0, limit: number = 50): Promise<Attack[]> {
+  const params = new URLSearchParams({
+    skip: skip.toString(),
+    limit: limit.toString(),
+  });
+  const res = await fetch(`${API_BASE}/attacks?${params.toString()}`);
+  return handleResponse<Attack[]>(res);
+}
+
 export async function fetchAttackEvents(
   attackId: number,
   skip: number = 0,

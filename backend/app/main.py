@@ -31,6 +31,8 @@ from app.routers import (
     risk,
     threat_intelligence,
     unified_orchestrator,
+    services,
+    mobile,
 )
 
 app = FastAPI(
@@ -78,6 +80,8 @@ app.include_router(deception.router, prefix="/api/v1")
 app.include_router(integrations.router, prefix="/api/v1")
 app.include_router(campaigns.router, prefix="/api/v1")
 app.include_router(hunts.router, prefix="/api/v1")
+app.include_router(services.router, prefix="/api/v1")
+app.include_router(mobile.router, prefix="/api/v1")
 
 POSTGRES_HOST = "127.0.0.1"
 POSTGRES_PORT = 5432
