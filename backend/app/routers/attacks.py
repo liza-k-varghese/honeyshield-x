@@ -36,6 +36,26 @@ def create_attack(
     db.add(db_attack)
     db.commit()
     db.refresh(db_attack)
+
+    try:
+        from app.events.service import publish_security_event
+        sev = (db_attack.severity or "medium").lower()
+        mapped_sev = "critical" if sev == "critical" else ("high" if sev == "high" else ("medium" if sev == "medium" else "low"))
+        publish_security_event(
+            event_type="attack.created",
+            resource_id=str(db_attack.id),
+            payload={
+                "attack_id": db_attack.id,
+                "source_ip": db_attack.source_ip,
+                "attack_type": db_attack.attack_type,
+                "severity": db_attack.severity,
+                "risk_score": db_attack.risk_score,
+            },
+            severity=mapped_sev,
+        )
+    except Exception:
+        pass
+
     return db_attack
 
 

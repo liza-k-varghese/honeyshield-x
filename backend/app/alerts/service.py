@@ -99,6 +99,26 @@ def evaluate_attack_alert(
     db.commit()
     db.refresh(new_alert)
 
+    try:
+        from app.events.service import publish_security_event
+        sev = (new_alert.severity or "high").lower()
+        mapped_sev = "critical" if sev == "critical" else ("high" if sev in ("high", "medium") else "info")
+        publish_security_event(
+            event_type="alert.created",
+            resource_id=str(new_alert.id),
+            payload={
+                "alert_id": new_alert.id,
+                "attack_id": attack.id,
+                "severity": new_alert.severity,
+                "status": new_alert.status,
+                "summary": new_alert.message,
+                "attack_type": new_alert.alert_type,
+            },
+            severity=mapped_sev,
+        )
+    except Exception:
+        pass
+
     return {
         "attack_id": attack.id,
         "alert_created": True,
@@ -152,4 +172,22 @@ def update_alert_status(
     alert.status = clean_status
     db.commit()
     db.refresh(alert)
+
+    try:
+        from app.events.service import publish_security_event
+        sev = (alert.severity or "high").lower()
+        mapped_sev = "critical" if sev == "critical" else ("high" if sev in ("high", "medium") else "info")
+        publish_security_event(
+            event_type="alert.updated",
+            resource_id=str(alert.id),
+            payload={
+                "alert_id": alert.id,
+                "status": alert.status,
+                "severity": alert.severity,
+            },
+            severity=mapped_sev,
+        )
+    except Exception:
+        pass
+
     return alert

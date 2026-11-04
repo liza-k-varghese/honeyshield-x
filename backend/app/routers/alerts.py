@@ -64,7 +64,9 @@ def list_alerts_endpoint(
     db: Session = Depends(get_db),
 ) -> list[AlertResponse]:
     """Retrieve all stored alerts with optional status filtering."""
-    alerts = list_alerts(db=db, status_filter=status_filter, limit=limit)
+    clean_status = status_filter if isinstance(status_filter, str) else None
+    clean_limit = limit if isinstance(limit, int) else 100
+    alerts = list_alerts(db=db, status_filter=clean_status, limit=clean_limit)
     return [AlertResponse.model_validate(a) for a in alerts]
 
 

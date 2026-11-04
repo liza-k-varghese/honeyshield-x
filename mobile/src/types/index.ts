@@ -26,7 +26,8 @@ export interface LoginResponse {
 
 export interface BreakGlassRequest {
   username: string;
-  password: string;
+  passphrase?: string;
+  password?: string;
   justification: string;
 }
 
@@ -354,3 +355,138 @@ export interface AuditEventsResponse {
   events: AuditEventItem[];
   total: number;
 }
+
+// ==========================================
+// 8. Real-Time Events & Push Notifications (Phase 3)
+// ==========================================
+
+export type RealtimeConnectionState = 'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'offline';
+
+export interface SecurityEventEnvelope {
+  event_id: string;
+  event_type: string;
+  timestamp: string;
+  schema_version: string;
+  resource_id: string;
+  severity: 'critical' | 'high' | 'medium' | 'low' | 'info';
+  payload: Record<string, any>;
+  correlation_id?: string | null;
+  cursor?: number | null;
+}
+
+export interface ConnectionTicketResponse {
+  ticket: string;
+  expires_in: number;
+  ws_endpoint: string;
+}
+
+export interface EventReplayResponse {
+  events: SecurityEventEnvelope[];
+  next_cursor: number | null;
+  total: number;
+  has_more: boolean;
+}
+
+export interface OperatorNotificationPreferences {
+  min_severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'ALL';
+  enable_canary_push: boolean;
+  enable_governor_stepup_push: boolean;
+  enable_service_failure_push: boolean;
+  quiet_hours_enabled: boolean;
+  quiet_hours_start: string;
+  quiet_hours_end: string;
+  categories: string[];
+}
+
+// ==========================================
+// 9. QR Pairing & Governor Level-3 Emergency (Phase 4)
+// ==========================================
+
+export interface PairingChallengeResponse {
+  challenge_id: string;
+  operator_username: string;
+  pairing_uri: string;
+  expires_at: string;
+  expires_in_seconds: number;
+}
+
+export interface PairingClaimRequest {
+  challenge_id: string;
+  device_fingerprint: string;
+  platform?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface PairingStatusResponse {
+  challenge_id: string;
+  status: 'pending' | 'claimed' | 'approved' | 'rejected' | 'revoked' | 'expired';
+  operator_username: string;
+  device_fingerprint?: string | null;
+  expires_at: string;
+  claimed_at?: string | null;
+  approved_at?: string | null;
+  approved_by?: string | null;
+}
+
+export type EmergencyActionType =
+  | 'CONTAIN_HOST'
+  | 'RELEASE_CONTAINMENT'
+  | 'BLOCK_IP'
+  | 'RESTART_CRITICAL_SERVICE';
+
+export interface EmergencyExecuteRequest {
+  action: EmergencyActionType;
+  target: string;
+  justification: string;
+  passphrase: string;
+  dry_run?: boolean;
+  parameters?: Record<string, any>;
+}
+
+export interface EmergencyExecuteResponse {
+  execution_id: string;
+  action: string;
+  target: string;
+  operator_username: string;
+  status: 'SUCCESS' | 'DRY_RUN_EXECUTED' | 'REJECTED';
+  safety_mode: string;
+  justification: string;
+  dry_run: boolean;
+  executed_at: string;
+  audit_event_id?: string | null;
+  details?: Record<string, any>;
+}
+
+export interface EmergencyStatusResponse {
+  status: string;
+  security_level: string;
+  dry_run_default: boolean;
+  contained_hosts: Array<{
+    host: string;
+    isolated_at: string;
+    operator: string;
+    justification: string;
+    dry_run: boolean;
+  }>;
+  blocked_ips: Array<{
+    target: string;
+    blocked_at: string;
+    operator: string;
+    justification: string;
+    dry_run: boolean;
+  }>;
+  recent_actions: Array<{
+    execution_id: string;
+    action: string;
+    target: string;
+    operator: string;
+    status: string;
+    dry_run: boolean;
+    executed_at: string;
+    justification: string;
+  }>;
+  total_actions: number;
+  server_time: string;
+}
+
+

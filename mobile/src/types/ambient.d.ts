@@ -67,8 +67,40 @@ declare module 'expo-local-authentication' {
 }
 
 declare module 'expo-notifications' {
+  export interface Subscription {
+    remove: () => void;
+  }
+  export const AndroidImportance: {
+    MAX: number;
+    HIGH: number;
+    DEFAULT: number;
+    LOW: number;
+    MIN: number;
+    NONE: number;
+  };
+  export function setNotificationHandler(handler: any): void;
+  export function setNotificationChannelAsync(channelId: string, channel: any): Promise<any>;
   export function getExpoPushTokenAsync(options?: any): Promise<{ data: string }>;
+  export function getPermissionsAsync(): Promise<{ status: string }>;
   export function requestPermissionsAsync(): Promise<{ status: string }>;
+  export function addNotificationResponseReceivedListener(listener: (response: any) => void): Subscription;
+}
+
+declare module 'expo-device' {
+  export const isDevice: boolean;
+  export const brand: string | null;
+  export const modelName: string | null;
+  export const osVersion: string | null;
+  export const platformApiLevel: number | null;
+}
+
+declare module 'expo-constants' {
+  const Constants: {
+    expoConfig?: any;
+    easConfig?: any;
+    [key: string]: any;
+  };
+  export default Constants;
 }
 
 declare module 'expo' {
@@ -115,6 +147,22 @@ declare module 'lucide-react-native' {
   export const Info: any;
   export const X: any;
   export const Calendar: any;
+  export const Bell: any;
+  export const Check: any;
+  export const Clock: any;
+  export const Moon: any;
+  export const Sliders: any;
+  export const Zap: any;
+  export const QrCode: any;
+  export const AlertOctagon: any;
+  export const Ban: any;
+  export const CheckCircle: any;
+  export const RefreshCw: any;
+  export const Unlock: any;
+  export const ArrowLeft: any;
+  export const Copy: any;
+  export const Smartphone: any;
+  export const XCircle: any;
 }
 
 declare module '@react-navigation/native' {

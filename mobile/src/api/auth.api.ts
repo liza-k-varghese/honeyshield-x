@@ -8,11 +8,17 @@ import { LoginResponse, OperatorProfile, BreakGlassRequest } from '../types';
 
 export const authApi = {
   async login(username: string, password: string): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, {
+    const response = await apiClient.post<any>(API_ENDPOINTS.AUTH.LOGIN, {
       username,
       password,
     });
-    return response.data;
+    const data = response.data;
+    return {
+      access_token: data.token || data.access_token,
+      token_type: data.token_type || 'bearer',
+      operator: data.operator,
+      expires_in: data.expires_in,
+    };
   },
 
   async logout(): Promise<void> {
@@ -25,7 +31,11 @@ export const authApi = {
   },
 
   async breakGlass(payload: BreakGlassRequest): Promise<{ success: boolean; session_expires_in: number }> {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH.BREAK_GLASS, payload);
+    const response = await apiClient.post(API_ENDPOINTS.AUTH.BREAK_GLASS, {
+      username: payload.username,
+      passphrase: payload.passphrase || payload.password,
+      justification: payload.justification,
+    });
     return response.data;
   },
 

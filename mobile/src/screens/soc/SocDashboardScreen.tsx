@@ -26,6 +26,7 @@ import { CyberPanel } from '../../components/hud/CyberPanel';
 import { KpiCard } from '../../components/kpi/KpiCard';
 import { socApi } from '../../api/soc.api';
 import { DashboardStats, AttackSummary } from '../../types';
+import { useRealtimeEvents } from '../../hooks/useRealtimeEvents';
 
 interface SocDashboardProps {
   navigation: any;
@@ -36,6 +37,10 @@ export const SocDashboardScreen: React.FC<SocDashboardProps> = ({ navigation }) 
   const [recentAttacks, setRecentAttacks] = useState<AttackSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  const { connectionState } = useRealtimeEvents((event) => {
+    fetchDashboardData();
+  });
 
   const fetchDashboardData = async () => {
     try {
@@ -104,6 +109,28 @@ export const SocDashboardScreen: React.FC<SocDashboardProps> = ({ navigation }) 
   return (
     <View style={styles.container}>
       <HeaderBar title="HONEYSHIELD X" subtitle="SYSTEM 1: SOC INTELLIGENCE" />
+
+      <View style={styles.streamBanner}>
+        <View
+          style={[
+            styles.streamDot,
+            connectionState === 'connected'
+              ? styles.dotConnected
+              : connectionState === 'reconnecting' || connectionState === 'connecting'
+              ? styles.dotReconnecting
+              : styles.dotDisconnected,
+          ]}
+        />
+        <Text style={styles.streamText}>
+          {connectionState === 'connected'
+            ? 'LIVE EVENT STREAM: CONNECTED'
+            : connectionState === 'reconnecting'
+            ? 'RECONNECTING STREAM...'
+            : connectionState === 'connecting'
+            ? 'INITIALIZING STREAM...'
+            : 'STREAM OFFLINE (POLLING ACTIVE)'}
+        </Text>
+      </View>
 
       {loading ? (
         <View style={styles.centerContainer}>
@@ -418,6 +445,39 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily,
     fontSize: 9,
     color: colors.purple,
+  },
+  streamBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0b1329',
+    borderBottomWidth: 1,
+    borderBottomColor: '#1e293b',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    gap: 8,
+  },
+  streamDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  dotConnected: {
+    backgroundColor: '#10b981',
+    shadowColor: '#10b981',
+    shadowRadius: 6,
+    shadowOpacity: 0.8,
+  },
+  dotReconnecting: {
+    backgroundColor: '#f59e0b',
+  },
+  dotDisconnected: {
+    backgroundColor: '#ef4444',
+  },
+  streamText: {
+    fontFamily: typography.fontFamily,
+    fontSize: 10,
+    color: '#94a3b8',
+    letterSpacing: 0.5,
   },
 });
 

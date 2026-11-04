@@ -14,7 +14,7 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import { Shield, Lock, User, Server, Fingerprint, AlertTriangle } from 'lucide-react-native';
+import { Shield, Lock, User, Server, Fingerprint, AlertTriangle, QrCode } from 'lucide-react-native';
 import { colors, typography, spacing } from '../../theme';
 import { CyberPanel } from '../../components/hud/CyberPanel';
 import { CyberButton } from '../../components/common/CyberButton';
@@ -213,6 +213,15 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         >
           <AlertTriangle color={colors.critical} size={16} />
           <Text style={styles.breakGlassText}>EMERGENCY BREAK-GLASS ELEVATION</Text>
+        </TouchableOpacity>
+
+        {/* Secure QR Pairing Link */}
+        <TouchableOpacity
+          style={[styles.breakGlassRow, { borderColor: colors.cyan, backgroundColor: 'rgba(6, 182, 212, 0.05)' }]}
+          onPress={() => navigation.navigate('QrPairing')}
+        >
+          <QrCode color={colors.cyan} size={16} />
+          <Text style={[styles.breakGlassText, { color: colors.cyan }]}>SECURE QR DEVICE PAIRING</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>

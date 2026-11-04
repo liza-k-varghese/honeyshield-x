@@ -86,4 +86,36 @@ export const API_ENDPOINTS = {
   AUDIT: {
     EVENTS: '/audit/events',
   },
+
+  // Real-Time Events & Streaming Gateway (Phase 3)
+  EVENTS: {
+    TICKET: '/events/ticket',
+    WS: '/events/ws',
+    REPLAY: '/events/replay',
+    STREAM: '/events/stream',
+  },
+
+  // Mobile Device & Push Preferences (Phase 3)
+  MOBILE: {
+    REGISTER_DEVICE: '/mobile/device/register',
+    UNREGISTER_DEVICE: '/mobile/device/unregister',
+    PREFERENCES: '/mobile/preferences',
+    PUSH_LOGS: '/mobile/push-logs',
+  },
+
+  // Secure QR Device Pairing (Phase 4)
+  PAIRING: {
+    CHALLENGE: '/auth/pairing/challenge',
+    CLAIM: '/auth/pairing/claim',
+    APPROVE: (challengeId: string) => `/auth/pairing/approve/${challengeId}`,
+    REVOKE: (challengeId: string) => `/auth/pairing/revoke/${challengeId}`,
+    STATUS: (challengeId: string) => `/auth/pairing/status/${challengeId}`,
+  },
+
+  // Governor Level-3 Emergency Console (Phase 4)
+  EMERGENCY: {
+    EXECUTE: '/governor/emergency/execute',
+    STATUS: '/governor/emergency/status',
+  },
 };
+

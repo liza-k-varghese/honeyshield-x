@@ -54,12 +54,18 @@ def list_hunts(
     operator: Operator = Depends(require_permission("hunt:view")),
 ) -> ListHuntResponse:
     """Retrieve list of threat hunts with deterministic sorting."""
+    s_val = status if isinstance(status, str) else None
+    sev_val = severity if isinstance(severity, str) else None
+    tactic_val = mitre_tactic if isinstance(mitre_tactic, str) else None
+    lim_val = limit if isinstance(limit, int) else 50
+    off_val = offset if isinstance(offset, int) else 0
+
     summaries, total = default_hunt_service.store.list_hunts(
-        status=status,
-        severity=severity,
-        mitre_tactic=mitre_tactic,
-        limit=limit,
-        offset=offset,
+        status=s_val,
+        severity=sev_val,
+        mitre_tactic=tactic_val,
+        limit=lim_val,
+        offset=off_val,
     )
     return ListHuntResponse(
         hunts=summaries,

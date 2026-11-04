@@ -33,7 +33,11 @@ from app.routers import (
     unified_orchestrator,
     services,
     mobile,
+    events,
+    pairing,
+    emergency,
 )
+import app.events.service  # Initialize event bus bridge & listeners
 
 app = FastAPI(
     title="HoneyShield X API",
@@ -82,6 +86,9 @@ app.include_router(campaigns.router, prefix="/api/v1")
 app.include_router(hunts.router, prefix="/api/v1")
 app.include_router(services.router, prefix="/api/v1")
 app.include_router(mobile.router, prefix="/api/v1")
+app.include_router(events.router, prefix="/api/v1")
+app.include_router(pairing.router, prefix="/api/v1")
+app.include_router(emergency.router, prefix="/api/v1")
 
 POSTGRES_HOST = "127.0.0.1"
 POSTGRES_PORT = 5432

@@ -147,6 +147,23 @@ def control_service(
         client_ip,
     )
 
+    try:
+        from app.events.service import publish_security_event
+        publish_security_event(
+            event_type="system.service_status_changed",
+            resource_id=payload.service.value,
+            payload={
+                "service": payload.service.value,
+                "action": payload.action.value,
+                "status": "restarted" if payload.action.value == "restart" else "active",
+                "operator": operator.username,
+                "justification": payload.justification,
+            },
+            severity="medium",
+        )
+    except Exception:
+        pass
+
     return {
         "success": True,
         "service": payload.service.value,

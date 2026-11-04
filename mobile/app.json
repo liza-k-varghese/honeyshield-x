@@ -2,6 +2,7 @@
   "expo": {
     "name": "HoneyShield X",
     "slug": "honeyshield-x",
+    "scheme": "honeyshield",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,6 +24,7 @@
       },
       "package": "com.honeyshield.soc",
       "permissions": [
+        "CAMERA",
         "USE_BIOMETRIC",
         "USE_FINGERPRINT",
         "RECEIVE_BOOT_COMPLETED",

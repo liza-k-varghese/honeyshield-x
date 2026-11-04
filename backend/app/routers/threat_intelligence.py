@@ -144,15 +144,23 @@ def list_indicators_endpoint(
     db: Session = Depends(get_db),
 ) -> ThreatIndicatorListResponse:
     """Retrieve paginated catalog of threat intelligence indicators with dynamic decay."""
+    clean_status = status if isinstance(status, str) else None
+    clean_type = indicator_type if isinstance(indicator_type, str) else None
+    clean_campaign = campaign if isinstance(campaign, str) else None
+    clean_min_conf = min_confidence if isinstance(min_confidence, (int, float)) else None
+    clean_search = search if isinstance(search, str) else None
+    clean_skip = skip if isinstance(skip, int) else 0
+    clean_limit = limit if isinstance(limit, int) else 50
+
     indicators, total = threat_intel_service.list_indicators(
         db=db,
-        status=status,
-        indicator_type=indicator_type,
-        campaign=campaign,
-        min_confidence=min_confidence,
-        search=search,
-        skip=skip,
-        limit=limit,
+        status=clean_status,
+        indicator_type=clean_type,
+        campaign=clean_campaign,
+        min_confidence=clean_min_conf,
+        search=clean_search,
+        skip=clean_skip,
+        limit=clean_limit,
     )
     return ThreatIndicatorListResponse(
         indicators=indicators,

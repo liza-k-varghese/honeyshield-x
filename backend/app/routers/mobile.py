@@ -1,20 +1,26 @@
-"""Mobile Device Management & Push Notification Gateway for HoneyShield-X.
+"""Mobile Device Management & Push Notification Gateway for HoneyShield-X (Phase 3).
 
 Provides:
 - POST /api/v1/mobile/device/register: Register Android device push token & hardware metadata
 - POST /api/v1/mobile/device/unregister: Unregister device on sign out
-- GET /api/v1/mobile/preferences: Mobile notification filter preferences
+- GET /api/v1/mobile/preferences: Retrieve operator notification filter preferences
+- PUT /api/v1/mobile/preferences: Update operator notification filter preferences
+- GET /api/v1/mobile/push-logs: Observable push dispatch ledger
 """
 
 import logging
-import time
 from typing import Any
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel, Field
 
 from app.auth.dependencies import get_current_operator
 from app.auth.registry import Operator
+from app.notifications.push_dispatcher import (
+    OperatorNotificationPreferences,
+    PushDeliveryLog,
+    default_push_dispatcher,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -30,17 +36,6 @@ class DeviceRegistrationRequest(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
-class MobilePreferences(BaseModel):
-    min_alert_severity: str = "HIGH"
-    enable_canary_push: bool = True
-    enable_governor_stepup_push: bool = True
-    quiet_hours_enabled: bool = False
-
-
-# In-memory registry for device tokens
-_REGISTERED_DEVICES: dict[str, dict[str, Any]] = {}
-
-
 @router.post(
     "/device/register",
     status_code=status.HTTP_200_OK,
@@ -51,22 +46,16 @@ def register_device(
     operator: Operator = Depends(get_current_operator),
 ) -> dict[str, Any]:
     """Link mobile push token to operator profile."""
-    _REGISTERED_DEVICES[payload.push_token] = {
-        "operator": operator.username,
-        "platform": payload.platform,
-        "metadata": payload.metadata,
-        "registered_at": time.time(),
-    }
-    logger.info(
-        "MOBILE_DEVICE_REGISTER operator=%s platform=%s token_prefix=%s",
-        operator.username,
-        payload.platform,
-        payload.push_token[:12],
+    rec = default_push_dispatcher.register_device(
+        push_token=payload.push_token,
+        operator=operator.username,
+        platform=payload.platform,
+        metadata=payload.metadata,
     )
     return {
         "registered": True,
         "operator": operator.username,
-        "device_count": len(_REGISTERED_DEVICES),
+        "registered_at": rec.registered_at,
     }
 
 
@@ -80,19 +69,46 @@ def unregister_device(
     operator: Operator = Depends(get_current_operator),
 ) -> dict[str, Any]:
     """Remove mobile push token from active dispatch registry."""
-    if payload.push_token in _REGISTERED_DEVICES:
-        del _REGISTERED_DEVICES[payload.push_token]
-    return {"unregistered": True}
+    success = default_push_dispatcher.unregister_device(
+        push_token=payload.push_token,
+        operator=operator.username,
+    )
+    return {"unregistered": success}
 
 
 @router.get(
     "/preferences",
-    response_model=MobilePreferences,
+    response_model=OperatorNotificationPreferences,
     summary="Retrieve operator mobile notification preferences",
 )
 def get_preferences(
     operator: Operator = Depends(get_current_operator),
-) -> MobilePreferences:
+) -> OperatorNotificationPreferences:
     """Retrieve active operator mobile notification filters."""
-    return MobilePreferences()
+    return default_push_dispatcher.get_preferences(operator.username)
 
+
+@router.put(
+    "/preferences",
+    response_model=OperatorNotificationPreferences,
+    summary="Update operator mobile notification preferences",
+)
+def update_preferences(
+    payload: OperatorNotificationPreferences,
+    operator: Operator = Depends(get_current_operator),
+) -> OperatorNotificationPreferences:
+    """Persist updated mobile notification filters for authenticated operator."""
+    return default_push_dispatcher.update_preferences(operator.username, payload)
+
+
+@router.get(
+    "/push-logs",
+    response_model=list[PushDeliveryLog],
+    summary="Retrieve recent push delivery observability records",
+)
+def get_push_delivery_logs(
+    limit: int = Query(default=50, ge=1, le=200),
+    operator: Operator = Depends(get_current_operator),
+) -> list[PushDeliveryLog]:
+    """Inspect recent push notification delivery audit logs."""
+    return default_push_dispatcher.get_logs(limit=limit)

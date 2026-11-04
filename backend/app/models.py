@@ -94,3 +94,40 @@ class SystemEvent(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow
     )
+
+
+class SecurityEventOutbox(Base):
+    """Transactional Outbox and Persistent Event Store for HoneyShield-X (Phase 4).
+
+    Ensures events and cursors survive backend process restarts, container recycles,
+    and Redis interruptions with strict sequence ordering.
+    """
+    __tablename__ = "security_event_outbox"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
+    event_id: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    event_type: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
+    resource_id: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
+    severity: Mapped[str] = mapped_column(String(20), default="info", nullable=False)
+    schema_version: Mapped[str] = mapped_column(String(10), default="1.0", nullable=False)
+    payload_json: Mapped[str] = mapped_column(Text, nullable=False)
+    correlation_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+
+class DevicePairingChallenge(Base):
+    """Secure, short-lived QR pairing challenge ledger for mobile devices (Phase 4)."""
+    __tablename__ = "device_pairing_challenges"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
+    challenge_id: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    operator_username: Mapped[str] = mapped_column(String(100), nullable=False)
+    device_fingerprint: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    status: Mapped[str] = mapped_column(String(30), default="pending", nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    claimed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    approved_by: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    device_metadata_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+

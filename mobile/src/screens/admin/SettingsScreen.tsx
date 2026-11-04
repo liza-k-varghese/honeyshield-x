@@ -19,6 +19,9 @@ import {
   Fingerprint,
   LogOut,
   Info,
+  Bell,
+  AlertOctagon,
+  QrCode,
 } from 'lucide-react-native';
 import { colors, typography, spacing } from '../../theme';
 import { HeaderBar } from '../../components/hud/HeaderBar';
@@ -156,6 +159,60 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) =>
             title="SAVE GATEWAY ENDPOINT"
             variant="outline"
             onPress={handleSaveGateway}
+            style={{ marginTop: spacing.sm }}
+          />
+        </CyberPanel>
+
+        {/* Push Notifications & Stream Filters Panel */}
+        <CyberPanel glowColor="cyan" style={styles.panel}>
+          <View style={styles.panelHeader}>
+            <Bell color={colors.cyan} size={18} />
+            <Text style={styles.panelTitle}>THREAT NOTIFICATION FILTERS</Text>
+          </View>
+          <Text style={styles.infoText}>
+            Deterministic severity thresholds, category selection, and quiet hours policy.
+          </Text>
+          <CyberButton
+            title="CONFIGURE PUSH & STREAM FILTERS"
+            variant="primary"
+            onPress={() => navigation.navigate('NotificationPreferences')}
+            icon={<Bell color={colors.background} size={16} />}
+            style={{ marginTop: spacing.sm }}
+          />
+        </CyberPanel>
+
+        {/* Governor Emergency Console (Phase 4) */}
+        <CyberPanel glowColor="red" style={styles.panel}>
+          <View style={styles.panelHeader}>
+            <AlertOctagon color={colors.critical} size={18} />
+            <Text style={[styles.panelTitle, { color: colors.critical }]}>GOVERNOR EMERGENCY CONSOLE</Text>
+          </View>
+          <Text style={styles.infoText}>
+            Governor Level-3 defensive countermeasure HUD (Contain Host, Block IP, Supervised RPC).
+          </Text>
+          <CyberButton
+            title="LAUNCH EMERGENCY OPERATIONS"
+            variant="danger"
+            onPress={() => navigation.navigate('EmergencyConsole')}
+            icon={<AlertOctagon color={colors.textPrimary} size={16} />}
+            style={{ marginTop: spacing.sm }}
+          />
+        </CyberPanel>
+
+        {/* Device Pairing Management (Phase 4) */}
+        <CyberPanel glowColor="blue" style={styles.panel}>
+          <View style={styles.panelHeader}>
+            <QrCode color={colors.blue} size={18} />
+            <Text style={styles.panelTitle}>SECURE QR DEVICE PAIRING</Text>
+          </View>
+          <Text style={styles.infoText}>
+            Generate and manage single-use, 180s expiring QR pairing challenges and device authorizations.
+          </Text>
+          <CyberButton
+            title="OPEN DEVICE PAIRING WORKFLOW"
+            variant="secondary"
+            onPress={() => navigation.navigate('QrPairing')}
+            icon={<QrCode color={colors.cyan} size={16} />}
             style={{ marginTop: spacing.sm }}
           />
         </CyberPanel>

@@ -11,15 +11,29 @@ import { colors, typography } from '../theme';
 import { useAuthStore } from '../store/authStore';
 import { AuthStack } from './AuthStack';
 import { MainTabs } from './MainTabs';
+import { realtimeService } from '../services/realtime.service';
+import { pushNotificationService } from '../services/notifications.service';
 
 const Stack = createNativeStackNavigator();
 
 export const RootNavigator = () => {
-  const { isAuthenticated, isLoading, initialize } = useAuthStore();
+  const { isAuthenticated, isLoading, initialize, apiBaseUrl } = useAuthStore();
 
   useEffect(() => {
     initialize();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      realtimeService.connect();
+      pushNotificationService.init().then(() => {
+        pushNotificationService.registerForPushNotifications();
+      });
+    } else {
+      realtimeService.disconnect();
+      pushNotificationService.unregister();
+    }
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return (
