@@ -99,6 +99,18 @@ export interface AgentHandoffRecord {
   };
 }
 
+export type TerritoryId = 'territory_sensors' | 'territory_core' | 'territory_intel' | 'territory_soc';
+
+export interface TerritoryDefinition {
+  id: TerritoryId;
+  name: string;
+  agent: AgentId;
+  color: string;
+  subsystem: string;
+  description: string;
+  nodeIds: string[];
+}
+
 export interface FlowNodeDefinition {
   id: string;
   label: string;
@@ -106,9 +118,13 @@ export interface FlowNodeDefinition {
   agentOwner: AgentId;
   x: number; // Percentage (0-100) or SVG grid units
   y: number;
-  status: 'active' | 'processing' | 'idle' | 'warning' | 'offline';
+  status: 'active' | 'processing' | 'idle' | 'warning' | 'offline' | 'unconfigured' | 'unknown';
   eventCount: number;
   lastActive?: string;
+  sensorType?: string;
+  heartbeat?: string;
+  latencyMs?: number;
+  pipelineDestination?: string;
 }
 
 export interface FlowConnectionDefinition {
@@ -124,18 +140,25 @@ export interface EventJourneyStage {
   stageName: string;
   responsibleAgent: AgentId;
   timestamp: string;
-  status: 'pending' | 'active' | 'completed' | 'failed';
+  status: 'pending' | 'active' | 'completed' | 'failed' | 'not_recorded' | 'not_available';
   details: string;
   durationMs?: number;
   failureReason?: string;
+  sourceNode?: string;
+  destinationNode?: string;
+  backendRecordId?: string;
+  stageKey?: string;
 }
 
 export interface EventJourneyRecord {
   eventId: string;
+  workflowId?: string;
+  transferId?: string;
   correlationId?: string;
   eventType: string;
   severity: PacketSeverity;
   sourceIp: string;
+  attackerIp?: string;
   startTime: string;
   endTime?: string;
   totalDurationMs?: number;
@@ -143,6 +166,76 @@ export interface EventJourneyRecord {
   currentStageIndex: number;
   isComplete: boolean;
   hasFailed: boolean;
+  attackId?: number;
+  alertId?: number;
+}
+
+export interface AgentWorkloadMetrics {
+  agentId: AgentId;
+  name: string;
+  operationalState: string;
+  currentTask: string;
+  activeTransfers: number;
+  pendingTransfers: number;
+  completedTransfers: number;
+  failedTransfers: number;
+  queueDepth: number | 'UNAVAILABLE';
+  lastActivity: string;
+  connectionStatus: 'CONNECTED' | 'IDLE' | 'DISCONNECTED';
+  recentHandoffsCount: number;
+}
+
+export interface ThreatGeoLocation {
+  ip: string;
+  country: string;
+  countryCode: string;
+  city?: string;
+  lat: number;
+  lng: number;
+  severity: PacketSeverity;
+  attackCount: number;
+  lastSeen: string;
+  attackType: string;
+  verified: boolean;
+}
+
+export interface TransferLifecycleContract {
+  event_id: string;
+  transfer_id: string;
+  workflow_id: string;
+  source: string;
+  destination: string;
+  agent: 'SCOUT' | 'NEXUS' | 'ORACLE' | 'SENTINEL';
+  stage:
+    | 'collection'
+    | 'ingestion'
+    | 'normalization'
+    | 'persistence'
+    | 'intelligence'
+    | 'alert'
+    | 'notification'
+    | 'containment'
+    | 'handoff';
+  status: 'started' | 'in_transit' | 'waiting' | 'completed' | 'failed';
+  severity: PacketSeverity;
+  timestamp: string;
+  resource_id: string;
+  schema_version: number | string;
+  failure_reason?: string;
+  payload?: Record<string, any>;
+  cursor?: number;
+}
+
+export type RealtimeStreamConnectionState = 'connected' | 'connecting' | 'reconnecting' | 'disconnected';
+
+export interface RealtimeStreamMetrics {
+  totalReceived: number;
+  totalDeduplicated: number;
+  totalReplayed: number;
+  activeTransfers: number;
+  queuedTransfers: number;
+  batchedCount: number;
+  lastCursor: number;
 }
 
 export interface NexusAssistantResponse {
@@ -158,3 +251,4 @@ export interface NexusAssistantResponse {
   answer: string;
   suggestedFollowUps: string[];
 }
+

@@ -28,6 +28,12 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { useAlerts, useDashboardStats, useAttacks } from './hooks/useDashboard';
 import { Alert, DetectionRuleSummary } from './types';
 import { Search, Network, ArrowRight, Shield, History, Sliders, FileText, BrainCircuit, Target } from 'lucide-react';
+import {
+  CompactAgentRibbon,
+  UniverseModeView,
+  useDigitalAgentUniverse,
+  NexusAssistantModal,
+} from './digital-agents';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +46,7 @@ const queryClient = new QueryClient({
 
 type HSXView =
   | 'overview'
+  | 'universe'
   | 'analytics'
   | 'alerts'
   | 'dashboard'
@@ -66,6 +73,24 @@ function DashboardContent() {
   const [promotedAlert, setPromotedAlert] = useState<Alert | null>(null);
 
   const { sessionExpired } = useAuth();
+
+  // Digital Agent Universe State & Real-Time Sync
+  const {
+    isDemoMode,
+    toggleDemoMode,
+    runtimeStatuses,
+    activePackets,
+    completedPackets,
+    failedPackets,
+    handoffs,
+    nodes,
+    connections,
+    journeys,
+    streamConnectionState,
+    streamMetrics,
+    simulateAgentState,
+  } = useDigitalAgentUniverse();
+  const [isAssistantModalOpen, setIsAssistantModalOpen] = useState(false);
 
   // Module 3.3 state
   const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
@@ -139,6 +164,7 @@ function DashboardContent() {
   // Map activeView to Sidebar active ID
   const sidebarActiveId = useMemo<SidebarNavId>(() => {
     if (activeView === 'overview') return 'overview';
+    if (activeView === 'universe') return 'universe';
     if (activeView === 'analytics' || activeView === 'dashboard') return 'analytics';
     if (activeView === 'rules') return rulesSubTab === 'audit' ? 'config' : 'detection';
     if (activeView === 'command') return 'network';
@@ -156,6 +182,9 @@ function DashboardContent() {
     switch (id) {
       case 'overview':
         setActiveView('overview');
+        break;
+      case 'universe':
+        setActiveView('universe');
         break;
       case 'analytics':
         setActiveView('analytics');
@@ -236,15 +265,42 @@ function DashboardContent() {
         {/* Content Area */}
         <main className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6 max-w-7xl w-full mx-auto pb-20 lg:pb-6">
           {activeView === 'overview' ? (
-            /* Flagship NEXUS SOC Command Centre (8 core panels) */
-            <CommandCenterView
-              stats={stats}
-              alerts={alerts}
-              attacks={attacks}
-              onSelectAlert={(alert) => setSelectedAlert(alert)}
-              onInvestigateIp={handleDeepLinkInvestigate}
-              onReplayAttack={handleDeepLinkReplayAttack}
-              onSelectAttack={(_id) => setActiveView('rules')}
+            /* Flagship NEXUS SOC Command Centre (8 core panels) + Compact Digital Agents Ribbon */
+            <div className="space-y-4">
+              <CompactAgentRibbon
+                runtimeStatuses={runtimeStatuses}
+                onOpenUniverseMode={() => setActiveView('universe')}
+                onOpenAssistant={() => setIsAssistantModalOpen(true)}
+                onSelectAgent={(_id) => setActiveView('universe')}
+              />
+              <CommandCenterView
+                stats={stats}
+                alerts={alerts}
+                attacks={attacks}
+                onSelectAlert={(alert) => setSelectedAlert(alert)}
+                onInvestigateIp={handleDeepLinkInvestigate}
+                onReplayAttack={handleDeepLinkReplayAttack}
+                onSelectAttack={(_id) => setActiveView('rules')}
+              />
+            </div>
+          ) : activeView === 'universe' ? (
+            /* Dedicated Fullscreen Digital Agent Universe (Stage 10) */
+            <UniverseModeView
+              runtimeStatuses={runtimeStatuses}
+              activePackets={activePackets}
+              completedPackets={completedPackets}
+              failedPackets={failedPackets}
+              handoffs={handoffs}
+              nodes={nodes}
+              connections={connections}
+              journeys={journeys}
+              isDemoMode={isDemoMode}
+              onToggleDemoMode={toggleDemoMode}
+              onSimulateState={simulateAgentState}
+              onExitUniverseMode={() => setActiveView('overview')}
+              onDeepLinkInvestigate={handleDeepLinkInvestigate}
+              streamConnectionState={streamConnectionState}
+              streamMetrics={streamMetrics}
             />
           ) : activeView === 'analytics' || activeView === 'dashboard' ? (
             /* Module 3.1 & Analytics Overview */
@@ -570,6 +626,21 @@ function DashboardContent() {
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         isSessionExpired={sessionExpired}
+      />
+
+      {/* NEXUS Grounded Assistant Modal */}
+      <NexusAssistantModal
+        isOpen={isAssistantModalOpen}
+        onClose={() => setIsAssistantModalOpen(false)}
+        activePackets={activePackets}
+        completedPackets={completedPackets}
+        failedPackets={failedPackets}
+        runtimeAgentStates={{
+          scout: runtimeStatuses.scout.currentState,
+          nexus: runtimeStatuses.nexus.currentState,
+          oracle: runtimeStatuses.oracle.currentState,
+          sentinel: runtimeStatuses.sentinel.currentState,
+        }}
       />
     </div>
   );

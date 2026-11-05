@@ -24,6 +24,12 @@ router = APIRouter(
     status_code=status.HTTP_201_CREATED,
     include_in_schema=False,
 )
+@router.post(
+    "/honeypot",
+    response_model=AttackEventResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Ingest a honeypot security event (backward-compatible alias)",
+)
 def ingest_event(
     event_in: AttackEventCreate,
     db: Session = Depends(get_db),
@@ -73,4 +79,85 @@ def ingest_event(
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
+
+    # Milestone 2: Emit Digital Agent Universe lifecycle events
+    try:
+        from app.events.service import publish_lifecycle_event, publish_handoff_event
+        # 1. SCOUT collection completed
+        publish_lifecycle_event(
+            agent="SCOUT",
+            stage="collection",
+            status="completed",
+            source=f"sensor:{event_in.source_ip or 'honeypot'}",
+            destination="ingestion_api",
+            resource_id=str(target_attack_id),
+            workflow_id=f"wf_attack_{target_attack_id}",
+            transfer_id=f"tr_scout_{db_event.id}",
+            severity="info",
+            payload={
+                "source_ip": event_in.source_ip,
+                "event_type": event_in.event_type,
+                "attack_id": target_attack_id,
+                "message": event_in.message,
+            },
+            db=db,
+        )
+        # 2. Verified Handoff: SCOUT -> NEXUS
+        publish_handoff_event(
+            from_agent="SCOUT",
+            to_agent="NEXUS",
+            resource_id=str(target_attack_id),
+            workflow_id=f"wf_attack_{target_attack_id}",
+            context_message=f"Sensor event from {event_in.source_ip or 'honeypot'} ingested. Handed off to NEXUS for normalization.",
+            task_type="Raw Ingestion Telemetry",
+            db=db,
+        )
+        # 3. NEXUS normalization and transactional outbox persistence
+        publish_lifecycle_event(
+            agent="NEXUS",
+            stage="normalization",
+            status="completed",
+            source="ingestion_api",
+            destination="outbox_db",
+            resource_id=str(target_attack_id),
+            workflow_id=f"wf_attack_{target_attack_id}",
+            transfer_id=f"tr_nexus_{db_event.id}",
+            severity="info",
+            payload={
+                "attack_id": target_attack_id,
+                "event_id": db_event.id,
+                "normalized": True,
+            },
+            db=db,
+        )
+    except Exception:
+        pass
+
     return db_event
+
+
+# Backward-compatible alias router for /ingest/*
+ingest_alias_router = APIRouter(
+    prefix="/ingest",
+    tags=["Ingestion"],
+)
+
+@ingest_alias_router.post(
+    "/events",
+    response_model=AttackEventResponse,
+    status_code=status.HTTP_201_CREATED,
+    include_in_schema=False,
+)
+@ingest_alias_router.post(
+    "/honeypot",
+    response_model=AttackEventResponse,
+    status_code=status.HTTP_201_CREATED,
+    include_in_schema=False,
+)
+def ingest_event_alias(
+    event_in: AttackEventCreate,
+    db: Session = Depends(get_db),
+) -> AttackEvent:
+    """Backward-compatible endpoint for /api/v1/ingest/events and /api/v1/ingest/honeypot."""
+    return ingest_event(event_in=event_in, db=db)
+

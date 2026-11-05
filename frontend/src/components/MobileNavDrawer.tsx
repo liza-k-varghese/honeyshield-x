@@ -16,6 +16,7 @@ import {
   User,
   LogOut,
   ChevronRight,
+  Sparkles,
 } from 'lucide-react';
 import { SidebarNavId } from './Sidebar';
 import { useAuth } from '../context/AuthContext';
@@ -48,6 +49,13 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
       desc: 'SOC Command Centre',
       icon: LayoutDashboard,
       system: 'SYS 1',
+    },
+    {
+      id: 'universe' as SidebarNavId,
+      label: 'Agent Universe',
+      desc: 'Interactive 4-Agent Defense',
+      icon: Sparkles,
+      system: 'SYS 1-3',
     },
     {
       id: 'analytics' as SidebarNavId,

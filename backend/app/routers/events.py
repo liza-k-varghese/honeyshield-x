@@ -16,6 +16,7 @@ from typing import Any
 from fastapi import (
     APIRouter,
     Depends,
+    Header,
     HTTPException,
     Query,
     Request,
@@ -27,14 +28,17 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_operator
-from app.auth.registry import Operator
+from app.auth.registry import Operator, default_operator_registry
+from app.auth.session import default_session_store
 from app.database import get_db
 from app.events.manager import default_connection_manager
 from app.events.schemas import (
     ConnectionTicketResponse,
     EventReplayResponse,
     SecurityEventEnvelope,
+    TransferLifecycleEvent,
 )
+from app.events.service import publish_lifecycle_event, publish_handoff_event
 from app.events.store import can_operator_view_event, default_event_store
 from app.events.tickets import default_ticket_service
 
@@ -44,6 +48,66 @@ router = APIRouter(
     prefix="/events",
     tags=["Real-Time Streaming & Replay Gateway"],
 )
+
+
+@router.post(
+    "/lifecycle",
+    response_model=SecurityEventEnvelope,
+    status_code=status.HTTP_201_CREATED,
+    summary="Publish a verified digital agent transfer lifecycle event",
+)
+def emit_lifecycle_event(
+    event_in: TransferLifecycleEvent,
+    operator: Operator = Depends(get_current_operator),
+    db: Session = Depends(get_db),
+) -> SecurityEventEnvelope:
+    """Publish an authoritative Digital Agent Universe lifecycle event.
+
+    Enforces operator authentication, outbox persistence with sequential cursor,
+    and real-time distribution across active WebSockets and mobile clients.
+    """
+    return publish_lifecycle_event(
+        agent=event_in.agent,
+        stage=event_in.stage,
+        status=event_in.status,
+        source=event_in.source,
+        destination=event_in.destination,
+        resource_id=event_in.resource_id,
+        workflow_id=event_in.workflow_id,
+        transfer_id=event_in.transfer_id,
+        severity=event_in.severity,
+        payload=event_in.payload,
+        failure_reason=event_in.failure_reason,
+        db=db,
+    )
+
+
+@router.get(
+    "/lifecycle/journey/{identifier}",
+    response_model=list[SecurityEventEnvelope],
+    status_code=status.HTTP_200_OK,
+    summary="Fetch chronologically ordered lifecycle events for a specific attack, workflow, or event ID",
+)
+def get_event_journey(
+    identifier: str,
+    operator: Operator = Depends(get_current_operator),
+    db: Session = Depends(get_db),
+) -> list[SecurityEventEnvelope]:
+    """Retrieve full recorded lifecycle progression for a given event, workflow, or attack ID."""
+    return default_event_store.get_journey_events(identifier=identifier, operator=operator, db=db)
+
+
+@router.get(
+    "/lifecycle/workload",
+    response_model=dict[str, Any],
+    status_code=status.HTTP_200_OK,
+    summary="Aggregate live operational workload metrics per digital agent",
+)
+def get_agent_workload(
+    operator: Operator = Depends(get_current_operator),
+) -> dict[str, Any]:
+    """Return authentic live workload metrics (active, pending, completed, failed, queue depth) for SCOUT, NEXUS, ORACLE, and SENTINEL."""
+    return default_event_store.get_agent_workloads(operator=operator)
 
 
 @router.post(
@@ -140,6 +204,8 @@ async def websocket_event_stream(
 )
 def replay_events(
     since_cursor: int | None = Query(default=None, description="Last successfully processed event cursor"),
+    cursor: int | None = Query(default=None, description="Backward-compatible alias for since_cursor"),
+    last_id: int | None = Query(default=None, description="Backward-compatible alias for since_cursor"),
     limit: int = Query(default=50, ge=1, le=200, description="Maximum number of historical events to return"),
     operator: Operator = Depends(get_current_operator),
     db: Session = Depends(get_db),
@@ -147,8 +213,10 @@ def replay_events(
     """Retrieve historical security events occurring since the specified cursor.
 
     Applies strict server-side RBAC filtering so operators only receive authorized events.
+    Supports `since_cursor`, `cursor`, and `last_id` for backward-compatible client integration.
     """
-    clean_cursor = since_cursor if isinstance(since_cursor, int) else None
+    effective_cursor = since_cursor if since_cursor is not None else (cursor if cursor is not None else last_id)
+    clean_cursor = effective_cursor if isinstance(effective_cursor, int) else None
     clean_limit = limit if isinstance(limit, int) else 50
     events, next_cursor, has_more = default_event_store.replay(
         since_cursor=clean_cursor,
@@ -164,13 +232,49 @@ def replay_events(
     )
 
 
+def resolve_sse_operator(
+    request: Request,
+    authorization: str | None = Header(default=None, alias="Authorization"),
+    token: str | None = Query(default=None),
+    ticket: str | None = Query(default=None),
+) -> Operator:
+    """Resolve operator for SSE stream from Header, query token, or single-use ticket."""
+    if authorization:
+        parts = authorization.split()
+        if len(parts) == 2 and parts[0].lower() == "bearer":
+            tok = parts[1].strip()
+            session_data = default_session_store.get_session(tok)
+            if session_data:
+                op = default_operator_registry.get_operator(session_data.username)
+                if op and op.is_active:
+                    return op
+
+    if ticket:
+        op = default_ticket_service.consume_ticket(ticket)
+        if op and op.is_active:
+            return op
+
+    if token:
+        session_data = default_session_store.get_session(token)
+        if session_data:
+            op = default_operator_registry.get_operator(session_data.username)
+            if op and op.is_active:
+                return op
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Missing or invalid authentication for SSE stream",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+
 @router.get(
     "/stream",
     summary="Authenticated Server-Sent Events (SSE) telemetry stream",
     response_class=StreamingResponse,
 )
 async def sse_event_stream(
-    operator: Operator = Depends(get_current_operator),
+    operator: Operator = Depends(resolve_sse_operator),
 ) -> StreamingResponse:
     """Subscribe to real-time events via Server-Sent Events with Bearer token authentication."""
 

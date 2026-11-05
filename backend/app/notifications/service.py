@@ -181,6 +181,30 @@ def dispatch_alert_notification(
             final_alert.notified_at = None
         db.commit()
 
+        try:
+            from app.events.service import publish_lifecycle_event
+            publish_lifecycle_event(
+                agent="SENTINEL",
+                stage="notification",
+                status="completed" if sent else "failed",
+                source="soc_console",
+                destination="push_dispatcher",
+                resource_id=str(alert_id),
+                workflow_id=f"wf_alert_{alert_id}",
+                transfer_id=f"tr_sentinel_notif_{alert_id}",
+                severity=(final_alert.severity or "high").lower() if final_alert else "high",
+                payload={
+                    "alert_id": alert_id,
+                    "provider": provider_name,
+                    "sent": sent,
+                    "message": message,
+                },
+                failure_reason=None if sent else message,
+                db=db,
+            )
+        except Exception:
+            pass
+
     return {
         "alert_id": alert_id,
         "provider": provider_name,

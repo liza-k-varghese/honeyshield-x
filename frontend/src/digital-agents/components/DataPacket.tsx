@@ -119,7 +119,7 @@ export const DataPacket: React.FC<DataPacketProps> = ({
                   : 'bg-slate-800 text-slate-300'
               }`}
             >
-              {packet.severity.slice(0, 4)}
+              {packet.severity.slice(0, 4).toUpperCase()}
             </span>
           </div>
 

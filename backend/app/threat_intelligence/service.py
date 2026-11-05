@@ -324,11 +324,47 @@ def enrich_attack(
         }
 
     try:
-        return lookup_indicator(
+        res = lookup_indicator(
             db=db,
             indicator_type="ip",
             indicator_value=attack.source_ip,
         )
+        try:
+            from app.events.service import publish_lifecycle_event, publish_handoff_event
+            is_found = res.get("found", False)
+            publish_lifecycle_event(
+                agent="ORACLE",
+                stage="intelligence",
+                status="completed",
+                source="detection_engine",
+                destination="threat_intel_store",
+                resource_id=str(attack_id),
+                workflow_id=f"wf_attack_{attack_id}",
+                transfer_id=f"tr_oracle_{attack_id}",
+                severity="high" if res.get("threat_level") in ("critical", "high") else "info",
+                payload={
+                    "attack_id": attack_id,
+                    "source_ip": attack.source_ip,
+                    "found": is_found,
+                    "threat_level": res.get("threat_level"),
+                    "confidence": res.get("confidence"),
+                    "source": res.get("source"),
+                },
+                db=db,
+            )
+            if is_found:
+                publish_handoff_event(
+                    from_agent="ORACLE",
+                    to_agent="SENTINEL",
+                    resource_id=str(attack_id),
+                    workflow_id=f"wf_attack_{attack_id}",
+                    context_message=f"Threat intelligence correlated IOC {attack.source_ip} (Threat: {res.get('threat_level')}). Escalated to SENTINEL.",
+                    task_type="Adversary IOC Correlation",
+                    db=db,
+                )
+        except Exception:
+            pass
+        return res
     except ValueError as err:
         return {
             "found": False,

@@ -14,10 +14,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Shield,
+  Sparkles,
 } from 'lucide-react';
 
 export type SidebarNavId =
   | 'overview'
+  | 'universe'
   | 'analytics'
   | 'detection'
   | 'network'
@@ -48,6 +50,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Overview',
       icon: LayoutDashboard,
       system: 'SYS 1',
+    },
+    {
+      id: 'universe' as SidebarNavId,
+      label: 'Agent Universe',
+      icon: Sparkles,
+      system: 'SYS 1-3',
     },
     {
       id: 'analytics' as SidebarNavId,

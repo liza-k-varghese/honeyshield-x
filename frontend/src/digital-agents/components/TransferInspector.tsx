@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { DataPacketPayload } from '../types';
-import { X, ArrowRight, Shield, Cpu, BrainCircuit, Bell, AlertTriangle, CheckCircle, ExternalLink } from 'lucide-react';
+import { X, ArrowRight, ExternalLink } from 'lucide-react';
 import { AGENT_PROFILES } from '../profiles';
 
 interface TransferInspectorProps {

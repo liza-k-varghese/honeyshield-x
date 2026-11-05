@@ -115,6 +115,14 @@ def evaluate_attack_alert(
                 "attack_type": new_alert.alert_type,
             },
             severity=mapped_sev,
+            agent="SENTINEL",
+            stage="alert",
+            status="completed",
+            source="alert_manager",
+            destination="soc_console",
+            workflow_id=f"wf_attack_{attack.id}",
+            transfer_id=f"tr_sentinel_{new_alert.id}",
+            db=db,
         )
     except Exception:
         pass

@@ -231,3 +231,4 @@ export const OracleCharacter: React.FC<OracleCharacterProps> = ({
     </div>
   );
 };
+

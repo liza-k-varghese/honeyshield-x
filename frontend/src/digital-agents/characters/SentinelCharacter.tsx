@@ -233,3 +233,4 @@ export const SentinelCharacter: React.FC<SentinelCharacterProps> = ({
     </div>
   );
 };
+

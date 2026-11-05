@@ -15,3 +15,4 @@ export const AgentCharacterMap: Record<AgentId, React.FC<any>> = {
   oracle: OracleCharacter,
   sentinel: SentinelCharacter,
 };
+

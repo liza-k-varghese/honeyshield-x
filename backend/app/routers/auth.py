@@ -134,3 +134,26 @@ def break_glass_endpoint(
         db=db,
     )
     return BreakGlassResponse(**result)
+
+
+@router.post(
+    "/ws-ticket",
+    status_code=status.HTTP_200_OK,
+    summary="Acquire short-lived WebSocket connection ticket (backward-compatible alias)",
+)
+def create_connection_ticket_alias(
+    operator: Operator = Depends(get_current_operator),
+) -> dict[str, Any]:
+    """Issue a 60-second single-use ticket bound to authenticated operator.
+
+    Backward-compatible alias for /api/v1/events/ticket.
+    """
+    from app.events.tickets import default_ticket_service
+
+    ticket = default_ticket_service.issue_ticket(operator=operator, ttl_seconds=60)
+    return {
+        "ticket": ticket,
+        "expires_in": 60,
+        "ws_endpoint": "/api/v1/events/ws",
+    }
+

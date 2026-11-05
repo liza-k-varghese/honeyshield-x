@@ -280,3 +280,4 @@ export const NexusCharacter: React.FC<NexusCharacterProps> = ({
     </div>
   );
 };
+

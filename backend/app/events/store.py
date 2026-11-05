@@ -114,6 +114,14 @@ class EventStore:
                             payload=payload,
                             correlation_id=row.correlation_id,
                             cursor=row.id,
+                            transfer_id=payload.get("_transfer_id") or payload.get("transfer_id"),
+                            workflow_id=payload.get("_workflow_id") or payload.get("workflow_id"),
+                            agent=payload.get("_agent") or payload.get("agent"),
+                            stage=payload.get("_stage") or payload.get("stage"),
+                            status=payload.get("_status") or payload.get("status"),
+                            source=payload.get("_source") or payload.get("source"),
+                            destination=payload.get("_destination") or payload.get("destination"),
+                            failure_reason=payload.get("_failure_reason") or payload.get("failure_reason"),
                         )
                         self._buffer.append(envelope)
 
@@ -145,7 +153,26 @@ class EventStore:
         try:
             from app.models import SecurityEventOutbox
 
-            payload_str = json.dumps(event.payload)
+            payload_data = dict(event.payload)
+            # Embed lifecycle fields in payload_data for lossless persistence
+            if event.transfer_id:
+                payload_data["_transfer_id"] = event.transfer_id
+            if event.workflow_id:
+                payload_data["_workflow_id"] = event.workflow_id
+            if event.agent:
+                payload_data["_agent"] = event.agent
+            if event.stage:
+                payload_data["_stage"] = event.stage
+            if event.status:
+                payload_data["_status"] = event.status
+            if event.source:
+                payload_data["_source"] = event.source
+            if event.destination:
+                payload_data["_destination"] = event.destination
+            if event.failure_reason:
+                payload_data["_failure_reason"] = event.failure_reason
+
+            payload_str = json.dumps(payload_data)
             outbox_row = SecurityEventOutbox(
                 event_id=event.event_id,
                 event_type=event.event_type,
@@ -169,7 +196,7 @@ class EventStore:
                     persisted_id = outbox_row.id
 
         except Exception as e:
-            logger.debug("Persistent outbox write bypassed (using in-memory sequencing): %s", e)
+            logger.warning("Persistent outbox write bypassed (using in-memory sequencing): %s", e)
 
         with self._lock:
             if persisted_id is not None:
@@ -236,6 +263,14 @@ class EventStore:
                             payload=p,
                             correlation_id=row.correlation_id,
                             cursor=row.id,
+                            transfer_id=p.get("_transfer_id") or p.get("transfer_id"),
+                            workflow_id=p.get("_workflow_id") or p.get("workflow_id"),
+                            agent=p.get("_agent") or p.get("agent"),
+                            stage=p.get("_stage") or p.get("stage"),
+                            status=p.get("_status") or p.get("status"),
+                            source=p.get("_source") or p.get("source"),
+                            destination=p.get("_destination") or p.get("destination"),
+                            failure_reason=p.get("_failure_reason") or p.get("failure_reason"),
                         )
                     )
                 return result
@@ -271,6 +306,100 @@ class EventStore:
         next_cursor = selected_events[-1].cursor if selected_events else None
 
         return selected_events, next_cursor, has_more
+
+    def get_journey_events(
+        self,
+        identifier: str,
+        operator: Operator,
+        db: Session | None = None,
+    ) -> list[SecurityEventEnvelope]:
+        """Fetch all lifecycle envelopes matching an event_id, workflow_id, or resource_id."""
+        matching: list[SecurityEventEnvelope] = []
+        with self._lock:
+            for env in self._buffer:
+                if not can_operator_view_event(operator, env.event_type):
+                    continue
+                p = env.payload or {}
+                if (
+                    env.event_id == identifier
+                    or env.resource_id == identifier
+                    or p.get("workflow_id") == identifier
+                    or p.get("transfer_id") == identifier
+                    or p.get("event_id") == identifier
+                    or str(p.get("attack_id")) == identifier
+                ):
+                    matching.append(env)
+        return matching
+
+    def get_agent_workloads(
+        self,
+        operator: Operator,
+    ) -> dict[str, Any]:
+        """Aggregate authentic workload metrics per agent from the persistent event store."""
+        workloads: dict[str, dict[str, Any]] = {
+            "scout": {
+                "active_transfers": 0,
+                "pending_transfers": 0,
+                "completed_transfers": 0,
+                "failed_transfers": 0,
+                "queue_depth": 0,
+                "last_active": "UNKNOWN",
+                "operational_state": "Observing Sensor Grid",
+                "current_task": "Monitoring honeypots & canary traps",
+            },
+            "nexus": {
+                "active_transfers": 0,
+                "pending_transfers": 0,
+                "completed_transfers": 0,
+                "failed_transfers": 0,
+                "queue_depth": 0,
+                "last_active": "UNKNOWN",
+                "operational_state": "Central Queue & Outbox Manager",
+                "current_task": "Ingesting, normalizing, and persisting events",
+            },
+            "oracle": {
+                "active_transfers": 0,
+                "pending_transfers": 0,
+                "completed_transfers": 0,
+                "failed_transfers": 0,
+                "queue_depth": 0,
+                "last_active": "UNKNOWN",
+                "operational_state": "Threat Intelligence Analyzer",
+                "current_task": "Correlating IOCs & risk scoring",
+            },
+            "sentinel": {
+                "active_transfers": 0,
+                "pending_transfers": 0,
+                "completed_transfers": 0,
+                "failed_transfers": 0,
+                "queue_depth": 0,
+                "last_active": "UNKNOWN",
+                "operational_state": "Alert Triage & Security Operations",
+                "current_task": "Triaging alerts & mobile dispatch",
+            },
+        }
+
+        with self._lock:
+            for env in self._buffer:
+                p = env.payload or {}
+                raw_agent = str(p.get("agent") or "").lower()
+                if raw_agent not in workloads:
+                    continue
+                w = workloads[raw_agent]
+                st = str(p.get("status") or "").lower()
+                if st == "completed":
+                    w["completed_transfers"] += 1
+                elif st == "failed":
+                    w["failed_transfers"] += 1
+                elif st in ("started", "in_transit", "processing"):
+                    w["active_transfers"] += 1
+                elif st == "waiting":
+                    w["pending_transfers"] += 1
+
+                ts = env.timestamp.isoformat() if hasattr(env.timestamp, "isoformat") else str(env.timestamp)
+                w["last_active"] = ts
+
+        return workloads
 
     @property
     def current_cursor(self) -> int:

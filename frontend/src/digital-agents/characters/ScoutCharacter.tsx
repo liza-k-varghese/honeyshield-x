@@ -230,3 +230,4 @@ export const ScoutCharacter: React.FC<ScoutCharacterProps> = ({
     </div>
   );
 };
+

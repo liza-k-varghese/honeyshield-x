@@ -15,12 +15,14 @@ import {
   Layers,
   CheckCircle2,
   Menu,
+  Sparkles,
 } from 'lucide-react';
 import { SystemHealth, Alert } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 export type TopNavView =
   | 'overview'
+  | 'universe'
   | 'dashboard'
   | 'command'
   | 'cases'
@@ -149,6 +151,19 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <LayoutDashboard className="w-3.5 h-3.5" />
               <span>Dashboard</span>
+            </button>
+
+            <button
+              onClick={() => onViewChange?.('universe')}
+              className={`px-3 py-1.5 rounded flex items-center space-x-1.5 transition-colors ${
+                activeView === 'universe'
+                  ? 'bg-cyan-600 text-white border border-cyan-400 shadow-nexus-cyan font-bold'
+                  : 'text-cyan-400 hover:text-white hover:bg-cyan-950/40'
+              }`}
+              title="Launch Digital Agent Universe"
+            >
+              <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+              <span>Agent Universe</span>
             </button>
 
             <button

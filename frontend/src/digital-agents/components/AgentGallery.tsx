@@ -6,14 +6,11 @@ import {
   Play,
   RotateCcw,
   Sparkles,
-  Shield,
   Activity,
   CheckCircle,
   AlertOctagon,
-  Clock,
   Radio,
   Sliders,
-  Terminal,
 } from 'lucide-react';
 
 interface AgentGalleryProps {
