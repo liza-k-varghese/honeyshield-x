@@ -101,3 +101,4 @@ The Universe Mode canvas provides four distinct operational quadrants:
 - **Scroll Wheel Zoom:** Smooth geometric scaling from `0.5x` (broad tactical view) to `2.2x` (deep node inspection).
 - **Reset View Button:** Instant smooth tween back to default center `(x: 0, y: 0, scale: 1.0)`.
 - **Node Selection:** Left-click triggers `NodeInspectorModal` with real-time throughput, CPU workload, and queue depth.
+

@@ -1,0 +1,114 @@
+name: honeyshield-staging
+
+services:
+  postgres-staging:
+    image: postgres:17-alpine
+    container_name: honeyshield-staging-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: honeyshield_staging
+      POSTGRES_USER: honeyshield_staging_user
+      POSTGRES_PASSWORD: ${STAGING_POSTGRES_PASSWORD:-staging_secure_pass_change_me}
+    volumes:
+      - staging_postgres_data:/var/lib/postgresql/data
+    ports:
+      # Strictly bound to loopback interface on staging port 5433
+      - "127.0.0.1:5433:5432"
+    networks:
+      - honeyshield_staging_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U honeyshield_staging_user -d honeyshield_staging"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+
+  redis-staging:
+    image: redis:7-alpine
+    container_name: honeyshield-staging-redis
+    restart: unless-stopped
+    volumes:
+      - staging_redis_data:/data
+    ports:
+      # Strictly bound to loopback interface on staging port 6380
+      - "127.0.0.1:6380:6379"
+    networks:
+      - honeyshield_staging_net
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  backend-staging:
+    build:
+      context: ../backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: honeyshield-staging-backend
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: staging
+      DEBUG: "false"
+      DATABASE_URL: postgresql+psycopg://honeyshield_staging_user:${STAGING_POSTGRES_PASSWORD:-staging_secure_pass_change_me}@postgres-staging:5432/honeyshield_staging
+      REDIS_HOST: redis-staging
+      REDIS_PORT: 6379
+      SECRET_KEY: ${STAGING_SECRET_KEY:-staging_secret_key_placeholder_min_32}
+    ports:
+      # Strictly bound to loopback interface on staging port 8001
+      - "127.0.0.1:8001:8000"
+    networks:
+      - honeyshield_staging_net
+    depends_on:
+      postgres-staging:
+        condition: service_healthy
+      redis-staging:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8000/api/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1536M
+
+  frontend-staging:
+    build:
+      context: ../frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    container_name: honeyshield-staging-frontend
+    restart: unless-stopped
+    ports:
+      # Strictly bound to loopback interface on staging port 5174
+      - "127.0.0.1:5174:80"
+    networks:
+      - honeyshield_staging_net
+    depends_on:
+      - backend-staging
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+volumes:
+  staging_postgres_data:
+  staging_redis_data:
+
+networks:
+  honeyshield_staging_net:
+    driver: bridge
+    internal: false
+

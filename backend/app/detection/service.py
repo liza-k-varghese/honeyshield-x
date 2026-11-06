@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.detection.rules import DEFAULT_SSH_RULE, SSHBruteForceConfig
 from app.models import Attack, AttackEvent
+from app.observability.metrics import default_metrics_collector
 from app.schemas import DetectionResult
 
 
@@ -36,6 +37,7 @@ def detect_ssh_brute_force(
        - Does not modify the Attack record.
        - Returns structured DetectionResult with detected=False.
     """
+    default_metrics_collector.detection_runs_total += 1
     cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(
         minutes=config.window_minutes
     )

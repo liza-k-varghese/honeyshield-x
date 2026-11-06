@@ -1,0 +1,27 @@
+# HoneyShield X — Staging Backend Container Packaging
+FROM python:3.13-slim AS backend-runtime
+
+WORKDIR /app
+
+# Install system dependencies (curl for healthchecks, libpq-dev if needed)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy dependency specifications
+COPY requirements.txt .
+
+# Install python wheels
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy backend source code
+COPY . .
+
+# Run as non-root user
+RUN useradd -m -u 1001 honeyshield && chown -R honeyshield:honeyshield /app
+USER honeyshield
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+

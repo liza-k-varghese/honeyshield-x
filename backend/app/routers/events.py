@@ -41,6 +41,7 @@ from app.events.schemas import (
 from app.events.service import publish_lifecycle_event, publish_handoff_event
 from app.events.store import can_operator_view_event, default_event_store
 from app.events.tickets import default_ticket_service
+from app.observability.metrics import default_metrics_collector
 
 logger = logging.getLogger(__name__)
 
@@ -142,11 +143,13 @@ async def websocket_event_stream(
     filters events through RBAC guards, and maintains heartbeat keepalive.
     """
     if not ticket:
+        default_metrics_collector.increment_ws_auth_failure()
         await websocket.close(code=4401, reason="Missing connection ticket")
         return
 
     operator = default_ticket_service.consume_ticket(ticket)
     if operator is None:
+        default_metrics_collector.increment_ws_auth_failure()
         await websocket.close(code=4403, reason="Invalid, expired, or already-consumed ticket")
         return
 
@@ -235,17 +238,29 @@ def replay_events(
 def resolve_sse_operator(
     request: Request,
     authorization: str | None = Header(default=None, alias="Authorization"),
-    token: str | None = Query(default=None),
     ticket: str | None = Query(default=None),
 ) -> Operator:
-    """Resolve operator for SSE stream from Header, query token, or single-use ticket."""
+    """Resolve operator for SSE stream securely from Authorization header or single-use ticket.
+
+    SECURITY HARDENING (Milestone 6.1):
+    Ordinary bearer tokens MUST NOT be passed via URL query parameters.
+    Only Authorization: Bearer <token> headers or short-lived single-use tickets are accepted.
+    """
     if authorization:
         parts = authorization.split()
         if len(parts) == 2 and parts[0].lower() == "bearer":
             tok = parts[1].strip()
             session_data = default_session_store.get_session(tok)
             if session_data:
-                op = default_operator_registry.get_operator(session_data.username)
+                if session_data.operator_id == "emergency_breakglass":
+                    return Operator(
+                        username="emergency_breakglass",
+                        role="security_administrator",
+                        email="breakglass@honeyshield.local",
+                        password_hash="",
+                        is_active=True,
+                    )
+                op = default_operator_registry.get_operator(session_data.operator_id)
                 if op and op.is_active:
                     return op
 
@@ -254,16 +269,9 @@ def resolve_sse_operator(
         if op and op.is_active:
             return op
 
-    if token:
-        session_data = default_session_store.get_session(token)
-        if session_data:
-            op = default_operator_registry.get_operator(session_data.username)
-            if op and op.is_active:
-                return op
-
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Missing or invalid authentication for SSE stream",
+        detail="Missing or invalid authentication for SSE stream. Authorization header or single-use ticket required.",
         headers={"WWW-Authenticate": "Bearer"},
     )
 

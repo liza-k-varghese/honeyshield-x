@@ -88,7 +88,8 @@ class AttackEventBase(BaseModel):
     )
     message: str | None = Field(
         default=None,
-        description="Log message or event details",
+        max_length=10000,
+        description="Log message or event details (bounded to 10KB)",
     )
     event_time: datetime | None = Field(
         default=None,

@@ -9,6 +9,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models import Alert, Attack
+from app.observability.metrics import default_metrics_collector
 
 ALERT_THRESHOLD_SCORE: float = 50.0
 VALID_ALERT_STATUSES: set[str] = {"open", "acknowledged", "resolved"}
@@ -28,6 +29,7 @@ def evaluate_attack_alert(
        - If active alert exists: reuses it and suppresses duplicate
        - If no active alert: creates and persists new Alert with status='open'
     """
+    default_metrics_collector.alerts_evaluated_total += 1
     attack = db.query(Attack).filter(Attack.id == attack_id).first()
     if attack is None:
         raise HTTPException(
@@ -98,6 +100,7 @@ def evaluate_attack_alert(
     db.add(new_alert)
     db.commit()
     db.refresh(new_alert)
+    default_metrics_collector.alerts_created_total += 1
 
     try:
         from app.events.service import publish_security_event

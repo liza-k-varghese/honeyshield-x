@@ -14,6 +14,7 @@
  */
 
 import { RealtimeStreamConnectionState, RealtimeStreamMetrics } from '../types';
+import { getActiveSessionToken } from '../../api/client';
 
 export type RealtimeEventListener = (event: any, isHistorical?: boolean) => void;
 export type RealtimeStateListener = (state: RealtimeStreamConnectionState) => void;
@@ -21,6 +22,7 @@ export type RealtimeStateListener = (state: RealtimeStreamConnectionState) => vo
 export class RealtimeAgentWebSocketClient {
   private ws: WebSocket | null = null;
   private sse: EventSource | null = null;
+  private sseAbortController: AbortController | null = null;
   private state: RealtimeStreamConnectionState = 'disconnected';
   private lastCursor: number = 0;
   private seenEventIds: Set<string> = new Set();
@@ -87,22 +89,10 @@ export class RealtimeAgentWebSocketClient {
   }
 
   /**
-   * Helper to resolve the active operator bearer token across HoneyShield X storage keys.
+   * Helper to resolve the active operator bearer token from the authoritative session storage.
    */
   private getAuthToken(): string {
-    if (typeof window === 'undefined') return '';
-    try {
-      return (
-        sessionStorage.getItem('hsx_auth_token') ||
-        sessionStorage.getItem('hsx_token') ||
-        localStorage.getItem('hsx_auth_token') ||
-        localStorage.getItem('hsx_token') ||
-        localStorage.getItem('token') ||
-        ''
-      );
-    } catch {
-      return '';
-    }
+    return getActiveSessionToken() || '';
   }
 
   /**
@@ -277,47 +267,135 @@ export class RealtimeAgentWebSocketClient {
 
   /**
    * Fallback to Server-Sent Events stream when WebSockets cannot be opened.
+   *
+   * SECURITY REMEDIATION (Milestone 6.1):
+   * Uses an authenticated fetch-based Web Streams client with Authorization: Bearer <token>
+   * transmitted strictly in the HTTP request headers. Normal bearer tokens are NEVER placed in URL query parameters.
    */
-  private fallbackToSSE(): void {
+  private async fallbackToSSE(): Promise<void> {
+    if (this.sseAbortController) {
+      try {
+        this.sseAbortController.abort();
+      } catch {}
+      this.sseAbortController = null;
+    }
     if (this.sse) {
-      this.sse.close();
+      try {
+        this.sse.close();
+      } catch {}
       this.sse = null;
     }
 
-    if (typeof window === 'undefined' || typeof EventSource === 'undefined') {
-      this.scheduleReconnect();
+    if (this.isExplicitlyClosed) {
       return;
     }
 
+    const token = this.getAuthToken();
+    if (!token) {
+      this.setState('disconnected');
+      return;
+    }
+
+    const abortController = new AbortController();
+    this.sseAbortController = abortController;
+    const sseUrl = `${this.apiBaseUrl}/api/v1/events/stream`;
+
     try {
-      const token = this.getAuthToken();
-      const sseUrl = token
-        ? `${this.apiBaseUrl}/api/v1/events/stream?token=${encodeURIComponent(token)}`
-        : `${this.apiBaseUrl}/api/v1/events/stream`;
-      const sse = new EventSource(sseUrl);
-      this.sse = sse;
+      const response = await fetch(sseUrl, {
+        method: 'GET',
+        headers: {
+          Accept: 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          Authorization: `Bearer ${token}`,
+        },
+        signal: abortController.signal,
+      });
 
-      sse.onopen = () => {
-        this.setState('connected');
-        this.reconnectAttempt = 0;
-      };
-
-      sse.onerror = () => {
-        this.sse?.close();
-        this.sse = null;
-        this.scheduleReconnect();
-      };
-
-      sse.onmessage = (e) => {
-        try {
-          const raw = JSON.parse(e.data);
-          this.handleIncomingRawEvent(raw, false);
-        } catch {
-          // Ignore parse errors on raw heartbeat
+      if (!response.ok) {
+        if (response.status === 401 && typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('session-expired'));
         }
-      };
-    } catch {
+        throw new Error(`SSE streaming response failed: ${response.status}`);
+      }
+
+      this.setState('connected');
+      this.reconnectAttempt = 0;
+
+      // Handle environments without body reader (e.g. basic mock fetch)
+      if (!response.body || typeof response.body.getReader !== 'function') {
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let buffer = '';
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done || abortController.signal.aborted) {
+          break;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // SSE messages delimited by double newline (\r\n\r\n or \n\n)
+        let boundaryIndex: number;
+        while ((boundaryIndex = buffer.search(/\r?\n\r?\n/)) !== -1) {
+          const rawMessage = buffer.slice(0, boundaryIndex);
+          const delimiterMatch = buffer.match(/\r?\n\r?\n/);
+          const delimiterLen = delimiterMatch ? delimiterMatch[0].length : 2;
+          buffer = buffer.slice(boundaryIndex + delimiterLen);
+
+          this.processRawSSEMessage(rawMessage);
+        }
+      }
+
+      if (!abortController.signal.aborted && !this.isExplicitlyClosed) {
+        this.scheduleReconnect();
+      }
+    } catch (err: any) {
+      if (abortController.signal.aborted || this.isExplicitlyClosed) {
+        return;
+      }
+      this.setState('disconnected');
       this.scheduleReconnect();
+    } finally {
+      if (this.sseAbortController === abortController) {
+        this.sseAbortController = null;
+      }
+    }
+  }
+
+  private processRawSSEMessage(raw: string): void {
+    if (!raw.trim()) return;
+
+    const lines = raw.split(/\r?\n/);
+    let eventType = 'message';
+    const dataLines: string[] = [];
+
+    for (const line of lines) {
+      if (!line || line.startsWith(':')) {
+        // Comment or heartbeat ping
+        continue;
+      }
+      if (line.startsWith('event:')) {
+        eventType = line.slice(6).trim();
+      } else if (line.startsWith('data:')) {
+        dataLines.push(line.slice(5).trimStart());
+      }
+    }
+
+    if (dataLines.length > 0) {
+      const dataStr = dataLines.join('\n');
+      try {
+        const parsed = JSON.parse(dataStr);
+        if (eventType === 'heartbeat' || parsed.event_type === 'system.heartbeat') {
+          return;
+        }
+        this.handleIncomingRawEvent(parsed, false);
+      } catch {
+        // Ignore unparseable data
+      }
     }
   }
 
@@ -371,6 +449,13 @@ export class RealtimeAgentWebSocketClient {
         this.ws.close(1000, 'Client unmounted');
       } catch {}
       this.ws = null;
+    }
+
+    if (this.sseAbortController) {
+      try {
+        this.sseAbortController.abort();
+      } catch {}
+      this.sseAbortController = null;
     }
 
     if (this.sse) {

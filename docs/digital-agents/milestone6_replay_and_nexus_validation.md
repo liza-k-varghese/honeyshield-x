@@ -83,3 +83,4 @@ The NEXUS Assistant acts as an interactive SOC conversational interface embedded
 - Replay scrubbing performs zero network requests once historical cursors are hydrated.
 - Modal dialogs trap focus properly and dismiss via `Escape` key without halting background 60 FPS animation.
 - Memory leak evaluation confirms that scrubbing across 100 historical events yields zero detached DOM elements.
+

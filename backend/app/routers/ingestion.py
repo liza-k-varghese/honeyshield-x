@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Attack, AttackEvent
+from app.observability.metrics import default_metrics_collector
 from app.schemas import AttackEventCreate, AttackEventResponse
 
 router = APIRouter(
@@ -79,6 +80,7 @@ def ingest_event(
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
+    default_metrics_collector.record_ingest(count=1)
 
     # Milestone 2: Emit Digital Agent Universe lifecycle events
     try:

@@ -25,6 +25,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import Attack, SystemEvent, ThreatIntelligence
+from app.observability.metrics import default_metrics_collector
 from app.schemas import (
     CampaignCluster,
     IndicatorStatus,
@@ -253,6 +254,7 @@ def lookup_indicator(
     strictly validates IPv4 and IPv6 format using python's ipaddress module.
     Preserves 100% backward-compatibility, returning clean human notes in 'description'.
     """
+    default_metrics_collector.threat_intel_lookups_total += 1
     if indicator_type == "ip":
         try:
             ipaddress.ip_address(indicator_value)
@@ -269,6 +271,9 @@ def lookup_indicator(
     )
 
     record = db.scalar(statement)
+
+    if record is not None:
+        default_metrics_collector.threat_intel_hits_total += 1
 
     if record is None:
         return {

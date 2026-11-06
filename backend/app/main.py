@@ -36,8 +36,10 @@ from app.routers import (
     events,
     pairing,
     emergency,
+    system_observability,
 )
 import app.events.service  # Initialize event bus bridge & listeners
+from app.observability.middleware import ObservabilityTracingMiddleware
 
 app = FastAPI(
     title="HoneyShield X API",
@@ -60,6 +62,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(ObservabilityTracingMiddleware)
+
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    """Enforce OWASP recommended security headers on all HTTP responses."""
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
 
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(attacks.router, prefix="/api/v1")
@@ -90,15 +103,17 @@ app.include_router(mobile.router, prefix="/api/v1")
 app.include_router(events.router, prefix="/api/v1")
 app.include_router(pairing.router, prefix="/api/v1")
 app.include_router(emergency.router, prefix="/api/v1")
+app.include_router(system_observability.router, prefix="/api/v1")
 
-POSTGRES_HOST = "127.0.0.1"
-POSTGRES_PORT = 5432
-POSTGRES_DB = "honeyshield"
-POSTGRES_USER = "honeyshield"
-POSTGRES_PASSWORD = "change_this_password"
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "127.0.0.1")
+POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
+POSTGRES_DB = os.getenv("POSTGRES_DB", "honeyshield")
+POSTGRES_USER = os.getenv("POSTGRES_USER", "honeyshield")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "change_this_password")
 
-REDIS_HOST = "127.0.0.1"
-REDIS_PORT = 6379
+REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
 
 
 @app.get("/health")
@@ -113,6 +128,7 @@ def health():
             dbname=POSTGRES_DB,
             user=POSTGRES_USER,
             password=POSTGRES_PASSWORD,
+            connect_timeout=2,
         ) as connection:
             with connection.cursor() as cursor:
                 cursor.execute("SELECT 1")
@@ -121,13 +137,15 @@ def health():
             postgres_status = "connected"
 
     except Exception as error:
-        postgres_status = f"error: {error}"
+        postgres_status = f"error: {error.__class__.__name__}"
 
     try:
         redis_client = redis.Redis(
             host=REDIS_HOST,
             port=REDIS_PORT,
+            password=REDIS_PASSWORD,
             decode_responses=True,
+            socket_connect_timeout=2.0,
         )
 
         redis_client.ping()
@@ -135,7 +153,7 @@ def health():
         redis_client.close()
 
     except Exception as error:
-        redis_status = f"error: {error}"
+        redis_status = f"error: {error.__class__.__name__}"
 
     overall_status = (
         "ok"

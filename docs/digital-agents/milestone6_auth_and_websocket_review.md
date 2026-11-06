@@ -148,3 +148,4 @@ In `backend/app/routers/auth.py`, a routing alias was registered for `/api/v1/au
 | Unauthenticated Access Attempts       | 401 Unauthorized            | 401 Unauthorized (Secure)   |
 +---------------------------------------+-----------------------------+-----------------------------+
 ```
+

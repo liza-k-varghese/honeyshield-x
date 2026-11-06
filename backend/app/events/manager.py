@@ -18,6 +18,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from app.auth.registry import Operator
 from app.events.schemas import SecurityEventEnvelope
 from app.events.store import can_operator_view_event, default_event_store
+from app.observability.metrics import default_metrics_collector
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,7 @@ class RealtimeConnectionManager:
                     await res
             self._active_connections[websocket] = operator
             self._operator_connection_counts[operator.username] = current_count + 1
+            default_metrics_collector.increment_ws_connect()
             logger.info("Realtime WS connected: operator=%s total_ws=%d", operator.username, len(self._active_connections))
             return True
 
@@ -64,6 +66,7 @@ class RealtimeConnectionManager:
                     self._operator_connection_counts.pop(operator.username, None)
                 else:
                     self._operator_connection_counts[operator.username] = current_count - 1
+                default_metrics_collector.increment_ws_disconnect()
                 logger.info("Realtime WS disconnected: operator=%s total_ws=%d", operator.username, len(self._active_connections))
 
     async def broadcast_event(self, envelope: SecurityEventEnvelope) -> None:

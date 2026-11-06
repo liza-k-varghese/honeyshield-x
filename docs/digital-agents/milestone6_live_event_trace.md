@@ -104,3 +104,4 @@ Upon receiving frame `cursor: 1042`:
 3. **Agent Traversal:** NEXUS animates along the assigned curved path to intercept the packet, changes state to `carrying`, and transports the payload across the virtual operational space to the Central Processing Hub `(600, 380)`.
 4. **Outbox Synchronization:** The client acknowledges cursor `1042`, updating its local high-water mark.
 5. **No Synthetic Mocking:** The entire motion was triggered by the real database commit and real WebSocket stream.
+

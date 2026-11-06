@@ -1,11 +1,12 @@
+import os
 from collections.abc import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-DATABASE_URL = (
-    "postgresql+psycopg://"
-    "honeyshield:change_this_password@127.0.0.1:5432/honeyshield"
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+psycopg://honeyshield:change_this_password@127.0.0.1:5432/honeyshield",
 )
 
 

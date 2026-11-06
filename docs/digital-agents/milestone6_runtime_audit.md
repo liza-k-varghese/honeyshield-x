@@ -108,3 +108,4 @@ frontend/src/digital-agents/
   - `backend/app/routers/events.py`: Implemented `resolve_sse_operator` multi-modal authentication guard supporting header tokens, URL query tokens, and single-use tickets for native browser `EventSource`.
   - `frontend/src/digital-agents/engine/RealtimeAgentWebSocketClient.ts`: Resolved token storage lookup to query `sessionStorage` (`hsx_auth_token`, `hsx_token`) and `localStorage`, appending query token on SSE fallback.
 - **Git Commit Policy:** No commits, branches, or tags created without explicit operator authorization.
+

@@ -8,10 +8,13 @@ import {
 
 const API_BASE = '/api/v1';
 
+export function getActiveSessionToken(): string | null {
+  if (typeof sessionStorage === 'undefined') return null;
+  return sessionStorage.getItem('hsx_auth_token') || sessionStorage.getItem('hsx_token') || null;
+}
+
 export function getAuthHeaders(): Record<string, string> {
-  const token = typeof sessionStorage !== 'undefined'
-    ? (sessionStorage.getItem('hsx_token') || sessionStorage.getItem('hsx_auth_token'))
-    : null;
+  const token = getActiveSessionToken();
   if (token) {
     return { 'Authorization': `Bearer ${token}` };
   }

@@ -19,6 +19,7 @@ from app.events.schemas import SecurityEventEnvelope, SecurityEventSeverity
 from app.events.store import default_event_store
 from app.incident_command.bus import _sanitize_payload, default_event_bus
 from app.notifications.push_dispatcher import default_push_dispatcher
+from app.observability.metrics import default_metrics_collector
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +92,7 @@ def publish_security_event(
 
     # 1. Record into durable outbox & ring buffer store
     default_event_store.append(envelope, db=db)
+    default_metrics_collector.record_outbox(cursor=envelope.cursor)
 
     # 2. Publish to legacy event bus for backwards compatibility
     legacy_payload = dict(clean_payload)

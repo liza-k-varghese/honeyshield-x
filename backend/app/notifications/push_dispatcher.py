@@ -22,6 +22,7 @@ import uuid
 from pydantic import BaseModel, Field
 
 from app.events.schemas import SecurityEventEnvelope
+from app.observability.metrics import default_metrics_collector
 
 logger = logging.getLogger(__name__)
 
@@ -223,6 +224,10 @@ class PushDispatcher:
             )
 
             status: Literal["accepted", "failed"] = "accepted" if success else "failed"
+            if success:
+                default_metrics_collector.push_dispatched_total += 1
+            else:
+                default_metrics_collector.push_failed_total += 1
             log_item = self._record_log(
                 envelope=envelope,
                 operator=dev.operator,
