@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {
   Briefcase,
@@ -20,6 +21,8 @@ import {
   UserX,
   Radio,
   FileText,
+  AlertCircle,
+  RefreshCw,
 } from 'lucide-react-native';
 import { colors, typography, spacing } from '../../theme';
 import { HeaderBar } from '../../components/hud/HeaderBar';
@@ -37,7 +40,9 @@ interface CasesListScreenProps {
 
 export const CasesListScreen: React.FC<CasesListScreenProps> = ({ navigation }) => {
   const [cases, setCases] = useState<IncidentCase[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [governorModalVisible, setGovernorModalVisible] = useState(false);
   const [selectedCase, setSelectedCase] = useState<IncidentCase | null>(null);
 
@@ -45,40 +50,13 @@ export const CasesListScreen: React.FC<CasesListScreenProps> = ({ navigation }) 
 
   const fetchCases = async () => {
     try {
-      const data = await casesApi.getCases().catch(() => [
-        {
-          id: 'CASE-2026-089',
-          title: 'Targeted Lateral Pivot via SSH Honey-decoy',
-          severity: 'CRITICAL',
-          status: 'investigating' as const,
-          assigned_analyst: 'responder_alex',
-          related_alerts: [1, 3],
-          created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-          playbook_tasks: [
-            { id: 't1', description: 'Inspect attack session raw keystrokes', completed: true },
-            { id: 't2', description: 'Cross-check source IP across AlienVault & AbuseIPDB', completed: true },
-            { id: 't3', description: 'Execute Governor Level-3 host isolation', completed: false },
-            { id: 't4', description: 'Rotate compromised decoy credentials', completed: false },
-          ],
-        },
-        {
-          id: 'CASE-2026-088',
-          title: 'Automated Multi-Vector Probe Wave',
-          severity: 'HIGH',
-          status: 'open' as const,
-          assigned_analyst: 'analyst_sarah',
-          related_alerts: [2],
-          created_at: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-          playbook_tasks: [
-            { id: 't1', description: 'Verify SQLi block rule in detection engine', completed: true },
-            { id: 't2', description: 'Extract payload hashes for threat intelligence feed', completed: false },
-          ],
-        },
-      ]);
-      setCases(data);
-    } catch {
-      // Handled
+      setErrorMessage(null);
+      const data = await casesApi.getCases();
+      setCases(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Failed to retrieve active incident cases.');
     } finally {
+      setLoading(false);
       setRefreshing(false);
     }
   };
@@ -104,7 +82,7 @@ export const CasesListScreen: React.FC<CasesListScreenProps> = ({ navigation }) 
         if (matchId !== caseId) return c;
         return {
           ...c,
-          playbook_tasks: c.playbook_tasks.map((t) => {
+          playbook_tasks: (c.playbook_tasks || []).map((t) => {
             const matchTaskId = t.task_id || t.id;
             return matchTaskId === taskId ? { ...t, completed: !t.completed } : t;
           }),
@@ -149,62 +127,89 @@ export const CasesListScreen: React.FC<CasesListScreenProps> = ({ navigation }) 
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.cyan} />}
       >
-        {cases.map((c) => (
-          <CyberPanel
-            key={c.id}
-            glowColor={c.severity === 'CRITICAL' ? 'critical' : 'blue'}
-            style={styles.caseCard}
-          >
-            <View style={styles.caseHeader}>
-              <View style={styles.caseIdRow}>
-                <Briefcase color={colors.cyan} size={16} />
-                <Text style={styles.caseIdText}>{c.id}</Text>
-              </View>
-              <SeverityBadge severity={c.severity} />
+        {errorMessage && (
+          <CyberPanel glowColor="critical" style={styles.errorPanel}>
+            <View style={styles.errorHeader}>
+              <AlertCircle color={colors.critical} size={16} />
+              <Text style={styles.errorText}>{errorMessage}</Text>
             </View>
-
-            <Text style={styles.caseTitle}>{c.title}</Text>
-            <Text style={styles.caseAnalyst}>
-              LEAD ANALYST: <Text style={{ color: colors.cyan }}>{c.assigned_analyst || 'Unassigned'}</Text>
-            </Text>
-
-            {/* Playbook Tasks Checklist */}
-            <View style={styles.playbookSection}>
-              <Text style={styles.playbookTitle}>INCIDENT RESPONSE PLAYBOOK:</Text>
-              {c.playbook_tasks.map((task) => (
-                <TouchableOpacity
-                  key={task.id}
-                  style={styles.taskRow}
-                  onPress={() => toggleTask(c.id, task.id)}
-                  activeOpacity={0.7}
-                >
-                  {task.completed ? (
-                    <CheckSquare color={colors.optimal} size={16} />
-                  ) : (
-                    <Square color={colors.textMuted} size={16} />
-                  )}
-                  <Text
-                    style={[
-                      styles.taskText,
-                      task.completed && styles.taskCompletedText,
-                    ]}
-                  >
-                    {task.description}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            {/* Governor SOAR Action Button */}
-            <CyberButton
-              title="EXECUTE GOVERNOR QUARANTINE"
-              variant="danger"
-              onPress={() => triggerContainment(c)}
-              icon={<ShieldAlert color={colors.critical} size={16} />}
-              style={{ marginTop: spacing.md }}
-            />
+            <TouchableOpacity style={styles.retryButton} onPress={fetchCases}>
+              <RefreshCw color={colors.textCyan} size={14} />
+              <Text style={styles.retryButtonText}>RETRY CONNECTIVITY</Text>
+            </TouchableOpacity>
           </CyberPanel>
-        ))}
+        )}
+
+        {loading ? (
+          <View style={styles.centerContainer}>
+            <ActivityIndicator size="small" color={colors.cyan} />
+            <Text style={styles.loadingText}>SYNCING ACTIVE CASES...</Text>
+          </View>
+        ) : cases.length === 0 ? (
+          <CyberPanel glowColor="optimal" style={styles.emptyPanel}>
+            <Text style={styles.emptyText}>NO ACTIVE INCIDENT CASES</Text>
+            <Text style={styles.emptySubtext}>All detection incidents are remediated or closed.</Text>
+          </CyberPanel>
+        ) : (
+          cases.map((c) => (
+            <CyberPanel
+              key={c.id}
+              glowColor={c.severity === 'CRITICAL' ? 'critical' : 'blue'}
+              style={styles.caseCard}
+            >
+              <View style={styles.caseHeader}>
+                <View style={styles.caseIdRow}>
+                  <Briefcase color={colors.cyan} size={16} />
+                  <Text style={styles.caseIdText}>{c.id}</Text>
+                </View>
+                <SeverityBadge severity={c.severity} />
+              </View>
+
+              <Text style={styles.caseTitle}>{c.title}</Text>
+              <Text style={styles.caseAnalyst}>
+                LEAD ANALYST: <Text style={{ color: colors.cyan }}>{c.assigned_analyst || 'Unassigned'}</Text>
+              </Text>
+
+              {/* Playbook Tasks Checklist */}
+              {Array.isArray(c.playbook_tasks) && c.playbook_tasks.length > 0 && (
+                <View style={styles.playbookSection}>
+                  <Text style={styles.playbookTitle}>INCIDENT RESPONSE PLAYBOOK:</Text>
+                  {c.playbook_tasks.map((task) => (
+                    <TouchableOpacity
+                      key={task.id}
+                      style={styles.taskRow}
+                      onPress={() => toggleTask(c.id, task.id)}
+                      activeOpacity={0.7}
+                    >
+                      {task.completed ? (
+                        <CheckSquare color={colors.optimal} size={16} />
+                      ) : (
+                        <Square color={colors.textMuted} size={16} />
+                      )}
+                      <Text
+                        style={[
+                          styles.taskText,
+                          task.completed && styles.taskCompletedText,
+                        ]}
+                      >
+                        {task.description}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+
+              {/* Governor SOAR Action Button */}
+              <CyberButton
+                title="EXECUTE GOVERNOR QUARANTINE"
+                variant="danger"
+                onPress={() => triggerContainment(c)}
+                icon={<ShieldAlert color={colors.critical} size={16} />}
+                style={{ marginTop: spacing.md }}
+              />
+            </CyberPanel>
+          ))
+        )}
       </ScrollView>
 
       {/* Governor Confirmation Modal */}
@@ -294,6 +299,72 @@ const styles = StyleSheet.create({
   taskCompletedText: {
     color: colors.textMuted,
     textDecorationLine: 'line-through',
+  },
+  errorPanel: {
+    marginBottom: spacing.md,
+    padding: spacing.md,
+  },
+  errorHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: spacing.xs,
+  },
+  errorText: {
+    fontFamily: typography.fontFamily,
+    fontSize: typography.sizes.xs,
+    color: colors.critical,
+    flex: 1,
+  },
+  retryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.xs,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: colors.cyan,
+  },
+  retryButtonText: {
+    fontFamily: typography.fontFamily,
+    fontSize: typography.sizes.xs,
+    color: colors.cyan,
+    fontWeight: typography.weights.bold,
+  },
+  centerContainer: {
+    padding: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    fontFamily: typography.fontFamily,
+    fontSize: typography.sizes.xs,
+    color: colors.textCyan,
+    marginTop: spacing.xs,
+    letterSpacing: 1,
+  },
+  emptyPanel: {
+    padding: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 4,
+  },
+  emptyText: {
+    fontFamily: typography.fontFamily,
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.bold,
+    color: colors.textPrimary,
+    letterSpacing: 1,
+  },
+  emptySubtext: {
+    fontFamily: typography.fontFamilySans,
+    fontSize: typography.sizes.xs,
+    color: colors.textSecondary,
+    marginTop: 4,
+    textAlign: 'center',
   },
 });
 

@@ -1307,6 +1307,7 @@ class IncidentCase(BaseModel):
     closed_by: str | None = Field(default=None, description="Operator username who signed off on closure")
     playbook_progress: float = Field(default=0.0, description="Completion ratio from 0.0 to 1.0")
     advisory_summary: str | None = Field(default=None, description="Advisory threat contextualization summary")
+    visibility: str = Field(default="team", description="Case visibility: team or private")
 
 
 class CaseCreateRequest(BaseModel):
@@ -1324,6 +1325,7 @@ class CaseCreateRequest(BaseModel):
     )
     assigned_to: str | None = Field(default=None, description="Initial assignee username")
     initial_note: str | None = Field(default=None, max_length=2000, description="Optional initial triage note")
+    visibility: str = Field(default="team", description="Case visibility: team or private")
 
 
 class CaseUpdateRequest(BaseModel):
@@ -2107,3 +2109,193 @@ class HuntMetricsResponse(BaseModel):
     inconclusive: int = Field(ge=0)
     promoted_rules_count: int = Field(ge=0)
     promoted_cases_count: int = Field(ge=0)
+
+
+# ---------------------------------------------------------------------------
+# Milestone 15 — Threat Hunting, Forensic Evidence & Investigation Schemas
+# ---------------------------------------------------------------------------
+
+
+class ThreatHuntSearchRequest(BaseModel):
+    """Multi-dimensional search request across normalized security events."""
+
+    query_string: str | None = Field(default=None, description="Free-text search over summary/message")
+    source_ip: str | None = Field(default=None, description="Exact or prefix source IPv4/IPv6")
+    destination_ip: str | None = Field(default=None, description="Exact destination IP")
+    protocol: str | None = Field(default=None, description="Protocol filter (e.g. TCP, UDP, SSH)")
+    severity: str | None = Field(default=None, description="Severity filter: low, medium, high, critical")
+    status: str | None = Field(default=None, description="Entity status")
+    risk_score_min: float | None = Field(default=None, ge=0.0, le=100.0)
+    risk_score_max: float | None = Field(default=None, ge=0.0, le=100.0)
+    start_time: str | None = Field(default=None, description="ISO 8601 UTC lower bound")
+    end_time: str | None = Field(default=None, description="ISO 8601 UTC upper bound")
+    event_type: str | None = Field(default=None, description="Normalized event type or attack vector")
+    payload_substr: str | None = Field(default=None, description="Substring search within event payload or message")
+    limit: int = Field(default=50, ge=1, le=200)
+    offset: int = Field(default=0, ge=0)
+
+
+class ThreatHuntSearchResultItem(BaseModel):
+    """Single matching record in the threat hunting search results."""
+
+    event_id: str
+    source_type: str  # "attack", "alert", "outbox_event", "threat_intel"
+    timestamp: str
+    source_ip: str | None = None
+    destination_ip: str | None = None
+    protocol: str | None = None
+    severity: str | None = None
+    risk_score: float | None = None
+    summary: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ThreatHuntSearchResponse(BaseModel):
+    """Response envelope for retrospective threat hunt search."""
+
+    results: list[ThreatHuntSearchResultItem]
+    total: int = Field(ge=0)
+    execution_time_ms: float = Field(ge=0.0)
+    filters_applied: dict[str, Any] = Field(default_factory=dict)
+
+
+class SavedHuntCreateRequest(BaseModel):
+    """Payload to save an authorized threat hunting query."""
+
+    name: str = Field(min_length=1, max_length=120)
+    description: str | None = Field(default=None, max_length=500)
+    filter_criteria: dict[str, Any] = Field(description="Structured query filter criteria")
+    visibility: str = Field(default="private", description="'private' or 'team'")
+
+
+class SavedHunt(BaseModel):
+    """Persisted saved hunt entity."""
+
+    id: str
+    name: str
+    description: str | None = None
+    filter_criteria: dict[str, Any]
+    visibility: str
+    created_by: str
+    created_at: str
+    updated_at: str
+
+
+class ForensicEvidenceCreateRequest(BaseModel):
+    """Payload to attach an immutable forensic snapshot to an incident case."""
+
+    source_type: str = Field(description="Evidence origin: 'alert', 'attack', 'canary', 'honeypot', 'intel', 'pcap'")
+    source_record_id: str = Field(description="Identifier of origin record")
+    description: str = Field(min_length=1, max_length=500)
+    content_type: str = Field(default="application/json")
+    raw_payload: dict[str, Any] | str = Field(description="Raw evidence content or snapshot")
+    access_classification: str = Field(default="confidential")
+    retention_policy: str = Field(default="standard_90d")
+
+
+class ForensicEvidence(BaseModel):
+    """Immutable forensic evidence item with cryptographic digest."""
+
+    evidence_id: str
+    case_id: str
+    source_type: str
+    source_record_id: str
+    description: str
+    content_type: str
+    byte_size: int
+    sha256_digest: str
+    collected_by: str
+    collected_at: str
+    access_classification: str
+    retention_policy: str
+    raw_payload: dict[str, Any] | str
+
+
+class EvidenceVerificationResponse(BaseModel):
+    """Cryptographic integrity check result for a forensic evidence item."""
+
+    evidence_id: str
+    verified: bool
+    stored_digest: str
+    computed_digest: str
+    verification_timestamp: str
+    audit_note: str
+
+
+class TimelineEvent(BaseModel):
+    """Single stage in a reconstructed forensic incident timeline."""
+
+    event_id: str
+    stage: str  # e.g. "sensor_ingest", "detection", "threat_enrichment", "alert_confirmed", "analyst_triage"
+    source_event_time: str
+    server_receipt_time: str
+    detection_time: str | None = None
+    publication_time: str | None = None
+    severity: str
+    summary: str
+    details: dict[str, Any] = Field(default_factory=dict)
+
+
+class ForensicTimelineResponse(BaseModel):
+    """Chronologically reconstructed forensic event timeline."""
+
+    case_id: str | None = None
+    attack_id: int | None = None
+    total_events: int
+    timeline: list[TimelineEvent]
+
+
+class DetectionSimulationRequest(BaseModel):
+    """Payload to evaluate a declarative detection rule against test datasets."""
+
+    test_events: list[dict[str, Any]] = Field(description="Collection of test event payloads")
+
+
+class DetectionSimulationResponse(BaseModel):
+    """Evaluation results of a detection rule simulation."""
+
+    rule_id: str
+    rule_name: str
+    total_evaluated: int
+    matched_count: int
+    unmatched_count: int
+    metrics: dict[str, float | int | None]
+    matched_events: list[dict[str, Any]]
+    candidate_alerts: list[dict[str, Any]]
+    simulation_mode: bool = True
+
+
+class RiskScoreExplanationResponse(BaseModel):
+    """Server-side deterministic risk score breakdown."""
+
+    attack_id: int
+    final_score: float
+    severity: str
+    model_version: str
+    breakdown: dict[str, float]
+    narrative_explanation: str
+    evaluated_at: str
+    scale: str = Field(default="0-100", description="Authoritative scale representation ('0-100' operational composite score)")
+    normalized_score_10: float = Field(default=0.0, description="Normalized score on 0-10 CVSS base scale")
+
+
+class NexusInvestigationAssistRequest(BaseModel):
+    """Analyst prompt to NEXUS AI-assisted investigation agent."""
+
+    query: str = Field(min_length=1, max_length=1000)
+    case_id: str | None = None
+    attack_id: int | None = None
+
+
+class NexusInvestigationAssistResponse(BaseModel):
+    """Grounded, evidence-backed answer from NEXUS Assistant."""
+
+    response: str
+    confidence: float
+    grounded_references: list[dict[str, str]]
+    is_factual: bool
+    security_boundary_enforced: bool
+    model_provider: str = Field(default="deterministic_grounded_engine", description="Inference engine: local deterministic vs external LLM")
+    untrusted_content_detected: bool = Field(default=False, description="Whether untrusted instruction patterns were intercepted and quarantined")
+    allowed_tools: list[str] = Field(default_factory=lambda: ["case_summary_retrieval", "evidence_integrity_lookup", "threat_intel_observable_lookup", "alert_confirmation_lookup"], description="Enumerated read-only analysis tools")
+

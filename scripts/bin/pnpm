@@ -1,0 +1,2 @@
+#!/bin/sh
+exec node /home/liza/.cache/node/corepack/pnpm/9.15.0/bin/pnpm.cjs "$@"

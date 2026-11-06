@@ -356,3 +356,97 @@ class HuntStore:
 
 # Default singleton instance
 default_hunt_store = HuntStore()
+
+
+# ---------------------------------------------------------------------------
+# Saved Hunts Storage (Milestone 15)
+# ---------------------------------------------------------------------------
+
+REDIS_KEY_SAVED_HUNTS = "hsx:saved_hunts:items"
+
+
+class SavedHuntStore:
+    """Thread-safe dual-mode store for saved threat hunting queries."""
+
+    def __init__(self, use_redis: bool = True) -> None:
+        self._lock = threading.RLock()
+        self._memory_items: dict[str, Any] = {}
+        self._redis_client: redis.Redis | None = None
+        if use_redis:
+            try:
+                client = redis.Redis(
+                    host=REDIS_HOST,
+                    port=REDIS_PORT,
+                    decode_responses=True,
+                    socket_timeout=1.0,
+                )
+                client.ping()
+                self._redis_client = client
+            except Exception:
+                self._redis_client = None
+
+    def save_hunt(self, hunt: Any) -> Any:
+        with self._lock:
+            self._memory_items[hunt.id] = hunt
+            if self._redis_client:
+                try:
+                    self._redis_client.hset(REDIS_KEY_SAVED_HUNTS, hunt.id, hunt.model_dump_json())
+                except Exception:
+                    pass
+            return hunt
+
+    def get_hunt(self, hunt_id: str) -> Any | None:
+        with self._lock:
+            if self._redis_client:
+                try:
+                    raw = self._redis_client.hget(REDIS_KEY_SAVED_HUNTS, hunt_id)
+                    if raw:
+                        from app.schemas import SavedHunt
+                        return SavedHunt.model_validate_json(raw)
+                except Exception:
+                    pass
+            return self._memory_items.get(hunt_id)
+
+    def list_hunts(self, operator_username: str) -> list[Any]:
+        with self._lock:
+            all_items: list[Any] = []
+            if self._redis_client:
+                try:
+                    from app.schemas import SavedHunt
+                    raw_items = self._redis_client.hgetall(REDIS_KEY_SAVED_HUNTS)
+                    for raw in raw_items.values():
+                        all_items.append(SavedHunt.model_validate_json(raw))
+                except Exception:
+                    all_items = list(self._memory_items.values())
+            else:
+                all_items = list(self._memory_items.values())
+
+            # Visibility filtering: team-visible or owned by operator
+            filtered = [
+                h for h in all_items
+                if getattr(h, "visibility", "private") == "team" or getattr(h, "created_by", "") == operator_username
+            ]
+            return sorted(filtered, key=lambda x: getattr(x, "created_at", ""), reverse=True)
+
+    def delete_hunt(self, hunt_id: str, operator_username: str, is_admin: bool = False) -> bool:
+        with self._lock:
+            hunt = self.get_hunt(hunt_id)
+            if not hunt:
+                return False
+            if not is_admin and getattr(hunt, "created_by", "") != operator_username:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Cannot delete a saved hunt created by another operator",
+                )
+            if hunt_id in self._memory_items:
+                del self._memory_items[hunt_id]
+            if self._redis_client:
+                try:
+                    self._redis_client.hdel(REDIS_KEY_SAVED_HUNTS, hunt_id)
+                except Exception:
+                    pass
+            return True
+
+
+default_saved_hunt_store = SavedHuntStore()
+

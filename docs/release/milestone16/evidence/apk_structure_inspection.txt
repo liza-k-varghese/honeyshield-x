@@ -1,0 +1,23 @@
+HONEYSHIELD X — APK STRUCTURE FORENSIC INSPECTION
+Target: release/v1.0.0-rc5/honeyshield-mobile-v1.0.0-rc5-debug.apk
+Size: 57,457 bytes
+MD5: cda69ea24d2657e0523ec18357a77e53
+SHA-256: 4b293c6f6426466f39e31d471542fcebfbb98d9eebc3f25d97151322fa1fb04d
+
+ARCHIVE INVENTORY:
+- AndroidManifest.xml (2,374 bytes) -> Content: Plain text XML (NOT compiled binary XML / AXML)
+- classes.dex (8,580 bytes) -> Content: Valid Dalvik executable bytecode (Header: dex\n035\0)
+- assets/index.android.bundle (181,534 bytes) -> Content: Valid React Native JavaScript bundle
+- META-INF/MANIFEST.MF -> Signature manifest
+- META-INF/HONEYSHI.SF -> Signature file
+- META-INF/HONEYSHI.RSA -> RSA public key certificate block
+- resources.arsc -> ABSENT (AAPT resource compilation was not performed)
+
+ANALYSIS VERDICT:
+- Java bytecode: PRESENT (Valid)
+- React Native bundle: PRESENT (Valid)
+- AndroidManifest.xml: INVALID (Plain text XML will trigger Android PackageManager parsing error on install)
+- Resource table: MISSING (resources.arsc)
+- Host Environment: Linux Parrot OS lacks Android SDK build-tools (aapt/aapt2) and adb.
+- Release Track Status: Track C = PARTIAL, Track D = NOT TESTED / BLOCKED.
+

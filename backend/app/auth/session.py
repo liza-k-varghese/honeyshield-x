@@ -21,12 +21,18 @@ import redis
 
 from app.auth.crypto import generate_session_token, hash_session_token
 from app.auth.registry import Operator
+from app.observability.metrics import default_metrics_collector
 
 logger = logging.getLogger(__name__)
 
 MAX_SESSION_LIFETIME_SECONDS: float = 28800.0  # 8 hours
 IDLE_TIMEOUT_SECONDS: float = 1800.0          # 30 minutes
 REDIS_SESSION_KEY_PREFIX: str = "auth:session:"
+
+HONEYSHIELD_STRICT_AUTH_COORDINATION: bool = (
+    os.getenv("HONEYSHIELD_STRICT_AUTH_COORDINATION", "false").lower() in ("true", "1", "yes")
+    or os.getenv("HONEYSHIELD_FAIL_CLOSED_ON_REDIS_ERROR", "false").lower() in ("true", "1", "yes")
+)
 
 
 @dataclass
@@ -112,10 +118,17 @@ class SessionStore:
                 key = f"{REDIS_SESSION_KEY_PREFIX}{token_hash}"
                 self._redis_client.set(key, json.dumps(session_data.to_dict()), ex=ttl)
             except Exception as e:
-                logger.error("Failed to store session in Redis: %s; saving in-memory", str(e))
+                logger.error("Failed to store session in Redis: %s", str(e))
+                default_metrics_collector.increment_auth_coordination_failure()
+                if HONEYSHIELD_STRICT_AUTH_COORDINATION:
+                    raise RuntimeError("Distributed session store unavailable")
                 with self._lock:
                     self._memory_sessions[token_hash] = session_data
         else:
+            default_metrics_collector.increment_auth_coordination_failure()
+            if HONEYSHIELD_STRICT_AUTH_COORDINATION:
+                raise RuntimeError("Distributed session store unavailable")
+            logger.warning("SECURITY WARNING: Redis unavailable. Storing session in process-local memory.")
             with self._lock:
                 self._memory_sessions[token_hash] = session_data
 
@@ -138,28 +151,38 @@ class SessionStore:
                     session_data = SessionData.from_dict(json.loads(raw_json))
             except Exception as e:
                 logger.error("Redis session lookup failed: %s", str(e))
+                default_metrics_collector.increment_auth_coordination_failure()
+                if HONEYSHIELD_STRICT_AUTH_COORDINATION:
+                    return None
                 with self._lock:
                     session_data = self._memory_sessions.get(token_hash)
         else:
+            default_metrics_collector.increment_auth_coordination_failure()
+            if HONEYSHIELD_STRICT_AUTH_COORDINATION:
+                return None
             with self._lock:
                 session_data = self._memory_sessions.get(token_hash)
 
         if session_data is None:
+            default_metrics_collector.increment_session_validation_failure()
             return None
 
         # Check explicit revocation
         if session_data.revoked:
             self._delete_session_by_hash(token_hash)
+            default_metrics_collector.increment_session_validation_failure()
             return None
 
         # Check absolute expiration
         if now > session_data.expires_at:
             self._delete_session_by_hash(token_hash)
+            default_metrics_collector.increment_session_validation_failure()
             return None
 
         # Check idle timeout (inactivity)
         if (now - session_data.last_active) > IDLE_TIMEOUT_SECONDS:
             self._delete_session_by_hash(token_hash)
+            default_metrics_collector.increment_session_validation_failure()
             return None
 
         # Valid session: touch last_active
@@ -179,14 +202,33 @@ class SessionStore:
         return session_data
 
     def revoke_session(self, token: str) -> bool:
-        """Revoke a single session by bearer token."""
+        """Revoke a single session by bearer token and terminate live connections."""
         if not token:
             return False
+        session = self.get_session(token)
+        operator_id = session.operator_id if session else None
         token_hash = hash_session_token(token)
-        return self._delete_session_by_hash(token_hash)
+        deleted = self._delete_session_by_hash(token_hash)
+
+        if deleted and operator_id:
+            try:
+                from app.events.manager import default_connection_manager
+                default_connection_manager.revoke_operator_connections_sync(operator_id)
+            except Exception:
+                pass
+            if self._redis_client is not None:
+                try:
+                    self._redis_client.publish(
+                        "hsx:auth:revocation",
+                        json.dumps({"action": "revoke_session", "operator_id": operator_id, "token_hash": token_hash, "timestamp": time.time()})
+                    )
+                except Exception:
+                    pass
+
+        return deleted
 
     def revoke_operator_sessions(self, operator_id: str) -> int:
-        """Revoke all active sessions for a specified operator."""
+        """Revoke all active sessions for a specified operator and disconnect active WebSockets."""
         revoked_count = 0
         if self._redis_client is not None:
             try:
@@ -201,6 +243,9 @@ class SessionStore:
                             revoked_count += 1
             except Exception as e:
                 logger.error("Failed to revoke operator sessions in Redis: %s", str(e))
+                default_metrics_collector.increment_auth_coordination_failure()
+                if HONEYSHIELD_STRICT_AUTH_COORDINATION:
+                    raise RuntimeError("Distributed session store unavailable for revocation")
 
         with self._lock:
             to_delete = [
@@ -210,6 +255,23 @@ class SessionStore:
             for h in to_delete:
                 del self._memory_sessions[h]
                 revoked_count += 1
+
+        # Zero-Trust Active Stream Revocation: Sever open WebSockets for this operator immediately
+        try:
+            from app.events.manager import default_connection_manager
+            default_connection_manager.revoke_operator_connections_sync(operator_id)
+        except Exception as e:
+            logger.warning("Active WebSocket revocation bridge encountered non-fatal error: %s", e)
+
+        # Broadcast revocation across cluster workers via Redis pubsub
+        if self._redis_client is not None:
+            try:
+                self._redis_client.publish(
+                    "hsx:auth:revocation",
+                    json.dumps({"action": "revoke_operator", "operator_id": operator_id, "timestamp": time.time()})
+                )
+            except Exception:
+                pass
 
         return revoked_count
 

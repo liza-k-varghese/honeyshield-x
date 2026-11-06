@@ -29,54 +29,17 @@ export const AttackExplorerScreen: React.FC<AttackExplorerScreenProps> = ({ navi
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fetchAttacks = async () => {
+    setErrorMessage(null);
     try {
-      const data = await socApi.getAttacks(50).catch(() => [
-        {
-          id: 101,
-          source_ip: '192.168.1.144',
-          protocol: 'SSH',
-          timestamp: new Date().toISOString(),
-          risk_score: 92,
-          country_code: 'US',
-          status: 'ACTIVE_PROBE',
-          mitre_tactics: ['Initial Access', 'Credential Access'],
-        },
-        {
-          id: 102,
-          source_ip: '10.0.2.18',
-          protocol: 'HTTP',
-          timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-          risk_score: 84,
-          country_code: 'NL',
-          status: 'SQLi_BLOCKED',
-          mitre_tactics: ['Exploit Public-Facing App'],
-        },
-        {
-          id: 103,
-          source_ip: '172.16.4.88',
-          protocol: 'RDP',
-          timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-          risk_score: 65,
-          country_code: 'DE',
-          status: 'BRUTE_FORCE',
-          mitre_tactics: ['Credential Dumping'],
-        },
-        {
-          id: 104,
-          source_ip: '198.51.100.42',
-          protocol: 'HTTP',
-          timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-          risk_score: 78,
-          country_code: 'RU',
-          status: 'COMMAND_INJECTION',
-          mitre_tactics: ['Execution'],
-        },
-      ]);
+      const data = await socApi.getAttacks(50);
       setAttacks(data);
-    } catch {
-      // Handled
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail || err?.message || 'Failed to fetch attacks';
+      setErrorMessage(msg);
+      setAttacks([]);
     } finally {
       setLoading(false);
       setRefreshing(false);

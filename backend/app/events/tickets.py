@@ -16,6 +16,7 @@ from typing import Any
 import redis
 
 from app.auth.registry import Operator
+from app.observability.metrics import default_metrics_collector
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,20 @@ TICKET_TTL_SECONDS: int = 60
 REDIS_HOST: str = os.getenv("REDIS_HOST", "127.0.0.1")
 REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
 REDIS_TICKET_PREFIX: str = "hsx:ws_ticket:"
+
+HONEYSHIELD_STRICT_AUTH_COORDINATION: bool = (
+    os.getenv("HONEYSHIELD_STRICT_AUTH_COORDINATION", "false").lower() in ("true", "1", "yes")
+    or os.getenv("HONEYSHIELD_FAIL_CLOSED_ON_REDIS_ERROR", "false").lower() in ("true", "1", "yes")
+)
+
+# Atomic GET and DEL script to eliminate race conditions under concurrent consumption
+LUA_ATOMIC_GETDEL: str = """
+local val = redis.call('GET', KEYS[1])
+if val then
+    redis.call('DEL', KEYS[1])
+end
+return val
+"""
 
 
 class TicketService:
@@ -70,9 +85,20 @@ class TicketService:
                 )
                 return ticket
             except Exception as e:
-                logger.warning("Redis ticket storage failed (%s), falling back to in-memory", e)
+                logger.warning("Redis ticket storage failed (%s)", e)
+                default_metrics_collector.increment_auth_coordination_failure()
+                if HONEYSHIELD_STRICT_AUTH_COORDINATION:
+                    logger.error("Strict distributed auth coordination enforced: refusing in-memory ticket issuance")
+                    raise RuntimeError("Distributed ticket coordination unavailable")
 
-        # In-memory fallback
+        if HONEYSHIELD_STRICT_AUTH_COORDINATION:
+            default_metrics_collector.increment_auth_coordination_failure()
+            logger.error("Strict distributed auth coordination enforced: refusing in-memory ticket issuance")
+            raise RuntimeError("Distributed ticket coordination unavailable")
+
+        # In-memory fallback (isolated single-worker dev/test only)
+        logger.warning("SECURITY WARNING: Redis unavailable. Storing ticket in process-local memory.")
+        default_metrics_collector.increment_auth_coordination_failure()
         with self._lock:
             # Purge expired
             now = time.time()
@@ -91,13 +117,12 @@ class TicketService:
 
         now = time.time()
 
-        # Check Redis first
+        # Check Redis first with Lua atomic GETDEL script to eliminate cross-worker race conditions
         if self._redis_client is not None:
             try:
                 key = f"{REDIS_TICKET_PREFIX}{ticket}"
-                raw = self._redis_client.get(key)
+                raw = self._redis_client.eval(LUA_ATOMIC_GETDEL, 1, key)
                 if raw:
-                    self._redis_client.delete(key)  # Single-use consumption
                     data = json.loads(raw)
                     if data.get("expires_at", 0) > now:
                         return Operator(
@@ -107,11 +132,27 @@ class TicketService:
                             password_hash="",
                             is_active=True,
                         )
+                    default_metrics_collector.increment_ticket_expiration()
                     return None
+                else:
+                    # Ticket already consumed or never existed in Redis
+                    default_metrics_collector.increment_ticket_replay()
+                    if not HONEYSHIELD_STRICT_AUTH_COORDINATION:
+                        # Fall through to check memory fallback if in dev mode
+                        pass
+                    else:
+                        return None
             except Exception as e:
-                logger.warning("Redis ticket consumption failed (%s), checking in-memory", e)
+                logger.warning("Redis atomic ticket consumption failed (%s)", e)
+                default_metrics_collector.increment_auth_coordination_failure()
+                if HONEYSHIELD_STRICT_AUTH_COORDINATION:
+                    return None
 
-        # Check in-memory fallback
+        if HONEYSHIELD_STRICT_AUTH_COORDINATION:
+            default_metrics_collector.increment_auth_coordination_failure()
+            return None
+
+        # Check in-memory fallback (atomic pop)
         with self._lock:
             data = self._fallback_tickets.pop(ticket, None)
             if data is not None:
@@ -123,6 +164,10 @@ class TicketService:
                         password_hash="",
                         is_active=True,
                     )
+                default_metrics_collector.increment_ticket_expiration()
+                return None
+            else:
+                default_metrics_collector.increment_ticket_replay()
         return None
 
 

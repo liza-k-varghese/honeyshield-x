@@ -31,62 +31,17 @@ export const AlertsListScreen: React.FC<AlertsListScreenProps> = ({ navigation }
   const [selectedSeverity, setSelectedSeverity] = useState('ALL');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fetchAlerts = async () => {
+    setErrorMessage(null);
     try {
-      const data = await socApi.getAlerts().catch(() => [
-        {
-          id: 1,
-          title: 'Automated SSH Credential Stuffing',
-          description: 'High frequency authentication failures detected from single source IP across multiple privileged accounts.',
-          severity: 'CRITICAL' as AlertSeverity,
-          status: 'NEW' as AlertStatus,
-          source_ip: '192.168.1.144',
-          risk_score: 95,
-          vector: 'SSH_BRUTE_FORCE',
-          created_at: new Date().toISOString(),
-          mitre_technique: 'T1110.004',
-        },
-        {
-          id: 2,
-          title: 'SQL Injection in Auth Endpoint',
-          description: 'Union-based SQL injection pattern intercepted by Multi-Vector Detection Engine.',
-          severity: 'HIGH' as AlertSeverity,
-          status: 'INVESTIGATING' as AlertStatus,
-          source_ip: '10.0.2.18',
-          risk_score: 84,
-          vector: 'SQL_INJECTION',
-          created_at: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
-          mitre_technique: 'T1190',
-        },
-        {
-          id: 3,
-          title: 'Canary Honey-Token Accessed',
-          description: 'Active Deception alert: Honey credential was read in decoys repository.',
-          severity: 'CRITICAL' as AlertSeverity,
-          status: 'NEW' as AlertStatus,
-          source_ip: '172.16.4.200',
-          risk_score: 98,
-          vector: 'CANARY_DECEPTION',
-          created_at: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
-          mitre_technique: 'T1552',
-        },
-        {
-          id: 4,
-          title: 'Port Scan Sweeping Decoy Subnet',
-          description: 'Horizontal SYN scan targeting ports 22, 80, 443, 3389.',
-          severity: 'MEDIUM' as AlertSeverity,
-          status: 'CLOSED' as AlertStatus,
-          source_ip: '45.33.32.156',
-          risk_score: 55,
-          vector: 'RECONNAISSANCE',
-          created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-          mitre_technique: 'T1046',
-        },
-      ]);
+      const data = await socApi.getAlerts();
       setAlerts(data);
-    } catch {
-      // Handled
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail || err?.message || 'Failed to fetch security alerts';
+      setErrorMessage(msg);
+      setAlerts([]);
     } finally {
       setLoading(false);
       setRefreshing(false);

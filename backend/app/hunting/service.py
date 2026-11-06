@@ -22,13 +22,20 @@ from typing import Any
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+import uuid
+
 from app.audit.service import record_operator_audit
 from app.auth.registry import Operator
 from app.cases.service import default_case_service
 from app.hunting.engine import RetrospectiveQueryEngine
-from app.hunting.storage import HuntStore, default_hunt_store
+from app.hunting.storage import (
+    HuntStore,
+    default_hunt_store,
+    default_saved_hunt_store,
+)
 from app.incident_command.bus import default_event_bus
 from app.incident_command.governor import default_governor
+from app.models import Alert, Attack, SecurityEventOutbox, ThreatIntelligence
 from app.multi_vector_detection.models import DetectionRule
 from app.multi_vector_detection.registry import default_registry
 from app.schemas import (
@@ -41,6 +48,11 @@ from app.schemas import (
     HuntPromotionResponse,
     HuntQuerySpec,
     HuntUpdateRequest,
+    SavedHunt,
+    SavedHuntCreateRequest,
+    ThreatHuntSearchRequest,
+    ThreatHuntSearchResultItem,
+    ThreatHuntSearchResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -675,6 +687,210 @@ class HuntService:
             message=f"Incident Case {case_id} initialized with playbook ADVANCED_THREAT_HUNT_DISCOVERY and {len(alert_ids)} linked alerts.",
             promoted_at=now_iso,
         )
+
+    # -----------------------------------------------------------------------
+    # Multi-Dimensional Search & Saved Hunts (Milestone 15)
+    # -----------------------------------------------------------------------
+
+    def search_telemetry(
+        self,
+        payload: ThreatHuntSearchRequest,
+        db: Session,
+        operator: Operator,
+    ) -> ThreatHuntSearchResponse:
+        """Perform high-performance, parameterized search across security events."""
+        start_perf = time.perf_counter()
+        results: list[ThreatHuntSearchResultItem] = []
+        filters_applied: dict[str, Any] = {}
+
+        # 1. Query Attacks
+        attack_query = db.query(Attack)
+        if payload.source_ip:
+            attack_query = attack_query.filter(Attack.source_ip.startswith(payload.source_ip))
+            filters_applied["source_ip"] = payload.source_ip
+        if payload.destination_ip:
+            attack_query = attack_query.filter(Attack.destination_ip == payload.destination_ip)
+            filters_applied["destination_ip"] = payload.destination_ip
+        if payload.protocol:
+            attack_query = attack_query.filter(Attack.protocol.ilike(f"%{payload.protocol}%"))
+            filters_applied["protocol"] = payload.protocol
+        if payload.severity:
+            attack_query = attack_query.filter(Attack.severity == payload.severity.lower())
+            filters_applied["severity"] = payload.severity
+        if payload.status:
+            attack_query = attack_query.filter(Attack.status == payload.status.lower())
+            filters_applied["status"] = payload.status
+        if payload.risk_score_min is not None:
+            attack_query = attack_query.filter(Attack.risk_score >= payload.risk_score_min)
+            filters_applied["risk_score_min"] = payload.risk_score_min
+        if payload.risk_score_max is not None:
+            attack_query = attack_query.filter(Attack.risk_score <= payload.risk_score_max)
+            filters_applied["risk_score_max"] = payload.risk_score_max
+        if payload.event_type:
+            attack_query = attack_query.filter(Attack.attack_type.ilike(f"%{payload.event_type}%"))
+            filters_applied["event_type"] = payload.event_type
+        if payload.query_string:
+            q = payload.query_string.strip()
+            attack_query = attack_query.filter(
+                Attack.attack_type.ilike(f"%{q}%") | Attack.source_ip.ilike(f"%{q}%")
+            )
+            filters_applied["query_string"] = payload.query_string
+
+        attacks = attack_query.order_by(Attack.detected_at.desc()).limit(100).all()
+        for a in attacks:
+            ts_iso = a.detected_at.isoformat() if hasattr(a.detected_at, "isoformat") else str(a.detected_at)
+            results.append(
+                ThreatHuntSearchResultItem(
+                    event_id=f"atk-{a.id}",
+                    source_type="attack",
+                    timestamp=ts_iso,
+                    source_ip=a.source_ip,
+                    destination_ip=a.destination_ip,
+                    protocol=a.protocol,
+                    severity=a.severity,
+                    risk_score=a.risk_score,
+                    summary=f"Attack: {a.attack_type} from {a.source_ip or 'unknown'}",
+                    metadata={"attack_id": a.id, "status": a.status, "attack_type": a.attack_type},
+                )
+            )
+
+        # 2. Query Alerts (only when not filtering specifically by source_ip or payload_substr)
+        if not payload.source_ip and not payload.payload_substr:
+            alert_query = db.query(Alert)
+            if payload.severity:
+                alert_query = alert_query.filter(Alert.severity == payload.severity.lower())
+            if payload.status:
+                alert_query = alert_query.filter(Alert.status == payload.status.lower())
+            if payload.query_string:
+                q = payload.query_string.strip()
+                alert_query = alert_query.filter(
+                    Alert.alert_type.ilike(f"%{q}%") | Alert.message.ilike(f"%{q}%")
+                )
+
+            alerts = alert_query.order_by(Alert.created_at.desc()).limit(100).all()
+            for al in alerts:
+                ts_iso = al.created_at.isoformat() if hasattr(al.created_at, "isoformat") else str(al.created_at)
+                results.append(
+                    ThreatHuntSearchResultItem(
+                        event_id=f"alt-{al.id}",
+                        source_type="alert",
+                        timestamp=ts_iso,
+                        source_ip=None,
+                        destination_ip=None,
+                        protocol=None,
+                        severity=al.severity,
+                        risk_score=None,
+                        summary=f"Alert: {al.alert_type} - {al.message}",
+                        metadata={"alert_id": al.id, "status": al.status, "attack_id": al.attack_id},
+                    )
+                )
+
+        # 3. Query Outbox events if specific event_type or general query without IP filter
+        if payload.event_type or (not payload.source_ip and not payload.payload_substr):
+            outbox_query = db.query(SecurityEventOutbox)
+            if payload.event_type:
+                outbox_query = outbox_query.filter(SecurityEventOutbox.event_type.ilike(f"%{payload.event_type}%"))
+            if payload.severity:
+                outbox_query = outbox_query.filter(SecurityEventOutbox.severity.ilike(f"%{payload.severity}%"))
+            outbox_events = outbox_query.order_by(SecurityEventOutbox.id.desc()).limit(50).all()
+            for ob in outbox_events:
+                ts_iso = ob.created_at.isoformat() if hasattr(ob.created_at, "isoformat") else str(ob.created_at)
+                results.append(
+                    ThreatHuntSearchResultItem(
+                        event_id=ob.event_id,
+                        source_type="outbox_event",
+                        timestamp=ts_iso,
+                        source_ip=None,
+                        destination_ip=None,
+                        protocol=None,
+                        severity=ob.severity,
+                        risk_score=None,
+                        summary=f"Outbox: {ob.event_type} ({ob.resource_id})",
+                        metadata={"cursor": ob.id, "correlation_id": ob.correlation_id},
+                    )
+                )
+
+        # Sort descending by timestamp
+        results.sort(key=lambda r: r.timestamp, reverse=True)
+        total = len(results)
+
+        # Paginate
+        paginated = results[payload.offset : payload.offset + payload.limit]
+        elapsed_ms = round((time.perf_counter() - start_perf) * 1000, 2)
+
+        return ThreatHuntSearchResponse(
+            results=paginated,
+            total=total,
+            execution_time_ms=elapsed_ms,
+            filters_applied=filters_applied,
+        )
+
+    def create_saved_hunt(
+        self,
+        payload: SavedHuntCreateRequest,
+        operator: Operator,
+    ) -> SavedHunt:
+        """Create and persist an authorized threat hunting query."""
+        if not operator.has_permission("hunt:create"):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Operator lacks hunt:create permission",
+            )
+        now_iso = datetime.now(timezone.utc).isoformat()
+        saved_id = f"saved-{uuid.uuid4().hex[:12]}"
+        hunt = SavedHunt(
+            id=saved_id,
+            name=payload.name,
+            description=payload.description,
+            filter_criteria=payload.filter_criteria,
+            visibility=payload.visibility,
+            created_by=operator.username,
+            created_at=now_iso,
+            updated_at=now_iso,
+        )
+        return default_saved_hunt_store.save_hunt(hunt)
+
+    def list_saved_hunts(self, operator: Operator) -> list[SavedHunt]:
+        """List saved hunts accessible to the current operator."""
+        return default_saved_hunt_store.list_hunts(operator.username)
+
+    def get_saved_hunt(self, hunt_id: str, operator: Operator) -> SavedHunt:
+        """Retrieve a saved hunt verifying ownership or team visibility."""
+        hunt = default_saved_hunt_store.get_hunt(hunt_id)
+        if not hunt:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Saved hunt '{hunt_id}' not found",
+            )
+        is_admin = operator.role in ("admin", "security_administrator") or operator.has_permission("hunt:admin")
+        if hunt.visibility == "private" and hunt.created_by != operator.username and not is_admin:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not authorized to access private saved hunt",
+            )
+        return hunt
+
+    def delete_saved_hunt(self, hunt_id: str, operator: Operator) -> bool:
+        """Delete a saved hunt."""
+        is_admin = operator.role in ("admin", "security_administrator") or operator.has_permission("hunt:admin")
+        deleted = default_saved_hunt_store.delete_hunt(hunt_id, operator.username, is_admin=is_admin)
+        if not deleted:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Saved hunt '{hunt_id}' not found",
+            )
+        return True
+
+    def execute_saved_hunt(
+        self,
+        hunt_id: str,
+        db: Session,
+        operator: Operator,
+    ) -> ThreatHuntSearchResponse:
+        """Execute a saved hunt re-validating operator permissions."""
+        saved = self.get_saved_hunt(hunt_id, operator)
+        search_req = ThreatHuntSearchRequest(**saved.filter_criteria)
+        return self.search_telemetry(payload=search_req, db=db, operator=operator)
 
 
 # Default singleton instance

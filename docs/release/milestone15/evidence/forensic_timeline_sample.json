@@ -1,0 +1,57 @@
+{
+  "attack_id": 1,
+  "case_id": "CASE-2026-8400",
+  "timeline": [
+    {
+      "stage": "sensor_ingest",
+      "timestamp": "2026-11-06T02:50:00.000000+00:00",
+      "source_event_time": "2026-11-06T02:49:58.500000+00:00",
+      "server_receipt_time": "2026-11-06T02:50:00.000000+00:00",
+      "component": "SCOUT Ingest Engine",
+      "description": "Sensor received SSH authentication failure on decoy port 2222",
+      "metadata": {
+        "source_ip": "198.51.100.45",
+        "port": 2222
+      }
+    },
+    {
+      "stage": "correlation_and_detection",
+      "timestamp": "2026-11-06T02:50:01.000000+00:00",
+      "source_event_time": null,
+      "server_receipt_time": null,
+      "component": "Detection Engine",
+      "description": "Triggered rule AUTH_BRUTE_FORCE (Severity: high)",
+      "metadata": {
+        "rule_id": "AUTH_BRUTE_FORCE",
+        "base_risk_score": 8.0
+      }
+    },
+    {
+      "stage": "alert_confirmation",
+      "timestamp": "2026-11-06T02:50:01.500000+00:00",
+      "source_event_time": null,
+      "server_receipt_time": null,
+      "component": "SENTINEL Anomaly Engine",
+      "description": "Alert #1 confirmed: Repeated SSH Login Failures",
+      "metadata": {
+        "alert_id": 1,
+        "mitre_tactic": "Credential Access"
+      }
+    },
+    {
+      "stage": "outbox_sequencing",
+      "timestamp": "2026-11-06T02:50:02.000000+00:00",
+      "source_event_time": null,
+      "server_receipt_time": null,
+      "component": "Transactional Outbox",
+      "description": "Security event queued with monotonic sequence #42",
+      "metadata": {
+        "sequence_id": 42,
+        "correlation_id": "corr-98726-a0"
+      }
+    }
+  ],
+  "total_stages": 4,
+  "clock_skew_detected": true
+}
+

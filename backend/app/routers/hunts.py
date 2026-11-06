@@ -30,6 +30,10 @@ from app.schemas import (
     HuntPromotionResponse,
     HuntUpdateRequest,
     ListHuntResponse,
+    SavedHunt,
+    SavedHuntCreateRequest,
+    ThreatHuntSearchRequest,
+    ThreatHuntSearchResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -85,6 +89,107 @@ def get_hunt_metrics(
 ) -> HuntMetricsResponse:
     """Retrieve operational KPIs for SOC console header ribbon."""
     return default_hunt_service.store.get_metrics()
+
+
+@router.post(
+    "/search",
+    response_model=ThreatHuntSearchResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Multi-dimensional retrospective search across security events",
+)
+def search_threat_telemetry(
+    payload: ThreatHuntSearchRequest,
+    operator: Operator = Depends(require_permission("hunt:view")),
+    db: Session = Depends(get_db),
+) -> ThreatHuntSearchResponse:
+    """Execute high-speed, parameterized search across attacks, alerts, and outbox events."""
+    return default_hunt_service.search_telemetry(
+        payload=payload,
+        db=db,
+        operator=operator,
+    )
+
+
+@router.get(
+    "/saved",
+    response_model=list[SavedHunt],
+    status_code=status.HTTP_200_OK,
+    summary="List saved threat hunting queries",
+)
+def list_saved_hunts(
+    operator: Operator = Depends(require_permission("hunt:view")),
+) -> list[SavedHunt]:
+    """Retrieve saved queries accessible to the operator (own private + team queries)."""
+    return default_hunt_service.list_saved_hunts(operator=operator)
+
+
+@router.post(
+    "/saved",
+    response_model=SavedHunt,
+    status_code=status.HTTP_201_CREATED,
+    summary="Save a threat hunting search configuration",
+)
+def create_saved_hunt(
+    payload: SavedHuntCreateRequest,
+    operator: Operator = Depends(require_permission("hunt:create")),
+) -> SavedHunt:
+    """Persist an authorized search configuration for team collaboration or scheduled hunting."""
+    return default_hunt_service.create_saved_hunt(
+        payload=payload,
+        operator=operator,
+    )
+
+
+@router.get(
+    "/saved/{saved_hunt_id}",
+    response_model=SavedHunt,
+    status_code=status.HTTP_200_OK,
+    summary="Retrieve a single saved threat hunting query",
+)
+def get_saved_hunt(
+    saved_hunt_id: str,
+    operator: Operator = Depends(require_permission("hunt:view")),
+) -> SavedHunt:
+    """Retrieve saved query definition with authorization validation."""
+    return default_hunt_service.get_saved_hunt(
+        hunt_id=saved_hunt_id,
+        operator=operator,
+    )
+
+
+@router.delete(
+    "/saved/{saved_hunt_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a saved threat hunting query",
+)
+def delete_saved_hunt(
+    saved_hunt_id: str,
+    operator: Operator = Depends(require_permission("hunt:update")),
+) -> None:
+    """Delete a saved query ensuring only owner or admin can remove."""
+    default_hunt_service.delete_saved_hunt(
+        hunt_id=saved_hunt_id,
+        operator=operator,
+    )
+
+
+@router.post(
+    "/saved/{saved_hunt_id}/execute",
+    response_model=ThreatHuntSearchResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Execute a saved threat hunting query",
+)
+def execute_saved_hunt(
+    saved_hunt_id: str,
+    operator: Operator = Depends(require_permission("hunt:execute")),
+    db: Session = Depends(get_db),
+) -> ThreatHuntSearchResponse:
+    """Execute a saved search with dynamic operator authorization re-validation."""
+    return default_hunt_service.execute_saved_hunt(
+        hunt_id=saved_hunt_id,
+        db=db,
+        operator=operator,
+    )
 
 
 @router.post(

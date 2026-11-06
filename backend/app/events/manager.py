@@ -69,10 +69,44 @@ class RealtimeConnectionManager:
                 default_metrics_collector.increment_ws_disconnect()
                 logger.info("Realtime WS disconnected: operator=%s total_ws=%d", operator.username, len(self._active_connections))
 
+    async def revoke_operator_connections(self, operator_username: str, reason: str = "Operator session revoked") -> int:
+        """Immediately disconnect all active WebSockets associated with operator_username (RFC 6455 close code 1008)."""
+        to_disconnect: list[WebSocket] = []
+        async with self._lock:
+            for ws, op in list(self._active_connections.items()):
+                if op.username == operator_username:
+                    to_disconnect.append(ws)
+
+        for ws in to_disconnect:
+            try:
+                # 1008: Policy Violation (RFC 6455)
+                await ws.close(code=1008, reason=reason)
+            except Exception:
+                pass
+            await self.disconnect(ws)
+            default_metrics_collector.increment_stream_revocation()
+
+        if to_disconnect:
+            logger.info("Revoked and closed %d active WebSocket(s) for operator %s", len(to_disconnect), operator_username)
+        return len(to_disconnect)
+
+    def revoke_operator_connections_sync(self, operator_username: str, reason: str = "Operator session revoked") -> int:
+        """Synchronous bridge to revoke operator connections across active event loops or background threads."""
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(self.revoke_operator_connections(operator_username, reason))
+            return 1
+        except RuntimeError:
+            try:
+                return asyncio.run(self.revoke_operator_connections(operator_username, reason))
+            except Exception:
+                return 0
+
     async def broadcast_event(self, envelope: SecurityEventEnvelope) -> None:
-        """Broadcast event to all authorized active connections."""
-        # Record into replay store first
-        default_event_store.append(envelope)
+        """Broadcast event to all authorized active connections with Zero-Trust operator revalidation."""
+        # Ensure event is recorded in replay store if not already appended
+        if envelope.cursor is None or envelope.cursor == 0:
+            default_event_store.append(envelope)
 
         serialized = envelope.model_dump_json()
 
@@ -83,7 +117,21 @@ class RealtimeConnectionManager:
             connections_snapshot = list(self._active_connections.items())
 
         for ws, op in connections_snapshot:
-            if not can_operator_view_event(op, envelope.event_type):
+            # Zero-Trust Active Revalidation: Verify operator is still active in registry
+            from app.auth.registry import default_operator_registry
+            current_op = default_operator_registry.get_operator(op.username)
+            if not current_op or not getattr(current_op, "is_active", True):
+                logger.warning("Zero-Trust stream policy: Operator %s is revoked/inactive; terminating socket", op.username)
+                try:
+                    await ws.close(code=1008, reason="Operator session revoked")
+                except Exception:
+                    pass
+                dead_sockets.append(ws)
+                default_metrics_collector.increment_stream_revocation()
+                continue
+
+            if not can_operator_view_event(current_op, envelope.event_type):
+                default_metrics_collector.increment_authorization_failure()
                 continue
 
             try:

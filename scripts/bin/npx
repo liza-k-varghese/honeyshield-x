@@ -1,0 +1,2 @@
+#!/bin/sh
+exec node /home/liza/.cache/node/corepack/npm/10.8.2/bin/npx-cli.js "$@"

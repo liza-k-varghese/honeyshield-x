@@ -19,6 +19,7 @@ from app.routers import (
     deception,
     detection,
     detection_rules,
+    evidence,
     hunts,
     incident_command,
     ingestion,
@@ -94,6 +95,7 @@ app.include_router(replay.router, prefix="/api/v1")
 app.include_router(audit.router, prefix="/api/v1")
 app.include_router(incident_command.router, prefix="/api/v1")
 app.include_router(cases.router, prefix="/api/v1")
+app.include_router(evidence.router, prefix="/api/v1")
 app.include_router(deception.router, prefix="/api/v1")
 app.include_router(integrations.router, prefix="/api/v1")
 app.include_router(campaigns.router, prefix="/api/v1")

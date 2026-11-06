@@ -24,6 +24,7 @@ import { colors, typography, spacing } from '../../theme';
 import { HeaderBar } from '../../components/hud/HeaderBar';
 import { CyberPanel } from '../../components/hud/CyberPanel';
 import { KpiCard } from '../../components/kpi/KpiCard';
+import { DigitalAgentStatusPanel } from '../../components/agents/DigitalAgentStatusPanel';
 import { socApi } from '../../api/soc.api';
 import { DashboardStats, AttackSummary } from '../../types';
 import { useRealtimeEvents } from '../../hooks/useRealtimeEvents';
@@ -37,60 +38,25 @@ export const SocDashboardScreen: React.FC<SocDashboardProps> = ({ navigation }) 
   const [recentAttacks, setRecentAttacks] = useState<AttackSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { connectionState } = useRealtimeEvents((event) => {
+  const { connectionState, lastEvent, lastCursor } = useRealtimeEvents((event) => {
     fetchDashboardData();
   });
 
   const fetchDashboardData = async () => {
+    setErrorMessage(null);
     try {
       const [statsData, attacksData] = await Promise.all([
-        socApi.getDashboardStats().catch(() => ({
-          total_attacks: 1248,
-          total_events: 5824,
-          active_alerts: 14,
-          critical_threats: 3,
-          system_health: 'optimal' as const,
-          risk_index: 74,
-        })),
-        socApi.getAttacks(6).catch(() => [
-          {
-            id: 101,
-            source_ip: '192.168.1.144',
-            protocol: 'SSH',
-            timestamp: new Date().toISOString(),
-            risk_score: 92,
-            country_code: 'US',
-            status: 'ACTIVE_PROBE',
-            mitre_tactics: ['Initial Access', 'Credential Access'],
-          },
-          {
-            id: 102,
-            source_ip: '10.0.2.18',
-            protocol: 'HTTP',
-            timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-            risk_score: 84,
-            country_code: 'NL',
-            status: 'SQLi_BLOCKED',
-            mitre_tactics: ['Exploit Public-Facing App'],
-          },
-          {
-            id: 103,
-            source_ip: '172.16.4.88',
-            protocol: 'RDP',
-            timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-            risk_score: 65,
-            country_code: 'DE',
-            status: 'BRUTE_FORCE',
-            mitre_tactics: ['Credential Dumping'],
-          },
-        ]),
+        socApi.getDashboardStats(),
+        socApi.getAttacks(6),
       ]);
 
       setStats(statsData);
       setRecentAttacks(attacksData);
-    } catch {
-      // Handled with fallbacks
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail || err?.message || 'Failed to connect to SOC backend';
+      setErrorMessage(msg);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -150,6 +116,19 @@ export const SocDashboardScreen: React.FC<SocDashboardProps> = ({ navigation }) 
             />
           }
         >
+          {errorMessage && (
+            <View style={styles.errorBanner}>
+              <ShieldAlert color={colors.critical} size={18} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.errorTitle}>BACKEND TELEMETRY DEGRADED</Text>
+                <Text style={styles.errorMessage}>{errorMessage}</Text>
+              </View>
+              <TouchableOpacity style={styles.retryButton} onPress={fetchDashboardData}>
+                <Text style={styles.retryText}>RETRY</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           {/* Top KPI Telemetry Grid (2x2 Mobile Layout) */}
           <View style={styles.kpiRow}>
             <KpiCard
@@ -185,6 +164,13 @@ export const SocDashboardScreen: React.FC<SocDashboardProps> = ({ navigation }) 
             />
           </View>
 
+          {/* Cross-Platform Digital Agent Universe Panel */}
+          <DigitalAgentStatusPanel
+            connectionState={connectionState}
+            lastCursor={lastCursor}
+            latestEvent={lastEvent}
+          />
+
           {/* System 1 Health & Pipeline Banner */}
           <CyberPanel glowColor="blue" style={styles.pipelineCard}>
             <View style={styles.pipelineRow}>
@@ -214,7 +200,14 @@ export const SocDashboardScreen: React.FC<SocDashboardProps> = ({ navigation }) 
             </TouchableOpacity>
           </View>
 
-          {recentAttacks.map((attack) => (
+          {recentAttacks.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <ShieldAlert color={colors.textMuted} size={32} />
+              <Text style={styles.emptyTitle}>NO ATTACK SESSIONS RECORDED</Text>
+              <Text style={styles.emptySubtitle}>Sensors and honeypot traps are active and listening.</Text>
+            </View>
+          ) : (
+            recentAttacks.map((attack) => (
             <TouchableOpacity
               key={attack.id}
               activeOpacity={0.75}
@@ -276,7 +269,7 @@ export const SocDashboardScreen: React.FC<SocDashboardProps> = ({ navigation }) 
                 )}
               </CyberPanel>
             </TouchableOpacity>
-          ))}
+          )))}
         </ScrollView>
       )}
     </View>
@@ -478,6 +471,68 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#94a3b8',
     letterSpacing: 0.5,
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(239, 68, 68, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+    borderRadius: 6,
+    padding: spacing.sm,
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  errorTitle: {
+    fontFamily: typography.fontFamily,
+    fontSize: 10,
+    fontWeight: typography.weights.bold,
+    color: colors.critical,
+    letterSpacing: 0.8,
+  },
+  errorMessage: {
+    fontFamily: typography.fontFamilySans,
+    fontSize: 11,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  retryButton: {
+    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+    borderWidth: 1,
+    borderColor: colors.critical,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  retryText: {
+    fontFamily: typography.fontFamily,
+    fontSize: 9,
+    fontWeight: typography.weights.bold,
+    color: colors.critical,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.xl,
+    backgroundColor: colors.surfaceElevated,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 6,
+    gap: spacing.xs,
+  },
+  emptyTitle: {
+    fontFamily: typography.fontFamily,
+    fontSize: 12,
+    fontWeight: typography.weights.bold,
+    color: colors.textSecondary,
+    letterSpacing: 1,
+    marginTop: 6,
+  },
+  emptySubtitle: {
+    fontFamily: typography.fontFamilySans,
+    fontSize: 11,
+    color: colors.textMuted,
+    textAlign: 'center',
   },
 });
 

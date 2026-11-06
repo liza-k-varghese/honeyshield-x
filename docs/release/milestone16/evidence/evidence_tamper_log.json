@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-11-06T04:16:30Z",
+  "audit_event": "evidence_tamper_verification",
+  "evidence_id": "evi-m16-test-01",
+  "case_id": "case-m16-sec-01",
+  "original_record": {
+    "source_type": "honeypot",
+    "stored_sha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+    "canonical_form": "{\"command\":\"uname -a\",\"ip\":\"192.168.1.55\"}"
+  },
+  "tamper_injection": {
+    "mutated_field": "command",
+    "tampered_value": "cat /etc/shadow"
+  },
+  "verification_result": {
+    "calculated_sha256": "81f2157a9fbb1389e18b4526df61cae936e76cf0a1c6a2824cf45e0f7e2a942b",
+    "is_tampered": true,
+    "status": "tampered",
+    "detail": "Cryptographic digest mismatch: stored=4b227777... vs calculated=81f2157a..."
+  },
+  "containment_action": "EVIDENCE_FLAGGED_TAMPERED_ALERT_EMITTED",
+  "trust_boundary_scope": "application-level verification"
+}
+

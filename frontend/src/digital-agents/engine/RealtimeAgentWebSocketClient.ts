@@ -176,9 +176,18 @@ export class RealtimeAgentWebSocketClient {
         // Handled in onclose
       };
 
-      ws.onclose = () => {
+      ws.onclose = (ev?: CloseEvent) => {
         this.stopHeartbeat();
         this.ws = null;
+        if (ev && (ev.code === 1008 || ev.code === 4001 || ev.code === 4003)) {
+          console.warn('[RealtimeWS] Connection closed by server due to authorization revocation:', ev.code);
+          this.isExplicitlyClosed = true;
+          this.setState('disconnected');
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('session-expired'));
+          }
+          return;
+        }
         if (!this.isExplicitlyClosed) {
           this.scheduleReconnect();
         } else {

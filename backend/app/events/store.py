@@ -145,6 +145,7 @@ class EventStore:
         self,
         event: SecurityEventEnvelope,
         db: Session | None = None,
+        defer_cache: bool = False,
     ) -> SecurityEventEnvelope:
         """Persist event to PostgreSQL outbox, assign cursor, and append to cache."""
         persisted_id: int | None = None
@@ -198,16 +199,24 @@ class EventStore:
         except Exception as e:
             logger.warning("Persistent outbox write bypassed (using in-memory sequencing): %s", e)
 
-        with self._lock:
-            if persisted_id is not None:
-                event.cursor = persisted_id
+        if persisted_id is not None:
+            event.cursor = persisted_id
+            with self._lock:
                 if persisted_id > self._cursor_counter:
                     self._cursor_counter = persisted_id
-            else:
+        else:
+            with self._lock:
                 self._cursor_counter += 1
                 event.cursor = self._cursor_counter
 
-            self._buffer.append(event)
+        # If deferred until transaction commit, do not commit to ring buffer or stream yet
+        if defer_cache:
+            return event
+
+        with self._lock:
+            # Deduplicate buffer append if already present
+            if not any(e.event_id == event.event_id for e in self._buffer):
+                self._buffer.append(event)
 
         # 2. Mirror to Redis Stream if available
         if self._redis_client is not None:
@@ -221,6 +230,28 @@ class EventStore:
                 logger.warning("Redis stream append failed: %s", e)
 
         return event
+
+    def commit_pending_envelope(self, event: SecurityEventEnvelope) -> None:
+        """Commit an outbox envelope to the memory buffer and Redis stream post-transaction."""
+        with self._lock:
+            if event.cursor and event.cursor > self._cursor_counter:
+                self._cursor_counter = event.cursor
+            if not any(e.event_id == event.event_id for e in self._buffer):
+                self._buffer.append(event)
+
+        if self._redis_client is not None:
+            try:
+                self._redis_client.xadd(
+                    REDIS_EVENT_STREAM_KEY,
+                    {"data": event.model_dump_json()},
+                    maxlen=self._max_buffer,
+                )
+            except Exception as e:
+                logger.warning("Redis stream post-commit append failed: %s", e)
+
+    def abort_pending_envelope(self, event: SecurityEventEnvelope) -> None:
+        """Discard an uncommitted envelope after a transaction rollback."""
+        logger.info("Outbox envelope %s safely aborted following transaction rollback", event.event_id)
 
     def replay(
         self,

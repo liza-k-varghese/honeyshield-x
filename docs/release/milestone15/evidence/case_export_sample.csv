@@ -1,0 +1,15 @@
+# HoneyShield-X Forensic Case Export,CASE-2026-8400
+Title,Investigation: APT-29 SSH Decoy Probe
+Severity,high
+Status,new
+Assignee,investigator_m15
+Created At,2026-11-06T02:53:11.666213+00:00
+
+--- FORENSIC EVIDENCE RECORDS ---
+Evidence ID,Source Type,Source Record ID,Description,SHA-256 Digest,Collected At
+evd-a810f52b65ec,honeypot,atk-1,Decoy SSH session pcap snapshot,3c7f99e31d47342981775f0a6d51bb1227091d37a28892f390e1819717db4a0f,2026-11-06T02:53:11.666213+00:00
+
+--- INVESTIGATION NOTES ---
+Note ID,Author,Timestamp,Message
+8e95e21b,investigator_m15,2026-11-06T02:53:11.667172+00:00,"'=SUM(1,2)*cmd|' /C calc'!A0"
+

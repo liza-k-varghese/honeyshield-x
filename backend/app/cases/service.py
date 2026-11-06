@@ -154,6 +154,7 @@ class CaseManagementService:
             closed_by=None,
             playbook_progress=0.0,
             advisory_summary=None,
+            visibility=getattr(payload, "visibility", "team"),
         )
 
         new_case.advisory_summary = generate_advisory_summary(new_case)

@@ -121,6 +121,40 @@ class MetricsCollector:
             self.websocket_auth_failures += 1
             self._error_counts["WEBSOCKET_AUTH_FAILED"] += 1
 
+    def increment_session_validation_failure(self) -> None:
+        with self._lock:
+            self.session_validation_failures += 1
+            self._error_counts["SESSION_VALIDATION_FAILED"] += 1
+
+    def increment_ticket_replay(self) -> None:
+        with self._lock:
+            self.ticket_replay_attempts += 1
+            self._error_counts["TICKET_REPLAY_ATTEMPT"] += 1
+
+    def increment_ticket_expiration(self) -> None:
+        with self._lock:
+            self.ticket_expirations_total += 1
+            self._error_counts["TICKET_EXPIRED"] += 1
+
+    def increment_stream_revocation(self) -> None:
+        with self._lock:
+            self.stream_revocations_total += 1
+            self._error_counts["STREAM_REVOCATION"] += 1
+
+    def increment_auth_coordination_failure(self) -> None:
+        with self._lock:
+            self.auth_coordination_failures += 1
+            self._error_counts["AUTH_COORDINATION_FAILED"] += 1
+
+    def increment_reconnection_attempt(self) -> None:
+        with self._lock:
+            self.reconnection_attempts_total += 1
+
+    def increment_authorization_failure(self) -> None:
+        with self._lock:
+            self.authorization_failures_total += 1
+            self._error_counts["AUTHORIZATION_FAILED"] += 1
+
     def record_ingest(self, count: int = 1, is_error: bool = False) -> None:
         with self._lock:
             if is_error:
@@ -163,6 +197,15 @@ class MetricsCollector:
                     "total_connects": self.total_websocket_connects,
                     "total_disconnects": self.total_websocket_disconnects,
                     "auth_failures": self.websocket_auth_failures,
+                    "stream_revocations": self.stream_revocations_total,
+                    "reconnections_total": self.reconnection_attempts_total,
+                },
+                "auth_security": {
+                    "session_validation_failures": self.session_validation_failures,
+                    "ticket_replay_attempts": self.ticket_replay_attempts,
+                    "ticket_expirations_total": self.ticket_expirations_total,
+                    "auth_coordination_failures": self.auth_coordination_failures,
+                    "authorization_failures_total": self.authorization_failures_total,
                 },
                 "event_pipeline": {
                     "ingested_events_total": self.ingested_events_total,

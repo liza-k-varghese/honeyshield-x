@@ -1,0 +1,9 @@
+{
+  "evidence_id": "evd-a810f52b65ec",
+  "verified": true,
+  "stored_digest": "3c7f99e31d47342981775f0a6d51bb1227091d37a28892f390e1819717db4a0f",
+  "computed_digest": "3c7f99e31d47342981775f0a6d51bb1227091d37a28892f390e1819717db4a0f",
+  "verification_timestamp": "2026-11-06T02:53:11.666213+00:00",
+  "audit_note": "Cryptographic integrity confirmed. Payload matches stored SHA-256."
+}
+

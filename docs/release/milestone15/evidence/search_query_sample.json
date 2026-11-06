@@ -1,0 +1,37 @@
+{
+  "request": {
+    "source_ip": "198.51.100.45",
+    "event_type": null,
+    "severity": null,
+    "limit": 50,
+    "offset": 0
+  },
+  "response": {
+    "results": [
+      {
+        "event_id": "atk-1",
+        "source_type": "attack_container",
+        "timestamp": "2026-11-06T02:53:11.666213+00:00",
+        "source_ip": "198.51.100.45",
+        "destination_ip": "10.0.1.5",
+        "protocol": "TCP",
+        "severity": "high",
+        "risk_score": 8.5,
+        "summary": "Decoy SSH Port 2222: ssh_brute_force (198.51.100.45)",
+        "metadata": {
+          "attack_id": 1,
+          "attack_type": "ssh_brute_force",
+          "target_port": 2222
+        }
+      }
+    ],
+    "total": 1,
+    "execution_time_ms": 4.82,
+    "filters_applied": {
+      "source_ip": "198.51.100.45",
+      "limit": 50,
+      "offset": 0
+    }
+  }
+}
+

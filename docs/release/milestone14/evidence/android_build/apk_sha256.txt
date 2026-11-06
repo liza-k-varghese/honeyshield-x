@@ -1,0 +1,1 @@
+149be32f18df3436a26b8b88a748ae4b1282cf885760bf68fb2ae43bf0de38f2  release/v1.0.0-rc5/honeyshield-mobile-v1.0.0-rc5-debug.apk

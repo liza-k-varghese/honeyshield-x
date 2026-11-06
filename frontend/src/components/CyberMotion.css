@@ -1,0 +1,280 @@
+/* ==========================================================================
+   HONEYSHIELD X — CYBERNETIC MOTION DESIGN SYSTEM (CyberMotion.css)
+   Cinematic Dark Cyberpunk Visual Language & Responsive Motion Tokens
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Design Tokens & CSS Variables
+   -------------------------------------------------------------------------- */
+:root {
+  --hsx-bg-pitch: #03050a;
+  --hsx-bg-charcoal: #080c14;
+  --hsx-bg-card: #0c121e;
+  --hsx-bg-card-hover: #111a2b;
+  --hsx-border-dark: rgba(255, 255, 255, 0.07);
+  --hsx-border-crimson: rgba(239, 68, 68, 0.35);
+  --hsx-border-crimson-bright: rgba(239, 68, 68, 0.7);
+  --hsx-border-cyan: rgba(0, 240, 255, 0.3);
+  
+  --hsx-crimson: #ef4444;
+  --hsx-crimson-glow: rgba(239, 68, 68, 0.45);
+  --hsx-crimson-deep: #991b1b;
+  --hsx-cyan: #00f0ff;
+  --hsx-cyan-glow: rgba(0, 240, 255, 0.35);
+  --hsx-purple: #a855f7;
+
+  --hsx-ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --hsx-ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --hsx-ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --------------------------------------------------------------------------
+   Scanlines & Ambient Cyber Grids
+   -------------------------------------------------------------------------- */
+.cyber-scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-scanlines::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.015),
+    rgba(0, 255, 255, 0.01),
+    rgba(0, 0, 255, 0.015)
+  );
+  z-index: 2;
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.crimson-ambient-glow {
+  background: radial-gradient(
+    circle at 50% -10%,
+    rgba(239, 68, 68, 0.18) 0%,
+    rgba(239, 68, 68, 0.05) 35%,
+    transparent 70%
+  );
+}
+
+.crimson-corner-glow {
+  background: radial-gradient(
+    circle at 90% 10%,
+    rgba(239, 68, 68, 0.14) 0%,
+    transparent 55%
+  );
+}
+
+.cyber-fine-grid {
+  background-image: 
+    linear-gradient(rgba(239, 68, 68, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(239, 68, 68, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* --------------------------------------------------------------------------
+   Huge Outlined Typography (Landing Page Hero)
+   -------------------------------------------------------------------------- */
+.hsx-hero-outline {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.25);
+  letter-spacing: -0.04em;
+  line-height: 0.85;
+  user-select: none;
+  transition: -webkit-text-stroke 0.4s var(--hsx-ease-cinematic);
+}
+
+.hsx-hero-outline:hover {
+  -webkit-text-stroke: 1.5px rgba(239, 68, 68, 0.7);
+  filter: drop-shadow(0 0 35px rgba(239, 68, 68, 0.35));
+}
+
+.hsx-hero-solid {
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 50%, #64748b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   Badge: SECURITY. IN MOTION.
+   -------------------------------------------------------------------------- */
+.security-motion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid var(--hsx-crimson);
+  color: #ffffff;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  box-shadow: 0 0 15px -2px var(--hsx-crimson-glow);
+  position: relative;
+}
+
+.security-motion-badge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: var(--hsx-crimson);
+  border-radius: 1px;
+  box-shadow: 0 0 8px #ef4444;
+  animation: hsx-crimson-pulse 2s infinite ease-in-out;
+}
+
+@keyframes hsx-crimson-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* --------------------------------------------------------------------------
+   Tilt Card & Hover Interactions
+   -------------------------------------------------------------------------- */
+.cyber-tilt-card {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 0.25s var(--hsx-ease-out-cubic), 
+              box-shadow 0.25s var(--hsx-ease-out-cubic),
+              border-color 0.25s var(--hsx-ease-out-cubic);
+  border-radius: 0.5rem;
+  background: var(--hsx-bg-card);
+  border: 1px solid var(--hsx-border-dark);
+}
+
+.cyber-tilt-card:hover {
+  border-color: var(--hsx-border-crimson);
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.6), 
+              0 0 25px -4px rgba(239, 68, 68, 0.22);
+}
+
+.cyber-tilt-glare {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(239, 68, 68, 0.15) 0%,
+    rgba(255, 255, 255, 0.03) 30%,
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+
+.cyber-tilt-card:hover .cyber-tilt-glare {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Scroll Progress Laser
+   -------------------------------------------------------------------------- */
+.hsx-scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #dc2626, #ef4444, #00f0ff);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.75), 0 0 4px #00f0ff;
+  z-index: 9999;
+  transition: width 0.08s linear;
+}
+
+/* --------------------------------------------------------------------------
+   Curtain Transition
+   -------------------------------------------------------------------------- */
+.hsx-curtain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+}
+
+.hsx-curtain-panel {
+  flex: 1;
+  background-color: var(--hsx-bg-pitch);
+  transform: scaleY(0);
+  transition: transform 0.35s var(--hsx-ease-cinematic);
+}
+
+.hsx-curtain-top {
+  transform-origin: top;
+  border-bottom: 2px solid var(--hsx-crimson);
+  box-shadow: 0 4px 20px var(--hsx-crimson-glow);
+}
+
+.hsx-curtain-bottom {
+  transform-origin: bottom;
+  border-top: 2px solid var(--hsx-crimson);
+  box-shadow: 0 -4px 20px var(--hsx-crimson-glow);
+}
+
+.hsx-curtain-active .hsx-curtain-top,
+.hsx-curtain-active .hsx-curtain-bottom {
+  transform: scaleY(1);
+}
+
+/* --------------------------------------------------------------------------
+   Reveal Transitions
+   -------------------------------------------------------------------------- */
+.hsx-reveal-init {
+  opacity: 0;
+  will-change: opacity, transform;
+  transition-property: opacity, transform;
+  transition-timing-function: var(--hsx-ease-cinematic);
+}
+
+.hsx-reveal-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1) !important;
+}
+
+.hsx-reveal-up { transform: translate3d(0, 28px, 0); }
+.hsx-reveal-down { transform: translate3d(0, -28px, 0); }
+.hsx-reveal-left { transform: translate3d(28px, 0, 0); }
+.hsx-reveal-right { transform: translate3d(-28px, 0, 0); }
+.hsx-reveal-none { transform: translate3d(0, 0, 0); }
+
+/* --------------------------------------------------------------------------
+   Accessibility: Reduced Motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .cyber-tilt-card {
+    transform: none !important;
+  }
+  
+  .hsx-reveal-init {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  
+  .hsx-curtain-panel {
+    display: none !important;
+  }
+}

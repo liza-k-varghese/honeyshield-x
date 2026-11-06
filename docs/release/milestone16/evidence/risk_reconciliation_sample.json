@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-11-06T04:14:22Z",
+  "attack_id": "atk-2026-9041",
+  "source_ip": "45.142.214.88",
+  "attack_type": "ssh_bruteforce",
+  "raw_composite_score": 85.0,
+  "scale": "0-100",
+  "normalized_score_10": 8.5,
+  "explanation": {
+    "severity_factor": 40.0,
+    "threat_intel_factor": 35.0,
+    "volume_frequency_factor": 10.0,
+    "total_calculated": 85.0
+  },
+  "reconciliation_rule": "normalized_score_10 = round(composite_score / 10.0, 1)",
+  "status": "RECONCILED"
+}
+

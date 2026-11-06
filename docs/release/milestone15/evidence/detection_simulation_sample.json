@@ -1,0 +1,44 @@
+{
+  "rule_id": "AUTH_BRUTE_FORCE",
+  "rule_name": "Authentication Brute Force",
+  "simulation_mode": true,
+  "total_evaluated": 4,
+  "matched_count": 2,
+  "unmatched_count": 2,
+  "candidate_alerts": [
+    {
+      "rule_id": "AUTH_BRUTE_FORCE",
+      "rule_name": "Authentication Brute Force",
+      "severity": "high",
+      "base_risk_score": 8.0,
+      "matched_event": {
+        "message": "Failed root password attempt on port 2222",
+        "event_type": "auth_failed",
+        "ground_truth_malicious": true
+      },
+      "simulated_alert_type": "SIM_AUTH_BRUTE_FORCE"
+    },
+    {
+      "rule_id": "AUTH_BRUTE_FORCE",
+      "rule_name": "Authentication Brute Force",
+      "severity": "high",
+      "base_risk_score": 8.0,
+      "matched_event": {
+        "message": "User admin failed root password typo",
+        "event_type": "auth_failed",
+        "ground_truth_malicious": false
+      },
+      "simulated_alert_type": "SIM_AUTH_BRUTE_FORCE"
+    }
+  ],
+  "metrics": {
+    "true_positives": 1,
+    "false_positives": 1,
+    "true_negatives": 1,
+    "false_negatives": 1,
+    "precision": 0.5,
+    "recall": 0.5,
+    "f1_score": 0.5
+  }
+}
+

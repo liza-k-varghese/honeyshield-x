@@ -11,6 +11,7 @@ import {
   RefreshControl,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {
   Crosshair,
@@ -20,6 +21,7 @@ import {
   Radio,
   Flame,
   AlertCircle,
+  RefreshCw,
 } from 'lucide-react-native';
 import { colors, typography, spacing } from '../../theme';
 import { HeaderBar } from '../../components/hud/HeaderBar';
@@ -38,81 +40,26 @@ export const DeceptionDashboardScreen: React.FC<DeceptionDashboardProps> = ({ na
   const [canaries, setCanaries] = useState<CanaryToken[]>([]);
   const [hits, setHits] = useState<CanaryHit[]>([]);
   const [decoys, setDecoys] = useState<DecoyHost[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const fetchDeceptionState = async () => {
     try {
+      setErrorMessage(null);
       const [canariesData, hitsData, decoysData] = await Promise.all([
-        deceptionApi.getCanaries().catch(() => [
-          {
-            id: 'tok_01',
-            name: 'AWS_PROD_S3_KEY',
-            token_type: 'aws_keys' as const,
-            token_value: 'AKIAIOSFODNN7EXAMPLE',
-            memo: 'Seeded in root git repo of decoy web server',
-            created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-            is_active: true,
-            hit_count: 2,
-            last_triggered_at: new Date().toISOString(),
-          },
-          {
-            id: 'tok_02',
-            name: 'DB_ADMIN_MYSQL_TOKEN',
-            token_type: 'mysql' as const,
-            token_value: 'mysql://dbadmin:HoneyP@ss!@10.0.4.12/finance',
-            memo: 'Configured in /var/www/.env fake configuration',
-            created_at: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
-            is_active: true,
-            hit_count: 5,
-            last_triggered_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-          },
-        ]),
-        deceptionApi.getCanaryHits().catch(() => [
-          {
-            id: 'hit_101',
-            token_id: 'tok_01',
-            token_name: 'AWS_PROD_S3_KEY',
-            source_ip: '198.51.100.77',
-            location: 'Frankfurt, Germany',
-            timestamp: new Date().toISOString(),
-            severity: 'CRITICAL',
-          },
-          {
-            id: 'hit_102',
-            token_id: 'tok_02',
-            token_name: 'DB_ADMIN_MYSQL_TOKEN',
-            source_ip: '203.0.113.19',
-            location: 'Tokyo, Japan',
-            timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-            severity: 'CRITICAL',
-          },
-        ]),
-        deceptionApi.getDecoyHosts().catch(() => [
-          {
-            id: 'decoy_01',
-            name: 'FINANCE-DB-DECOY',
-            ip_address: '10.0.4.12',
-            emulated_service: 'MySQL 8.0 Emulation',
-            status: 'compromised' as const,
-            interactions_count: 48,
-          },
-          {
-            id: 'decoy_02',
-            name: 'CORP-DC-RODC-01',
-            ip_address: '10.0.2.20',
-            emulated_service: 'SMB / Kerberos Honeypot',
-            status: 'active' as const,
-            interactions_count: 14,
-          },
-        ]),
+        deceptionApi.getCanaries(),
+        deceptionApi.getCanaryHits(),
+        deceptionApi.getDecoyHosts(),
       ]);
 
-      setCanaries(canariesData);
-      setHits(hitsData);
-      setDecoys(decoysData);
-    } catch {
-      // Handled
+      setCanaries(Array.isArray(canariesData) ? canariesData : []);
+      setHits(Array.isArray(hitsData) ? hitsData : []);
+      setDecoys(Array.isArray(decoysData) ? decoysData : []);
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Failed to connect to Deception API service.');
     } finally {
+      setLoading(false);
       setRefreshing(false);
     }
   };
@@ -135,8 +82,8 @@ export const DeceptionDashboardScreen: React.FC<DeceptionDashboardProps> = ({ na
       );
       Alert.alert('Canary Token Minted', `Token ID: ${newToken.id || 'NEW_TOK'} successfully deployed to Deception Grid.`);
       fetchDeceptionState();
-    } catch {
-      Alert.alert('Minting Completed', 'Simulated tripwire token active in Active Deception Grid.');
+    } catch (err: any) {
+      Alert.alert('Minting Error', err?.message || 'Failed to mint canary token. Please check backend connection.');
     }
   };
 
@@ -148,18 +95,31 @@ export const DeceptionDashboardScreen: React.FC<DeceptionDashboardProps> = ({ na
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.cyan} />}
       >
+        {errorMessage && (
+          <CyberPanel glowColor="critical" style={styles.errorPanel}>
+            <View style={styles.errorHeader}>
+              <AlertCircle color={colors.critical} size={16} />
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            </View>
+            <TouchableOpacity style={styles.retryButton} onPress={fetchDeceptionState}>
+              <RefreshCw color={colors.textCyan} size={14} />
+              <Text style={styles.retryButtonText}>RETRY CONNECTIVITY</Text>
+            </TouchableOpacity>
+          </CyberPanel>
+        )}
+
         {/* KPI Summary Row */}
         <View style={styles.kpiRow}>
           <KpiCard
             label="MINTED CANARIES"
-            value={canaries.length}
+            value={loading ? '--' : canaries.length}
             subValue="Active Tripwires"
             glowColor="cyan"
             icon={<Key color={colors.cyan} size={16} />}
           />
           <KpiCard
             label="DECEPTION HITS"
-            value={hits.length}
+            value={loading ? '--' : hits.length}
             subValue="Tripped Traps"
             glowColor="critical"
             icon={<Flame color={colors.critical} size={16} />}
@@ -190,61 +150,85 @@ export const DeceptionDashboardScreen: React.FC<DeceptionDashboardProps> = ({ na
           <Text style={styles.sectionTitle}>REAL-TIME CANARY HIT LOG</Text>
         </View>
 
-        {hits.map((hit) => (
-          <CyberPanel key={hit.id} glowColor="critical" style={styles.hitCard}>
-            <View style={styles.hitHeader}>
-              <View style={styles.hitTokenRow}>
-                <AlertCircle color={colors.critical} size={16} />
-                <Text style={styles.tokenNameText}>{hit.token_name}</Text>
-              </View>
-              <SeverityBadge severity={hit.severity} />
-            </View>
-
-            <View style={styles.hitDetailRow}>
-              <Text style={styles.hitIp}>ATTACKER IP: {hit.source_ip}</Text>
-              <Text style={styles.hitLocation}>{hit.location || 'Unknown Geo'}</Text>
-            </View>
+        {loading ? (
+          <View style={styles.centerContainer}>
+            <ActivityIndicator size="small" color={colors.cyan} />
+            <Text style={styles.loadingText}>SYNCING DECEPTION TELEMETRY...</Text>
+          </View>
+        ) : hits.length === 0 ? (
+          <CyberPanel glowColor="optimal" style={styles.emptyPanel}>
+            <Text style={styles.emptyText}>NO DECEPTION TRIPS RECORDED</Text>
+            <Text style={styles.emptySubtext}>Canary tripwires are primed and monitored.</Text>
           </CyberPanel>
-        ))}
+        ) : (
+          hits.map((hit) => (
+            <CyberPanel key={hit.id} glowColor="critical" style={styles.hitCard}>
+              <View style={styles.hitHeader}>
+                <View style={styles.hitTokenRow}>
+                  <AlertCircle color={colors.critical} size={16} />
+                  <Text style={styles.tokenNameText}>{hit.token_name}</Text>
+                </View>
+                <SeverityBadge severity={hit.severity} />
+              </View>
+
+              <View style={styles.hitDetailRow}>
+                <Text style={styles.hitIp}>ATTACKER IP: {hit.source_ip}</Text>
+                <Text style={styles.hitLocation}>{hit.location || 'Unknown Geo'}</Text>
+              </View>
+            </CyberPanel>
+          ))
+        )}
 
         {/* Section: Emulated Decoy Hosts */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>ACTIVE DECOY HOSTS & HONEYPOTS</Text>
         </View>
 
-        {decoys.map((decoy) => (
-          <CyberPanel key={decoy.id} style={styles.decoyCard}>
-            <View style={styles.decoyHeader}>
-              <Text style={styles.decoyName}>{decoy.name}</Text>
-              <View
-                style={[
-                  styles.statusTag,
-                  {
-                    backgroundColor:
-                      decoy.status === 'compromised'
-                        ? 'rgba(239, 68, 68, 0.15)'
-                        : 'rgba(16, 185, 129, 0.15)',
-                    borderColor: decoy.status === 'compromised' ? colors.critical : colors.optimal,
-                  },
-                ]}
-              >
-                <Text
+        {loading ? (
+          <View style={styles.centerContainer}>
+            <ActivityIndicator size="small" color={colors.purple} />
+            <Text style={styles.loadingText}>PROBING DECOY MESH...</Text>
+          </View>
+        ) : decoys.length === 0 ? (
+          <CyberPanel glowColor="blue" style={styles.emptyPanel}>
+            <Text style={styles.emptyText}>NO ACTIVE DECOY HOSTS DEPLOYED</Text>
+            <Text style={styles.emptySubtext}>Honeypot nodes report telemetry once provisioned.</Text>
+          </CyberPanel>
+        ) : (
+          decoys.map((decoy) => (
+            <CyberPanel key={decoy.id} style={styles.decoyCard}>
+              <View style={styles.decoyHeader}>
+                <Text style={styles.decoyName}>{decoy.name}</Text>
+                <View
                   style={[
-                    styles.statusTagText,
-                    { color: decoy.status === 'compromised' ? colors.critical : colors.optimal },
+                    styles.statusTag,
+                    {
+                      backgroundColor:
+                        decoy.status === 'compromised'
+                          ? 'rgba(239, 68, 68, 0.15)'
+                          : 'rgba(16, 185, 129, 0.15)',
+                      borderColor: decoy.status === 'compromised' ? colors.critical : colors.optimal,
+                    },
                   ]}
                 >
-                  {decoy.status.toUpperCase()}
-                </Text>
+                  <Text
+                    style={[
+                      styles.statusTagText,
+                      { color: decoy.status === 'compromised' ? colors.critical : colors.optimal },
+                    ]}
+                  >
+                    {decoy.status.toUpperCase()}
+                  </Text>
+                </View>
               </View>
-            </View>
 
-            <View style={styles.decoyMeta}>
-              <Text style={styles.decoyIp}>IP: {decoy.ip_address}</Text>
-              <Text style={styles.decoyService}>{decoy.emulated_service}</Text>
-            </View>
-          </CyberPanel>
-        ))}
+              <View style={styles.decoyMeta}>
+                <Text style={styles.decoyIp}>IP: {decoy.ip_address}</Text>
+                <Text style={styles.decoyService}>{decoy.emulated_service}</Text>
+              </View>
+            </CyberPanel>
+          ))
+        )}
       </ScrollView>
     </View>
   );
@@ -380,6 +364,72 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontFamily,
     fontSize: typography.sizes.xs,
     color: colors.textSecondary,
+  },
+  errorPanel: {
+    marginBottom: spacing.md,
+    padding: spacing.md,
+  },
+  errorHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: spacing.xs,
+  },
+  errorText: {
+    fontFamily: typography.fontFamily,
+    fontSize: typography.sizes.xs,
+    color: colors.critical,
+    flex: 1,
+  },
+  retryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.xs,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: colors.cyan,
+  },
+  retryButtonText: {
+    fontFamily: typography.fontFamily,
+    fontSize: typography.sizes.xs,
+    color: colors.cyan,
+    fontWeight: typography.weights.bold,
+  },
+  centerContainer: {
+    padding: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    fontFamily: typography.fontFamily,
+    fontSize: typography.sizes.xs,
+    color: colors.textCyan,
+    marginTop: spacing.xs,
+    letterSpacing: 1,
+  },
+  emptyPanel: {
+    padding: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 4,
+  },
+  emptyText: {
+    fontFamily: typography.fontFamily,
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.bold,
+    color: colors.textPrimary,
+    letterSpacing: 1,
+  },
+  emptySubtext: {
+    fontFamily: typography.fontFamilySans,
+    fontSize: typography.sizes.xs,
+    color: colors.textSecondary,
+    marginTop: 4,
+    textAlign: 'center',
   },
 });
 

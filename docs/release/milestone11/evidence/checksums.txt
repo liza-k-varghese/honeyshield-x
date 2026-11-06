@@ -1,0 +1,1 @@
+60bff8331447493fbac98c462e4d8b493d5d77908d8e6a99fa3a421270f2adc4  release/v1.0.0-rc5/honeyshield-frontend-v1.0.0-rc5.tar.gz

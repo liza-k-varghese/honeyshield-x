@@ -21,6 +21,7 @@ from app.auth.registry import Operator, default_operator_registry
 from app.auth.session import default_session_store
 from app.database import Base
 from app.events.schemas import TransferLifecycleEvent
+from app.events.store import default_event_store
 from app.main import health as public_health_endpoint
 from app.observability.alerts import AlarmSeverity, default_alert_manager
 from app.observability.health import ServiceHealthStatus, evaluate_full_system_health
@@ -61,6 +62,9 @@ class TestMilestone8OperationalReadiness(unittest.TestCase):
 
     def setUp(self):
         self.db = self.SessionLocal()
+        default_metrics_collector.last_outbox_cursor = 0
+        default_event_store._buffer.clear()
+        default_event_store._cursor_counter = 0
 
     def tearDown(self):
         self.db.close()

@@ -1,0 +1,196 @@
+/* ==========================================================================
+   HONEYSHIELD X — CINEMATIC LANDING PAGE (HoneyShieldLanding.css)
+   Black and Charcoal Backgrounds with Crimson Accent Lighting
+   ========================================================================== */
+
+.hsx-landing-wrapper {
+  background-color: #03050a;
+  color: #f8fafc;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Ambient Radial Lighting */
+.hsx-landing-glow-top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1000px;
+  height: 600px;
+  background: radial-gradient(
+    ellipse at top,
+    rgba(239, 68, 68, 0.16) 0%,
+    rgba(239, 68, 68, 0.04) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hsx-landing-glow-cyan {
+  position: absolute;
+  top: 40%;
+  right: -100px;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 240, 255, 0.06) 0%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hsx-landing-glow-purple {
+  position: absolute;
+  bottom: 10%;
+  left: -150px;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(
+    circle,
+    rgba(168, 85, 247, 0.05) 0%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Editorial Title Sizing */
+.hsx-giant-title {
+  font-size: clamp(3.2rem, 11vw, 10.5rem);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  font-weight: 900;
+  margin: 0;
+}
+
+/* Action Buttons */
+.hsx-btn-crimson {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.9rem 2.2rem;
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  color: #ffffff;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.825rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid #f87171;
+  border-radius: 0.375rem;
+  box-shadow: 0 0 25px -4px rgba(239, 68, 68, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.hsx-btn-crimson:hover {
+  background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+  box-shadow: 0 0 35px 2px rgba(239, 68, 68, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.hsx-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.9rem 2rem;
+  background: rgba(10, 16, 32, 0.75);
+  color: #00f0ff;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.825rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 0.375rem;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 18px -4px rgba(0, 240, 255, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.hsx-btn-secondary:hover {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: #00f0ff;
+  color: #ffffff;
+  box-shadow: 0 0 25px 0 rgba(0, 240, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.hsx-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1.8rem;
+  background: transparent;
+  color: #94a3b8;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.825rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.hsx-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* Metric Ticker Item */
+.hsx-metric-box {
+  padding: 1.5rem;
+  background: rgba(12, 18, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.hsx-metric-box:hover {
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: translateY(-2px);
+}
+
+.hsx-metric-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #ef4444, transparent);
+  opacity: 0.8;
+}
+
+/* Agent Avatar Presentation Container */
+.hsx-agent-portrait {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hsx-agent-portrait:hover {
+  transform: scale(1.08);
+}

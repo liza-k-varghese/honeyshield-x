@@ -1,0 +1,18 @@
+Archive:  release/v1.0.0-rc5/honeyshield-mobile-v1.0.0-rc5-debug.apk
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+      706  2026-11-06 06:57   META-INF/MANIFEST.MF
+      868  2026-11-06 06:57   META-INF/HONEYSHI.SF
+     1574  2026-11-06 06:57   META-INF/HONEYSHI.RSA
+        0  2026-11-06 06:57   assets/
+   181534  2026-11-06 06:57   assets/index.android.bundle
+     1368  2026-11-06 06:57   assets/app.json
+        0  2026-11-06 06:56   res/
+        0  2026-11-06 06:57   res/drawable/
+    12466  2026-11-06 06:57   res/drawable/splash.png
+     2325  2026-11-06 06:57   res/drawable/icon.png
+     2325  2026-11-06 06:57   res/drawable/adaptive_icon.png
+     8580  2026-11-06 06:57   classes.dex
+     2961  2026-11-06 06:57   AndroidManifest.xml
+---------                     -------
+   214707                     13 files

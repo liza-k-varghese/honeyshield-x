@@ -14,6 +14,8 @@ import logging
 from typing import Any
 import uuid
 
+import sqlalchemy as sa
+
 from app.events.manager import default_connection_manager
 from app.events.schemas import SecurityEventEnvelope, SecurityEventSeverity
 from app.events.store import default_event_store
@@ -90,44 +92,69 @@ def publish_security_event(
         failure_reason=failure_reason,
     )
 
-    # 1. Record into durable outbox & ring buffer store
-    default_event_store.append(envelope, db=db)
-    default_metrics_collector.record_outbox(cursor=envelope.cursor)
+    def _dispatch_to_listeners() -> None:
+        default_metrics_collector.record_outbox(cursor=envelope.cursor)
 
-    # 2. Publish to legacy event bus for backwards compatibility
-    legacy_payload = dict(clean_payload)
-    legacy_payload.update({
-        "_resource_id": str(resource_id),
-        "_severity": severity,
-        "_cursor": envelope.cursor,
-        "_transfer_id": envelope.transfer_id,
-        "_workflow_id": envelope.workflow_id,
-        "_agent": envelope.agent,
-        "_stage": envelope.stage,
-        "_status": envelope.status,
-        "_source": envelope.source,
-        "_destination": envelope.destination,
-    })
-    try:
-        default_event_bus.publish_event(event_type, legacy_payload)
-    except Exception as e:
-        logger.warning("Legacy event bus publish failed: %s", e)
-
-    # 3. Broadcast to active WebSockets in event loop if running
-    try:
-        loop = asyncio.get_running_loop()
-        loop.create_task(default_connection_manager.broadcast_event(envelope))
-    except RuntimeError:
+        # 2. Publish to legacy event bus for backwards compatibility
+        legacy_payload = dict(clean_payload)
+        legacy_payload.update({
+            "_resource_id": str(resource_id),
+            "_severity": severity,
+            "_cursor": envelope.cursor,
+            "_transfer_id": envelope.transfer_id,
+            "_workflow_id": envelope.workflow_id,
+            "_agent": envelope.agent,
+            "_stage": envelope.stage,
+            "_status": envelope.status,
+            "_source": envelope.source,
+            "_destination": envelope.destination,
+        })
         try:
-            asyncio.run(default_connection_manager.broadcast_event(envelope))
+            default_event_bus.publish_event(event_type, legacy_payload)
         except Exception as e:
-            logger.debug("Async broadcast skipped (no event loop): %s", e)
+            logger.warning("Legacy event bus publish failed: %s", e)
 
-    # 4. Dispatch to push notification engine
-    try:
-        default_push_dispatcher.dispatch_event(envelope)
-    except Exception as e:
-        logger.warning("Push notification dispatch failed: %s", e)
+        # 3. Broadcast to active WebSockets in event loop if running
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(default_connection_manager.broadcast_event(envelope))
+        except RuntimeError:
+            try:
+                asyncio.run(default_connection_manager.broadcast_event(envelope))
+            except Exception as e:
+                logger.debug("Async broadcast skipped (no event loop): %s", e)
+
+        # 4. Dispatch to push notification engine
+        try:
+            default_push_dispatcher.dispatch_event(envelope)
+        except Exception as e:
+            logger.warning("Push notification dispatch failed: %s", e)
+
+    # Check if database session is in an active transaction
+    is_in_tx = False
+    if db is not None:
+        try:
+            is_in_tx = bool(db.in_transaction())
+        except Exception:
+            is_in_tx = False
+
+    if is_in_tx:
+        # Append to PostgreSQL outbox table within active transaction, deferring ring-buffer & broadcast until commit
+        default_event_store.append(envelope, db=db, defer_cache=True)
+
+        @sa.event.listens_for(db, "after_commit", once=True)
+        def _on_tx_commit(session: Any) -> None:
+            default_event_store.commit_pending_envelope(envelope)
+            _dispatch_to_listeners()
+
+        @sa.event.listens_for(db, "after_rollback", once=True)
+        def _on_tx_rollback(session: Any) -> None:
+            default_event_store.abort_pending_envelope(envelope)
+            logger.warning("Transaction rolled back: discarded event %s from outbox broadcast", envelope.event_id)
+    else:
+        # Non-transactional or standalone operation
+        default_event_store.append(envelope, db=db, defer_cache=False)
+        _dispatch_to_listeners()
 
     return envelope
 
