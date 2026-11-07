@@ -1,0 +1,24 @@
+HoneyShield X — Milestone 17 APK Structure & Android Native Audit
+Artifact: mobile/honeyshield-mobile-v1.0.0-rc5-debug.apk
+Size: 60,416 bytes
+Archive format: Zip archive data, at least v2.0 to extract
+Signature status: jar verified. (apksigner / jarsigner debug cert)
+
+ZIP Contents:
+- AndroidManifest.xml: 2,418 bytes [UTF-8 text, with CRLF line terminators]
+  * CRITICAL FINDING: Raw plaintext XML rather than compiled Android Binary XML (AXML).
+  * Causes runtime parse failure on real Android devices (INSTALL_PARSE_FAILED_UNEXPECTED_EXCEPTION).
+- classes.dex: 32,840 bytes [Dalvik dex file 035]
+- resources.arsc: [ABSENT - Missing compiled resource table]
+- META-INF/MANIFEST.MF
+- META-INF/CERT.SF
+- META-INF/CERT.RSA
+
+Remediation:
+- Restructured Android Gradle hierarchy in mobile/android/
+- Root settings.gradle and build.gradle
+- Module app/build.gradle with compileSdkVersion 34, minSdkVersion 26
+- Valid manifest app/src/main/AndroidManifest.xml
+- Full native build requires external Android SDK build-tools (aapt2, d8, android.jar).
+Hardware Status: NOT TESTED / BLOCKED (No attached physical device or ADB daemon on host).
+

@@ -22,6 +22,7 @@ import { useAuth } from '../context/AuthContext';
 
 export type TopNavView =
   | 'overview'
+  | 'landing'
   | 'universe'
   | 'dashboard'
   | 'command'
@@ -151,6 +152,19 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <LayoutDashboard className="w-3.5 h-3.5" />
               <span>Dashboard</span>
+            </button>
+
+            <button
+              onClick={() => onViewChange?.('landing')}
+              className={`px-3 py-1.5 rounded flex items-center space-x-1.5 transition-colors ${
+                activeView === 'landing'
+                  ? 'bg-red-950/90 text-red-300 border border-red-500/60 shadow-[0_0_15px_rgba(239,68,68,0.4)] font-bold'
+                  : 'text-red-400/90 hover:text-red-300 hover:bg-red-950/30'
+              }`}
+              title="Launch Cinematic Landing Experience"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-red-400 animate-pulse" />
+              <span>Cinematic</span>
             </button>
 
             <button

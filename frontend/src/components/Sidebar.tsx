@@ -19,6 +19,7 @@ import {
 
 export type SidebarNavId =
   | 'overview'
+  | 'landing'
   | 'universe'
   | 'analytics'
   | 'detection'
@@ -50,6 +51,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Overview',
       icon: LayoutDashboard,
       system: 'SYS 1',
+    },
+    {
+      id: 'landing' as SidebarNavId,
+      label: 'Cinematic Entry',
+      icon: Shield,
+      system: 'PORTAL',
     },
     {
       id: 'universe' as SidebarNavId,

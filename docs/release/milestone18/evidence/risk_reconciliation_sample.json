@@ -1,0 +1,17 @@
+{
+  "attack_id": 1,
+  "final_score": 85.0,
+  "severity": "high",
+  "model_version": "v1.0-deterministic",
+  "breakdown": {
+    "detection_vector_points": 40.0,
+    "threat_intel_points": 35.0,
+    "frequency_points": 10.0,
+    "total_score": 85.0
+  },
+  "narrative_explanation": "Server-derived risk score 85.0 (HIGH) for attack #1 (ssh_bruteforce). Components: Detection Vector Weight: 40.0 pts, Threat Intel Reputation: 35.0 pts, Frequency Scaling: 10.0 pts. Enforced under Deterministic Scoring Model v1.0.",
+  "evaluated_at": "2026-11-06T10:28:00Z",
+  "scale": "0-100",
+  "normalized_score_10": 8.5
+}
+

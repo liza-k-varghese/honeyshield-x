@@ -1,0 +1,80 @@
+name: HoneyShield X Android Build & Package Validation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/android-build.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'mobile/**'
+  workflow_dispatch:
+
+jobs:
+  build-android-apk:
+    name: Build & Verify Android Native APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Revision
+        uses: actions/checkout@v4
+
+      - name: Set up OpenJDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Setup Android SDK Tools
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0 cmdline-tools;latest'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verify Mobile Type Checking
+        run: |
+          cd mobile
+          npx tsc --noEmit
+
+      - name: Bundle React Native JavaScript Asset
+        run: |
+          cd mobile
+          npx esbuild index.js \
+            --bundle \
+            --minify \
+            --platform=neutral \
+            --packages=external \
+            --outfile=android/app/src/main/assets/index.android.bundle
+
+      - name: Grant Execute Permission to Gradle Wrapper
+        run: |
+          chmod +x mobile/android/gradlew || true
+
+      - name: Assemble Debug APK with Gradle
+        working-directory: mobile/android
+        run: |
+          gradle :app:assembleDebug --stacktrace --no-daemon
+
+      - name: Verify APK Binary Structure & Signature
+        working-directory: mobile/android
+        run: |
+          APK_PATH=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+          echo "Assembled APK: $APK_PATH"
+          $ANDROID_HOME/build-tools/34.0.0/aapt dump badging "$APK_PATH" | grep -E "package:|launchable-activity:|sdkVersion:"
+          $ANDROID_HOME/build-tools/34.0.0/apksigner verify --verbose "$APK_PATH"
+          sha256sum "$APK_PATH" > "$APK_PATH.sha256"
+
+      - name: Archive Android Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: honeyshield-mobile-v1.0.0-rc5-debug.apk
+          path: mobile/android/app/build/outputs/apk/debug/*.apk
+          retention-days: 14
+

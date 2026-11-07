@@ -278,3 +278,4 @@ export const CurtainTransition: React.FC<CurtainTransitionProps> = ({
     </div>
   );
 };
+

@@ -2,14 +2,12 @@ import React from 'react';
 import {
   ShieldAlert,
   Terminal,
-  Activity,
   ArrowRight,
   Lock,
   Cpu,
   Radio,
   ExternalLink,
   ChevronRight,
-  Database,
   Crosshair,
 } from 'lucide-react';
 import { Reveal, TiltCard, ScrollProgress, usePrefersReducedMotion } from './CyberMotion';
@@ -40,10 +38,15 @@ export const HoneyShieldLanding: React.FC<HoneyShieldLandingProps> = ({
   const { data: alerts = [] } = useAlerts('all');
   const { data: attacks = [] } = useAttacks(0, 50);
 
-  const activeAttacksCount = stats?.active_attacks ?? attacks.length;
+  const activeAttacksCount = stats?.total_attacks ?? attacks.length;
   const activeAlertsCount = stats?.active_alerts ?? alerts.filter((a) => a.status === 'open').length;
-  const activeHoneypotsCount = stats?.active_honeypots ?? 4;
-  const systemHealth = stats?.system_health ?? 'HEALTHY';
+  const activeHoneypotsCount = 4; // 4 core honeypot listeners: SSH, HTTP, Redis, SQL
+  const systemHealthStatus =
+    stats?.system_health &&
+    stats.system_health.api === 'ok' &&
+    stats.system_health.postgresql === 'ok'
+      ? 'HEALTHY'
+      : 'ONLINE';
   const highSeverityAlerts = alerts.filter(
     (a) => a.severity === 'critical' || a.severity === 'high'
   ).length;
@@ -200,7 +203,7 @@ export const HoneyShieldLanding: React.FC<HoneyShieldLandingProps> = ({
                     <span>System Health</span>
                   </div>
                   <div className="text-2xl sm:text-3xl font-mono font-bold text-white">
-                    {isStatsLoading ? 'SYNCING...' : systemHealth}
+                    {isStatsLoading ? 'SYNCING...' : systemHealthStatus}
                   </div>
                   <div className="text-[11px] font-mono text-emerald-400">
                     PostgreSQL + Redis Active

@@ -1,0 +1,3 @@
+rootProject.name = 'HoneyShieldX'
+include ':app'
+

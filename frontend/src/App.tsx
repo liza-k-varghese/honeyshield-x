@@ -4,7 +4,6 @@ import { Header } from './components/Header';
 import { Sidebar, SidebarNavId } from './components/Sidebar';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { MobileNavDrawer } from './components/MobileNavDrawer';
-import { CommandCenterView } from './components/command-center/CommandCenterView';
 import { BottomStatusBar } from './components/command-center/BottomStatusBar';
 import { KpiRibbon } from './components/KpiRibbon';
 import { AlertTable } from './components/AlertTable';
@@ -29,11 +28,14 @@ import { useAlerts, useDashboardStats, useAttacks } from './hooks/useDashboard';
 import { Alert, DetectionRuleSummary } from './types';
 import { Search, Network, ArrowRight, Shield, History, Sliders, FileText, BrainCircuit, Target } from 'lucide-react';
 import {
-  CompactAgentRibbon,
   UniverseModeView,
   useDigitalAgentUniverse,
   NexusAssistantModal,
 } from './digital-agents';
+
+import { Reveal, CurtainTransition } from './components/CyberMotion';
+import { HoneyShieldLanding } from './components/HoneyShieldLanding';
+import { UniverseCommandCenter } from './components/UniverseCommandCenter';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,6 +48,7 @@ const queryClient = new QueryClient({
 
 type HSXView =
   | 'overview'
+  | 'landing'
   | 'universe'
   | 'analytics'
   | 'alerts'
@@ -61,7 +64,15 @@ type HSXView =
   | 'rules';
 
 function DashboardContent() {
-  const [activeView, setActiveView] = useState<HSXView>('overview');
+  const [activeView, setActiveView] = useState<HSXView>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'landing') return 'landing';
+      if (window.location.hash === '#landing') return 'landing';
+    }
+    return 'overview';
+  });
+  const [isCurtainActive, setIsCurtainActive] = useState(false);
   const [rulesSubTab, setRulesSubTab] = useState<'catalog' | 'replay' | 'simulation' | 'audit'>('catalog');
   const [aiSubTab, setAiSubTab] = useState<'campaigns' | 'hunting'>('campaigns');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -164,6 +175,7 @@ function DashboardContent() {
   // Map activeView to Sidebar active ID
   const sidebarActiveId = useMemo<SidebarNavId>(() => {
     if (activeView === 'overview') return 'overview';
+    if (activeView === 'landing') return 'landing';
     if (activeView === 'universe') return 'universe';
     if (activeView === 'analytics' || activeView === 'dashboard') return 'analytics';
     if (activeView === 'rules') return rulesSubTab === 'audit' ? 'config' : 'detection';
@@ -182,6 +194,9 @@ function DashboardContent() {
     switch (id) {
       case 'overview':
         setActiveView('overview');
+        break;
+      case 'landing':
+        setActiveView('landing');
         break;
       case 'universe':
         setActiveView('universe');
@@ -240,8 +255,28 @@ function DashboardContent() {
     }
   };
 
+  if (activeView === 'landing') {
+    return (
+      <div className="min-h-screen bg-[#03050a] text-slate-100">
+        <CurtainTransition isActive={isCurtainActive} />
+        <HoneyShieldLanding
+          onNavigate={(view) => {
+            setIsCurtainActive(true);
+            setTimeout(() => {
+              setActiveView(view as HSXView);
+              setIsCurtainActive(false);
+            }, 180);
+          }}
+          onOpenLogin={() => setIsLoginModalOpen(true)}
+        />
+        <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#060913] cyber-grid-bg flex flex-col text-slate-100">
+      <CurtainTransition isActive={isCurtainActive} />
       {/* Top Navigation */}
       <Header
         health={stats?.system_health}
@@ -265,46 +300,50 @@ function DashboardContent() {
         {/* Content Area */}
         <main className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6 max-w-7xl w-full mx-auto pb-20 lg:pb-6">
           {activeView === 'overview' ? (
-            /* Flagship NEXUS SOC Command Centre (8 core panels) + Compact Digital Agents Ribbon */
-            <div className="space-y-4">
-              <CompactAgentRibbon
-                runtimeStatuses={runtimeStatuses}
-                onOpenUniverseMode={() => setActiveView('universe')}
-                onOpenAssistant={() => setIsAssistantModalOpen(true)}
-                onSelectAgent={(_id) => setActiveView('universe')}
-              />
-              <CommandCenterView
+            /* Flagship Universe SOC Command Center (Central Orbital Map & Observatory Consoles) */
+            <Reveal direction="up" duration={260} distance={12} className="space-y-4">
+              <UniverseCommandCenter
                 stats={stats}
                 alerts={alerts}
                 attacks={attacks}
-                onSelectAlert={(alert) => setSelectedAlert(alert)}
+                runtimeStatuses={runtimeStatuses}
+                activePackets={activePackets}
+                completedPackets={completedPackets}
+                failedPackets={failedPackets}
+                journeys={journeys}
+                isDemoMode={isDemoMode}
+                onToggleDemoMode={toggleDemoMode}
                 onInvestigateIp={handleDeepLinkInvestigate}
-                onReplayAttack={handleDeepLinkReplayAttack}
-                onSelectAttack={(_id) => setActiveView('rules')}
+                onNavigateView={(view) => setActiveView(view as HSXView)}
+                streamConnectionState={streamConnectionState}
+                streamMetrics={streamMetrics}
+                onOpenNexusAssistant={() => setIsAssistantModalOpen(true)}
               />
-            </div>
+            </Reveal>
           ) : activeView === 'universe' ? (
             /* Dedicated Fullscreen Digital Agent Universe (Stage 10) */
-            <UniverseModeView
-              runtimeStatuses={runtimeStatuses}
-              activePackets={activePackets}
-              completedPackets={completedPackets}
-              failedPackets={failedPackets}
-              handoffs={handoffs}
-              nodes={nodes}
-              connections={connections}
-              journeys={journeys}
-              isDemoMode={isDemoMode}
-              onToggleDemoMode={toggleDemoMode}
-              onSimulateState={simulateAgentState}
-              onExitUniverseMode={() => setActiveView('overview')}
-              onDeepLinkInvestigate={handleDeepLinkInvestigate}
-              streamConnectionState={streamConnectionState}
-              streamMetrics={streamMetrics}
-            />
+            <Reveal direction="up" duration={260} distance={12}>
+              <UniverseModeView
+                runtimeStatuses={runtimeStatuses}
+                activePackets={activePackets}
+                completedPackets={completedPackets}
+                failedPackets={failedPackets}
+                handoffs={handoffs}
+                nodes={nodes}
+                connections={connections}
+                journeys={journeys}
+                isDemoMode={isDemoMode}
+                onToggleDemoMode={toggleDemoMode}
+                onSimulateState={simulateAgentState}
+                onExitUniverseMode={() => setActiveView('overview')}
+                onDeepLinkInvestigate={handleDeepLinkInvestigate}
+                streamConnectionState={streamConnectionState}
+                streamMetrics={streamMetrics}
+              />
+            </Reveal>
           ) : activeView === 'analytics' || activeView === 'dashboard' ? (
             /* Module 3.1 & Analytics Overview */
-            <div className="space-y-6">
+            <Reveal direction="up" duration={260} distance={12} className="space-y-6">
               <KpiRibbon stats={stats} isLoading={isStatsLoading} />
               <AlertTable
                 alerts={alerts}
@@ -313,10 +352,10 @@ function DashboardContent() {
                 statusFilter={statusFilter}
                 onStatusFilterChange={(status) => setStatusFilter(status)}
               />
-            </div>
+            </Reveal>
           ) : activeView === 'alerts' ? (
             /* Dedicated Alerts Feed */
-            <div className="space-y-6">
+            <Reveal direction="up" duration={260} distance={12} className="space-y-6">
               <div className="p-4 rounded-lg bg-slate-950/80 border border-cyan-500/20 flex items-center justify-between">
                 <div>
                   <h2 className="text-sm font-bold text-white uppercase font-mono tracking-wider">
@@ -337,40 +376,50 @@ function DashboardContent() {
                 statusFilter={statusFilter}
                 onStatusFilterChange={(status) => setStatusFilter(status)}
               />
-            </div>
+            </Reveal>
           ) : activeView === 'command' ? (
             /* Module 3.4 Live Incident Command Workspace */
-            <LiveCommandCenterView
-              onInvestigateIp={handleDeepLinkInvestigate}
-              onReplayAttack={handleDeepLinkReplayAttack}
-            />
+            <Reveal direction="up" duration={260} distance={12}>
+              <LiveCommandCenterView
+                onInvestigateIp={handleDeepLinkInvestigate}
+                onReplayAttack={handleDeepLinkReplayAttack}
+              />
+            </Reveal>
           ) : activeView === 'cases' ? (
             /* Module 3.6 Incident Case Management & Playbooks */
-            <CaseManagementView
-              onInvestigateIp={handleDeepLinkInvestigate}
-            />
+            <Reveal direction="up" duration={260} distance={12}>
+              <CaseManagementView
+                onInvestigateIp={handleDeepLinkInvestigate}
+              />
+            </Reveal>
           ) : activeView === 'deception' ? (
             /* Module 3.7 Active Deception Grid & Canary Orchestrator (System 2) */
-            <DeceptionGridView
-              onInvestigateIp={handleDeepLinkInvestigate}
-              onStageContainment={(ip) => {
-                handleDeepLinkInvestigate(ip);
-              }}
-            />
+            <Reveal direction="up" duration={260} distance={12}>
+              <DeceptionGridView
+                onInvestigateIp={handleDeepLinkInvestigate}
+                onStageContainment={(ip) => {
+                  handleDeepLinkInvestigate(ip);
+                }}
+              />
+            </Reveal>
           ) : activeView === 'intel' ? (
             /* Module 3.8 Threat Intelligence & IOC Fusion (System 3) */
-            <ThreatIntelView
-              onInvestigateIp={handleDeepLinkInvestigate}
-              onStageContainment={(ip) => {
-                handleDeepLinkInvestigate(ip);
-              }}
-            />
+            <Reveal direction="up" duration={260} distance={12}>
+              <ThreatIntelView
+                onInvestigateIp={handleDeepLinkInvestigate}
+                onStageContainment={(ip) => {
+                  handleDeepLinkInvestigate(ip);
+                }}
+              />
+            </Reveal>
           ) : activeView === 'integrations' ? (
             /* Module 3.9 Enterprise Defensive Integration & SIEM-SOAR Gateway */
-            <IntegrationsView />
+            <Reveal direction="up" duration={260} distance={12}>
+              <IntegrationsView />
+            </Reveal>
           ) : activeView === 'campaigns' || activeView === 'hunts' ? (
             /* AI Analysis Workspace: Campaigns & Threat Hunting */
-            <div className="space-y-6">
+            <Reveal direction="up" duration={260} distance={12} className="space-y-6">
               <div className="flex items-center space-x-2 border-b border-cyan-500/20 pb-3 text-xs font-mono font-medium">
                 <button
                   onClick={() => setAiSubTab('campaigns')}
@@ -401,9 +450,9 @@ function DashboardContent() {
               ) : (
                 <ThreatHuntingView onInvestigateIp={handleDeepLinkInvestigate} />
               )}
-            </div>
+            </Reveal>
           ) : activeView === 'investigation' ? (
-            <div className="space-y-6">
+            <Reveal direction="up" duration={260} distance={12} className="space-y-6">
               {/* IP Search / Query Ribbon */}
               <div className="p-4 rounded-lg bg-slate-950/90 border border-cyan-500/20 space-y-3">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -474,10 +523,10 @@ function DashboardContent() {
                   </p>
                 </div>
               )}
-            </div>
+            </Reveal>
           ) : (
             /* Module 3.3 Detection & Replay Workspace */
-            <div className="space-y-6">
+            <Reveal direction="up" duration={260} distance={12} className="space-y-6">
               {/* Sub-navigation tabs */}
               <div className="flex items-center space-x-2 border-b border-cyan-500/20 pb-3 text-xs font-mono font-medium">
                 <button
@@ -558,7 +607,7 @@ function DashboardContent() {
               )}
 
               {rulesSubTab === 'audit' && <AuditTrailView />}
-            </div>
+            </Reveal>
           )}
         </main>
       </div>

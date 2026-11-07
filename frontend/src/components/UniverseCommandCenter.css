@@ -1,0 +1,574 @@
+/**
+ * HoneyShield X — Next Generation Universe Command Center (Universe 2.0)
+ * Spatial Cybersecurity Orbital Interface, Living Observatory & Agent Locomotion
+ */
+
+/* ==========================================================================
+   1. Universe Stage & Background
+   ========================================================================== */
+
+.hsx-universe-stage {
+  position: relative;
+  background: radial-gradient(ellipse at center, #070d1e 0%, #030611 50%, #010207 100%);
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 229, 255, 0.15);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8) inset, 0 0 20px rgba(0, 229, 255, 0.05);
+  min-height: 590px;
+}
+
+/* Procedural Constellation & Starfield Canvas */
+.hsx-constellation-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hsx-universe-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hsx-universe-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 3;
+}
+
+/* ==========================================================================
+   2. Spatial Camera Viewport & World Transforms
+   ========================================================================== */
+
+.hsx-spatial-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 560px;
+  perspective: 1000px;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.hsx-spatial-world {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 560px;
+  transform-origin: center center;
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Camera Target Presets */
+.camera-overview {
+  transform: scale(1) translate(0%, 0%);
+}
+
+.camera-singularity {
+  transform: scale(1.35) translate(0%, 0%);
+}
+
+.camera-scout {
+  transform: scale(1.3) translate(18%, 18%);
+}
+
+.camera-nexus {
+  transform: scale(1.3) translate(-18%, 18%);
+}
+
+.camera-oracle {
+  transform: scale(1.3) translate(-18%, -18%);
+}
+
+.camera-sentinel {
+  transform: scale(1.3) translate(18%, -18%);
+}
+
+/* ==========================================================================
+   3. Orbital Rings & Event Singularity Core 2.0
+   ========================================================================== */
+
+.hsx-orbital-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hsx-orbital-ring-outer {
+  width: 720px;
+  height: 720px;
+  border: 1px solid rgba(59, 130, 246, 0.14);
+  animation: hsx-orbit-clockwise 140s linear infinite;
+}
+
+.hsx-orbital-ring-mid {
+  width: 520px;
+  height: 520px;
+  border: 1px dashed rgba(168, 85, 247, 0.22);
+  animation: hsx-orbit-counter 90s linear infinite;
+}
+
+.hsx-orbital-ring-inner {
+  width: 320px;
+  height: 320px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  animation: hsx-orbit-clockwise 60s linear infinite;
+}
+
+@keyframes hsx-orbit-clockwise {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes hsx-orbit-counter {
+  from { transform: translate(-50%, -50%) rotate(360deg); }
+  to { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+/* Event Singularity Core Base */
+.hsx-singularity-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #0b1530 0%, #030611 75%);
+  border: 2px solid rgba(0, 229, 255, 0.4);
+  box-shadow: 0 0 35px rgba(0, 229, 255, 0.25), 0 0 70px rgba(59, 130, 246, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 25;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hsx-singularity-core:hover {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.hsx-singularity-pulse {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  animation: hsx-pulse-ring 3s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes hsx-pulse-ring {
+  0% { transform: scale(0.85); opacity: 0.8; }
+  50% { transform: scale(1.25); opacity: 0.15; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* Explicit Core States */
+.hsx-core-connected {
+  border-color: rgba(0, 229, 255, 0.6);
+  box-shadow: 0 0 35px rgba(0, 229, 255, 0.3), 0 0 70px rgba(16, 185, 129, 0.2);
+}
+
+.hsx-core-processing {
+  border-color: rgba(0, 229, 255, 0.9);
+  box-shadow: 0 0 50px rgba(0, 229, 255, 0.6), 0 0 90px rgba(59, 130, 246, 0.4);
+}
+
+.hsx-core-degraded {
+  border-color: rgba(245, 158, 11, 0.7);
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.35);
+}
+
+.hsx-core-disconnected {
+  border-color: rgba(239, 68, 68, 0.7);
+  box-shadow: 0 0 35px rgba(239, 68, 68, 0.35);
+}
+
+.hsx-core-replay {
+  border-color: rgba(168, 85, 247, 0.8);
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.4);
+}
+
+.hsx-core-demo {
+  border-color: rgba(245, 158, 11, 0.8);
+  box-shadow: 0 0 45px rgba(245, 158, 11, 0.45), 0 0 80px rgba(234, 88, 12, 0.25);
+}
+
+/* ==========================================================================
+   4. Four Distinct Agent Territories & Environments
+   ========================================================================== */
+
+.hsx-territory-card {
+  position: absolute;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(8, 14, 28, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 20;
+  cursor: pointer;
+}
+
+.hsx-territory-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  background: rgba(12, 20, 42, 0.92);
+}
+
+/* SCOUT: Sensor Frontier */
+.hsx-territory-scout {
+  border-color: rgba(59, 130, 246, 0.45);
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.18);
+}
+.hsx-territory-scout:hover {
+  border-color: rgba(59, 130, 246, 0.85);
+  box-shadow: 0 0 35px rgba(59, 130, 246, 0.4);
+}
+
+.hsx-radar-sweep {
+  position: absolute;
+  inset: -8px;
+  border-radius: 16px;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hsx-radar-sweep::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(59, 130, 246, 0.15) 60deg, transparent 90deg);
+  animation: hsx-sweep-spin 6s linear infinite;
+}
+
+@keyframes hsx-sweep-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* NEXUS: Processing Nexus */
+.hsx-territory-nexus {
+  border-color: rgba(0, 229, 255, 0.45);
+  box-shadow: 0 0 25px rgba(0, 229, 255, 0.18);
+}
+.hsx-territory-nexus:hover {
+  border-color: rgba(0, 229, 255, 0.85);
+  box-shadow: 0 0 35px rgba(0, 229, 255, 0.4);
+}
+
+.hsx-circuit-bus {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00e5ff, transparent);
+  animation: hsx-circuit-pulse 2s ease-in-out infinite;
+}
+
+@keyframes hsx-circuit-pulse {
+  0%, 100% { opacity: 0.2; transform: scaleX(0.8); }
+  50% { opacity: 0.9; transform: scaleX(1); }
+}
+
+/* ORACLE: Intelligence Sanctum */
+.hsx-territory-oracle {
+  border-color: rgba(168, 85, 247, 0.45);
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.18);
+}
+.hsx-territory-oracle:hover {
+  border-color: rgba(168, 85, 247, 0.85);
+  box-shadow: 0 0 35px rgba(168, 85, 247, 0.4);
+}
+
+.hsx-intel-glyph {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px dashed rgba(168, 85, 247, 0.4);
+  animation: hsx-orbit-clockwise 20s linear infinite;
+  pointer-events: none;
+}
+
+/* SENTINEL: Response Bastion */
+.hsx-territory-sentinel {
+  border-color: rgba(239, 68, 68, 0.45);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.18);
+}
+.hsx-territory-sentinel:hover {
+  border-color: rgba(239, 68, 68, 0.85);
+  box-shadow: 0 0 35px rgba(239, 68, 68, 0.4);
+}
+
+.hsx-barrier-shield {
+  position: absolute;
+  inset: -4px;
+  border-radius: 16px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  animation: hsx-barrier-pulse 3s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes hsx-barrier-pulse {
+  0% { border-color: rgba(239, 68, 68, 0.15); box-shadow: 0 0 5px rgba(239, 68, 68, 0.1); }
+  100% { border-color: rgba(239, 68, 68, 0.5); box-shadow: 0 0 15px rgba(239, 68, 68, 0.25); }
+}
+
+/* ==========================================================================
+   5. Dynamic Energy Conduits & Data Flow
+   ========================================================================== */
+
+.hsx-conduit-line {
+  stroke-dasharray: 6 6;
+  animation: hsx-conduit-flow 25s linear infinite;
+}
+
+@keyframes hsx-conduit-flow {
+  from { stroke-dashoffset: 200; }
+  to { stroke-dashoffset: 0; }
+}
+
+.hsx-conduit-pulse {
+  animation: hsx-conduit-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes hsx-conduit-pulse {
+  0% { stroke-opacity: 0.3; }
+  100% { stroke-opacity: 0.8; }
+}
+
+/* ==========================================================================
+   6. Travelling Digital Agent & Physical Packet Capsules
+   ========================================================================== */
+
+.hsx-travelling-agent-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 22;
+}
+
+.hsx-travelling-agent {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+.hsx-travelling-agent:hover {
+  filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.6));
+}
+
+.hsx-packet-capsule {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(3, 7, 18, 0.9);
+  border: 1px solid;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  box-shadow: 0 0 12px;
+  animation: hsx-capsule-bounce 1s ease-in-out infinite alternate;
+}
+
+@keyframes hsx-capsule-bounce {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-3px); }
+}
+
+/* ==========================================================================
+   7. Camera Navigation HUD & Spatial Controls
+   ========================================================================== */
+
+.hsx-camera-hud {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  background: rgba(3, 7, 18, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  z-index: 30;
+}
+
+.hsx-camera-btn {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.hsx-camera-btn:hover {
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.hsx-camera-btn-active {
+  color: #00e5ff !important;
+  background: rgba(0, 229, 255, 0.15) !important;
+  border-color: rgba(0, 229, 255, 0.4) !important;
+}
+
+/* ==========================================================================
+   8. Observatory Instrument Consoles & Modals
+   ========================================================================== */
+
+.hsx-console-panel {
+  background: rgba(6, 11, 22, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.hsx-console-panel-highlight {
+  border-color: rgba(0, 229, 255, 0.25);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.08);
+}
+
+.hsx-tag-badge {
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+/* Diagnostics Modal */
+.hsx-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.hsx-diagnostics-modal {
+  max-width: 680px;
+  width: 100%;
+  background: #030712;
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  box-shadow: 0 0 50px rgba(0, 229, 255, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   9. Responsive Design Breakpoints
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .hsx-universe-stage {
+    min-height: 520px;
+  }
+  .hsx-spatial-viewport,
+  .hsx-spatial-world {
+    min-height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hsx-universe-stage {
+    min-height: 460px;
+    border-radius: 12px;
+  }
+  .hsx-spatial-viewport,
+  .hsx-spatial-world {
+    min-height: 440px;
+  }
+  .hsx-territory-card {
+    padding: 8px 10px;
+    max-width: 170px !important;
+  }
+  .hsx-singularity-core {
+    width: 110px;
+    height: 110px;
+  }
+  .hsx-camera-hud {
+    top: 8px;
+    right: 8px;
+    scale: 0.9;
+  }
+}
+
+/* ==========================================================================
+   10. Reduced Motion Support (Accessibility)
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .hsx-orbital-ring-outer,
+  .hsx-orbital-ring-mid,
+  .hsx-orbital-ring-inner,
+  .hsx-singularity-pulse,
+  .hsx-conduit-line,
+  .hsx-radar-sweep::after,
+  .hsx-circuit-bus,
+  .hsx-intel-glyph,
+  .hsx-barrier-shield,
+  .hsx-packet-capsule {
+    animation: none !important;
+  }
+  
+  .hsx-spatial-world {
+    transition: none !important;
+  }
+
+  .hsx-territory-card:hover,
+  .hsx-singularity-core:hover {
+    transform: none !important;
+  }
+}
