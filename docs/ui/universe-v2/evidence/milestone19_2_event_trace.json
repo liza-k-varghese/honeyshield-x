@@ -1,0 +1,69 @@
+{
+  "milestone": "19.2",
+  "timestamp": "2026-11-06T19:06:05.034201+00:00",
+  "workflow_id": "wf_m19_2_live_trace_901",
+  "attack_id": 1,
+  "alert_id": 1,
+  "source_sensor": "cowrie-honeypot-dmz-02",
+  "source_ip": "198.51.100.77",
+  "outbox_cursor_sequence": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "stages": [
+    {
+      "stage": 1,
+      "agent": "INGESTION_API",
+      "action": "database_transaction_commit",
+      "status": "COMMITTED",
+      "attack_id": 1
+    },
+    {
+      "stage": 2,
+      "agent": "SCOUT",
+      "action": "sensor_telemetry_collection",
+      "status": "COLLECTED",
+      "transfer_id": "tr_scout_m19_2_001",
+      "cursor": 1
+    },
+    {
+      "stage": 3,
+      "agent": "NEXUS",
+      "action": "normalization_and_acid_outbox",
+      "status": "NORMALIZED",
+      "transfer_id": "tr_nexus_m19_2_002",
+      "cursor": 2
+    },
+    {
+      "stage": 4,
+      "agent": "ORACLE",
+      "action": "stix_taxii_ioc_enrichment",
+      "status": "ENRICHED",
+      "transfer_id": "tr_oracle_m19_2_003",
+      "cursor": 3
+    },
+    {
+      "stage": 5,
+      "agent": "SENTINEL",
+      "action": "alert_generation_and_containment",
+      "status": "CONTAINED",
+      "transfer_id": "tr_sentinel_m19_2_004",
+      "cursor": 4,
+      "alert_id": 1
+    }
+  ],
+  "frontend_websocket_adapter": {
+    "channel": "ws://127.0.0.1:8000/api/v1/events/stream",
+    "frame_format": "SecurityEventEnvelope",
+    "schema_version": 1,
+    "monotonic_cursor_verified": true,
+    "browser_animation_mapping": {
+      "tr_scout_m19_2_001": "scout_pickup_and_transit",
+      "tr_nexus_m19_2_002": "nexus_receive_and_outbox_burn",
+      "tr_oracle_m19_2_003": "oracle_glyph_scan",
+      "tr_sentinel_m19_2_004": "sentinel_shield_deflection"
+    }
+  }
+}

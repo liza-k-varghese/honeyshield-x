@@ -36,8 +36,8 @@ REDIS_KEY_ITEMS = "hsx:hunts:items"
 REDIS_KEY_ORDER = "hsx:hunts:order"
 REDIS_KEY_ACTIVE = "hsx:hunts:active_ids"
 
-REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
-REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_HOST = os.getenv("REDIS_HOST", os.getenv("HONEYSHIELD_REDIS_HOST", "127.0.0.1"))
+REDIS_PORT = int(os.getenv("REDIS_PORT", os.getenv("HONEYSHIELD_REDIS_PORT", "6379")))
 
 
 class HuntStore:

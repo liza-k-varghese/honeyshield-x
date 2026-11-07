@@ -1,0 +1,52 @@
+======================================================================
+HONEYSHIELD X — MILESTONE 20.1 DATA INTEGRITY REMEDIATION DIFFS
+======================================================================
+
+--- A/frontend/src/components/SecurityOverview.tsx (Milestone 20 Flawed Implementation)
++++ B/frontend/src/components/SecurityOverview.tsx (Milestone 20.1 Truthful Implementation)
+@@ -202,17 +202,23 @@
+-        {/* Metric 3: Sensor Health */}
+-        <div className="p-4 rounded-xl bg-slate-900/70 border border-slate-800 hover:border-slate-700 transition-colors">
+-          <div className="flex items-center justify-between">
+-            <span className="text-xs font-medium text-slate-400">Deception Sensors</span>
+-            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+-              <Target className="w-4 h-4" />
+-            </div>
+-          </div>
+-          <div className="mt-3 flex items-baseline gap-2">
+-            <span className="text-3xl font-bold font-sans text-emerald-400">
+-              4 / 4
+-            </span>
+-            <span className="text-xs text-slate-400 font-mono">active traps</span>
+-          </div>
+-          <div className="mt-2 text-xs text-slate-500 flex items-center justify-between">
+-            <span>Listeners:</span>
+-            <span className="font-semibold text-slate-300 font-mono">SSH, HTTP, SQL, Redis</span>
+-          </div>
++        {/* Metric 3: Truthful Deception Sensor Health */}
++        <div className="p-4 rounded-xl bg-slate-900/70 border border-slate-800 hover:border-slate-700 transition-colors">
++          <div className="flex items-center justify-between">
++            <span className="text-xs font-medium text-slate-400">Deception Sensors</span>
++            <div className={`p-1.5 rounded-lg ${sensorState.statusType === 'healthy' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-300'}`}>
++              <Target className="w-4 h-4" />
++            </div>
++          </div>
++          <div className="mt-3 flex items-baseline gap-2">
++            <span className={`text-3xl font-bold font-sans ${sensorState.color}`}>
++              {sensorState.badgeText}
++            </span>
++            <span className="text-xs text-slate-400 font-mono">{sensorState.subText}</span>
++          </div>
++          <div className="mt-2 text-xs text-slate-500 flex items-center justify-between">
++            <span className="truncate pr-1">{sensorState.detailText}</span>
++          </div>
+
+--- A/frontend/src/components/LoginModal.tsx (Insecure Prefilled Break-Glass)
++++ B/frontend/src/components/LoginModal.tsx (Hardened Zero-Secret State)
+@@ -48,2 +48,2 @@
+-  const [breakGlassPassphrase, setBreakGlassPassphrase] = useState('BREAK_GLASS_PROD_OVERRIDE_SEC_991');
+-  const [justification, setJustification] = useState('Emergency production incident triage');
++  const [breakGlassPassphrase, setBreakGlassPassphrase] = useState('');
++  const [justification, setJustification] = useState('');
+======================================================================
+

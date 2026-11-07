@@ -84,9 +84,9 @@ def check_redis_health() -> dict[str, Any]:
     start = time.perf_counter()
     try:
         import redis
-        host = os.getenv("REDIS_HOST", "127.0.0.1")
-        port = int(os.getenv("REDIS_PORT", "6379"))
-        password = os.getenv("REDIS_PASSWORD", None)
+        host = os.getenv("REDIS_HOST", os.getenv("HONEYSHIELD_REDIS_HOST", "127.0.0.1"))
+        port = int(os.getenv("REDIS_PORT", os.getenv("HONEYSHIELD_REDIS_PORT", "6379")))
+        password = os.getenv("REDIS_PASSWORD", os.getenv("HONEYSHIELD_REDIS_PASSWORD", None))
 
         client = redis.Redis(
             host=host,

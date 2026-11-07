@@ -46,14 +46,44 @@ export interface SystemHealth {
   api: string;
   postgresql: string;
   redis: string;
+  total_services?: number;
+  healthy_services?: number;
+  degraded_services?: number;
+  offline_services?: number;
+}
+
+export interface DeceptionSensorItem {
+  name: string;
+  display_name: string;
+  status: string;
+  configured: boolean;
+  active: boolean;
+}
+
+export interface DeceptionSensorSummary {
+  status: string;
+  active_canary_tokens: number;
+  configured_external_sensors: number;
+  unconfigured_external_sensors: number;
+  total_sensors?: number;
+  configured_sensors?: number;
+  healthy_sensors?: number;
+  unconfigured_sensors?: number;
+  sensor_inventory?: DeceptionSensorItem[];
 }
 
 export interface DashboardStats {
   total_attacks: number;
   active_alerts: number;
-  active_alerts_by_severity: AlertSeverityCounts;
+  active_alerts_by_severity?: AlertSeverityCounts;
   unique_attacker_ips_24h: number;
+  unique_attackers?: number;
+  critical_alerts?: number;
+  honeypot_types?: number;
+  attack_types?: number;
+  events_processed_24h?: number;
   system_health: SystemHealth;
+  sensor_health?: DeceptionSensorSummary;
 }
 
 // ==========================================

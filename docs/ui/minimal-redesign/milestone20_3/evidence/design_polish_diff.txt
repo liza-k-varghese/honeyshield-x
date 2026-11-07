@@ -1,0 +1,67 @@
+======================================================================
+HONEYSHIELD X — MILESTONE 20.3 DESIGN POLISH & CANONICAL COPY DIFFS
+======================================================================
+
+--- A/frontend/src/components/SecurityOverview.tsx (Milestone 20.2 Draft Copy)
++++ B/frontend/src/components/SecurityOverview.tsx (Milestone 20.3 Canonical Minimal Copy)
+@@ -420,18 +420,18 @@
+-            desc: 'Real-time telemetry, automated triage, and guided incident investigation across all endpoints.',
++            desc: 'Detection, alerts and investigations. Autonomous threat triage and guided incident response workflows.',
+             primaryMetric: `${unresolvedCount} Active`,
+             secondaryMetric: 'Response < 4m',
+             badge: 'Detection Engine',
+@@ -432,18 +432,18 @@
+-            desc: 'Production-mimicking decoys, high-interaction honeypots, and active canary tokens.',
++            desc: 'Traps, sensors and captured suspicious activity. Active decoys and canary tokens engage adversaries before production exposure.',
+             primaryMetric: `${metrics.sensorCount} Deployed`,
+             secondaryMetric: `${metrics.activeDecoyCount} Decoys Active`,
+             badge: 'Zero False-Positives',
+@@ -444,18 +444,18 @@
+-            desc: 'Adversary attribution, MITRE ATT&CK mapping, and community IOC threat feeds.',
++            desc: 'Indicators, enrichment and correlation. Multi-feed STIX 2.1 IOC fusion and adversary campaign attribution.',
+             primaryMetric: `${metrics.threatCount} Monitored`,
+             secondaryMetric: 'STIX 2.1 Feeds',
+             badge: 'Adversary Context',
+@@ -470,9 +470,9 @@
+-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+-              Explore the Digital Agent Universe
+-            </h2>
+-            <p className="text-sm text-slate-300 mt-1 max-w-xl">
+-              Observe our four autonomous security agents—SCOUT, NEXUS, ORACLE, and SENTINEL—collaborating in real-time.
+-            </p>
++            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
++              Explore the Digital Universe
++            </h2>
++            <p className="text-sm text-slate-300 mt-1 max-w-xl">
++              Follow security events through HoneyShield X with four digital agents.
++            </p>
+-            <button ...>
+-              Launch Universe <ArrowRight className="w-4 h-4 ml-1.5" />
+-            </button>
++            <button ...>
++              Open Universe <ArrowRight className="w-4 h-4 ml-1.5" />
++            </button>
+
+--- A/frontend/src/tests/security_overview.test.tsx (Milestone 20.2 Tests: 181 Tests)
++++ B/frontend/src/tests/security_overview.test.tsx (Milestone 20.3 Tests: 183 Tests)
+@@ -62,8 +62,8 @@
+-    expect(screen.getByText('Explore the Digital Agent Universe')).toBeInTheDocument();
+-    expect(screen.getByRole('button', { name: /launch universe/i })).toBeInTheDocument();
++    expect(screen.getByText('Explore the Digital Universe')).toBeInTheDocument();
++    expect(screen.getByText(/Follow security events through HoneyShield X with four digital agents/i)).toBeInTheDocument();
++    expect(screen.getByRole('button', { name: /open universe/i })).toBeInTheDocument();
++
++  it('renders concise, professional definitions for the Three Security Systems', () => {
++    render(<SecurityOverview onNavigate={mockNavigate} />);
++    expect(screen.getByText(/Detection, alerts and investigations/i)).toBeInTheDocument();
++    expect(screen.getByText(/Traps, sensors and captured suspicious activity/i)).toBeInTheDocument();
++    expect(screen.getByText(/Indicators, enrichment and correlation/i)).toBeInTheDocument();
++  });
++
++  it('renders the final Digital Universe entry point with exact text and button', () => {
++    render(<SecurityOverview onNavigate={mockNavigate} />);
++    expect(screen.getByText('Explore the Digital Universe')).toBeInTheDocument();
++    expect(screen.getByRole('button', { name: /open universe/i })).toBeInTheDocument();
++  });
+======================================================================
+

@@ -143,10 +143,16 @@ export class RealtimeAgentWebSocketClient {
       const ticket = data.ticket;
 
       // 2. Build WebSocket URL
-      const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
-      const wsProto = isHttps ? 'wss:' : 'ws:';
-      const host = typeof window !== 'undefined' ? window.location.host : 'localhost:8000';
-      const wsUrl = `${wsProto}//${host}/api/v1/events/ws?ticket=${ticket}`;
+      let wsUrl: string;
+      if (this.apiBaseUrl) {
+        const baseWs = this.apiBaseUrl.replace(/^http/, 'ws');
+        wsUrl = `${baseWs}/api/v1/events/ws?ticket=${ticket}`;
+      } else {
+        const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+        const wsProto = isHttps ? 'wss:' : 'ws:';
+        const host = typeof window !== 'undefined' ? window.location.host : 'localhost:8000';
+        wsUrl = `${wsProto}//${host}/api/v1/events/ws?ticket=${ticket}`;
+      }
 
       // 3. Instantiate WebSocket
       const ws = new WebSocket(wsUrl);

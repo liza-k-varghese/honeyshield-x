@@ -69,8 +69,8 @@ class SessionStore:
 
     def _init_redis(self) -> None:
         """Connect to Redis if available."""
-        host = os.getenv("HONEYSHIELD_REDIS_HOST", "127.0.0.1")
-        port = int(os.getenv("HONEYSHIELD_REDIS_PORT", "6379"))
+        host = os.getenv("HONEYSHIELD_REDIS_HOST", os.getenv("REDIS_HOST", "127.0.0.1"))
+        port = int(os.getenv("HONEYSHIELD_REDIS_PORT", os.getenv("REDIS_PORT", "6379")))
         try:
             client = redis.Redis(host=host, port=port, decode_responses=True, socket_timeout=1.0)
             client.ping()

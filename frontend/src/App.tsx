@@ -28,7 +28,6 @@ import { useAlerts, useDashboardStats, useAttacks } from './hooks/useDashboard';
 import { Alert, DetectionRuleSummary } from './types';
 import { Search, Network, ArrowRight, Shield, History, Sliders, FileText, BrainCircuit, Target } from 'lucide-react';
 import {
-  UniverseModeView,
   useDigitalAgentUniverse,
   NexusAssistantModal,
 } from './digital-agents';
@@ -36,6 +35,7 @@ import {
 import { Reveal, CurtainTransition } from './components/CyberMotion';
 import { HoneyShieldLanding } from './components/HoneyShieldLanding';
 import { UniverseCommandCenter } from './components/UniverseCommandCenter';
+import { SecurityOverview } from './components/SecurityOverview';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -93,13 +93,9 @@ function DashboardContent() {
     activePackets,
     completedPackets,
     failedPackets,
-    handoffs,
-    nodes,
-    connections,
     journeys,
     streamConnectionState,
     streamMetrics,
-    simulateAgentState,
   } = useDigitalAgentUniverse();
   const [isAssistantModalOpen, setIsAssistantModalOpen] = useState(false);
 
@@ -113,12 +109,14 @@ function DashboardContent() {
     data: stats,
     isLoading: isStatsLoading,
     isFetching: isStatsFetching,
+    isError: isStatsError,
   } = useDashboardStats();
 
   const {
     data: alerts = [],
     isLoading: isAlertsLoading,
     isFetching: isAlertsFetching,
+    isError: isAlertsError,
   } = useAlerts(statusFilter);
 
   const {
@@ -286,6 +284,7 @@ function DashboardContent() {
         onOpenLogin={() => setIsLoginModalOpen(true)}
         alerts={alerts}
         onOpenMobileDrawer={() => setIsMobileDrawerOpen(true)}
+        onSearchSubmit={handleDeepLinkInvestigate}
       />
 
       {/* Main Workspace with Left Sidebar */}
@@ -300,7 +299,25 @@ function DashboardContent() {
         {/* Content Area */}
         <main className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6 max-w-7xl w-full mx-auto pb-20 lg:pb-6">
           {activeView === 'overview' ? (
-            /* Flagship Universe SOC Command Center (Central Orbital Map & Observatory Consoles) */
+            /* Minimal, Premium Security Overview (Milestone 20 Flagship Experience) */
+            <Reveal direction="up" duration={260} distance={12}>
+              <SecurityOverview
+                stats={stats}
+                alerts={alerts}
+                attacks={attacks}
+                isStatsLoading={isStatsLoading}
+                isAlertsLoading={isAlertsLoading}
+                isStatsError={isStatsError}
+                isAlertsError={isAlertsError}
+                onInvestigateIp={handleDeepLinkInvestigate}
+                onNavigateView={(view) => setActiveView(view as HSXView)}
+                onSelectAlert={(alert) => setSelectedAlert(alert)}
+                streamConnectionState={streamConnectionState}
+                streamMetrics={streamMetrics}
+              />
+            </Reveal>
+          ) : activeView === 'universe' ? (
+            /* Dedicated Immersive Digital Agent Universe (Universe 2.0 Command Center) */
             <Reveal direction="up" duration={260} distance={12} className="space-y-4">
               <UniverseCommandCenter
                 stats={stats}
@@ -318,27 +335,6 @@ function DashboardContent() {
                 streamConnectionState={streamConnectionState}
                 streamMetrics={streamMetrics}
                 onOpenNexusAssistant={() => setIsAssistantModalOpen(true)}
-              />
-            </Reveal>
-          ) : activeView === 'universe' ? (
-            /* Dedicated Fullscreen Digital Agent Universe (Stage 10) */
-            <Reveal direction="up" duration={260} distance={12}>
-              <UniverseModeView
-                runtimeStatuses={runtimeStatuses}
-                activePackets={activePackets}
-                completedPackets={completedPackets}
-                failedPackets={failedPackets}
-                handoffs={handoffs}
-                nodes={nodes}
-                connections={connections}
-                journeys={journeys}
-                isDemoMode={isDemoMode}
-                onToggleDemoMode={toggleDemoMode}
-                onSimulateState={simulateAgentState}
-                onExitUniverseMode={() => setActiveView('overview')}
-                onDeepLinkInvestigate={handleDeepLinkInvestigate}
-                streamConnectionState={streamConnectionState}
-                streamMetrics={streamMetrics}
               />
             </Reveal>
           ) : activeView === 'analytics' || activeView === 'dashboard' ? (

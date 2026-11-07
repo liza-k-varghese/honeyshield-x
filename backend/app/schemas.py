@@ -673,6 +673,20 @@ class SystemHealthSummary(BaseModel):
     api: str = Field(default="healthy", description="API operational status")
     postgresql: str = Field(description="PostgreSQL database connectivity status")
     redis: str = Field(description="Redis server connectivity status")
+    total_services: int = Field(default=3, description="Total monitored infrastructure services")
+    healthy_services: int = Field(default=3, description="Count of operational healthy services")
+    degraded_services: int = Field(default=0, description="Count of degraded services")
+    offline_services: int = Field(default=0, description="Count of unavailable/offline services")
+
+
+class DeceptionSensorSummary(BaseModel):
+    """Authoritative deception and honeypot sensor operational health."""
+
+    status: str = Field(description="Overall sensor health status: healthy, active_with_unconfigured, degraded, unconfigured, or unavailable")
+    active_canary_tokens: int = Field(default=0, ge=0, description="Active honeypot tripwire tokens minted and listening")
+    configured_external_sensors: int = Field(default=0, ge=0, description="Count of external daemon sensors configured and online")
+    unconfigured_external_sensors: int = Field(default=0, ge=0, description="Count of external daemon sensors unconfigured in staging")
+    sensor_inventory: list[dict[str, Any]] = Field(default_factory=list, description="Truthful inventory per sensor")
 
 
 class DashboardStatsResponse(BaseModel):
@@ -682,7 +696,9 @@ class DashboardStatsResponse(BaseModel):
     active_alerts: int = Field(ge=0, description="Total count of open alerts")
     active_alerts_by_severity: AlertSeverityCounts = Field(description="Breakdown of open alerts by severity")
     unique_attacker_ips_24h: int = Field(ge=0, description="Count of distinct attacker IPs detected in last 24h")
+    events_processed_24h: int = Field(default=0, ge=0, description="Authoritative security events processed in the sliding 24-hour UTC window")
     system_health: SystemHealthSummary = Field(description="Platform component health indicators")
+    sensor_health: DeceptionSensorSummary | None = Field(default=None, description="Truthful deception sensor status")
 
     model_config = ConfigDict(from_attributes=True)
 

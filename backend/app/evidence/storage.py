@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 
 REDIS_EVIDENCE_PREFIX = "hsx:evidence:"
 REDIS_CASE_EVIDENCE_PREFIX = "hsx:case_evidence:"
-REDIS_HOST = os.getenv("HONEYSHIELD_REDIS_HOST", "127.0.0.1")
-REDIS_PORT = int(os.getenv("HONEYSHIELD_REDIS_PORT", "6379"))
+REDIS_HOST = os.getenv("HONEYSHIELD_REDIS_HOST", os.getenv("REDIS_HOST", "127.0.0.1"))
+REDIS_PORT = int(os.getenv("HONEYSHIELD_REDIS_PORT", os.getenv("REDIS_PORT", "6379")))
 
 
 class EvidenceStore:

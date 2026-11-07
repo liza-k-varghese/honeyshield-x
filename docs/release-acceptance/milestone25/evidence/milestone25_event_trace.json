@@ -1,0 +1,69 @@
+{
+  "milestone": "25",
+  "release_candidate": "v1.0.0-rc5",
+  "timestamp": "2026-11-07T02:19:51.825867+00:00",
+  "database_backend": "SQLite (Transactional In-Memory Fallback)",
+  "redis_pubsub": "In-Memory EventBus Active",
+  "workflow_id": "wf_m25_live_incident_001",
+  "attack_record": {
+    "id": 1,
+    "attack_type": "RCE_EXPLOIT_ATTEMPT",
+    "source_ip": "198.51.100.99",
+    "risk_score": 96.0,
+    "severity": "critical",
+    "status": "detected"
+  },
+  "alert_record": {
+    "id": 1,
+    "attack_id": 1,
+    "alert_type": "RCE Exploit Attempt",
+    "status": "open",
+    "severity": "critical"
+  },
+  "monotonic_outbox_cursors": [
+    1,
+    2,
+    3
+  ],
+  "events": [
+    {
+      "stage": 1,
+      "event_id": "0d617f06-2622-47ba-ba88-2199f4a5673b",
+      "workflow_id": "wf_m25_live_incident_001",
+      "transfer_id": "tr_m25_scout_001",
+      "outbox_cursor": 1,
+      "agent_id": "scout",
+      "source": "sensor:canary_token_sql",
+      "destination": "gateway:ingestion",
+      "backend_status": "COMMITTED",
+      "frontend_status": "ANIMATING_PICKUP",
+      "timestamp": "2026-11-07T02:19:51.832204+00:00"
+    },
+    {
+      "stage": 2,
+      "event_id": "07982b02-b789-4bdb-84e2-f6dae31f2a70",
+      "workflow_id": "wf_m25_live_incident_001",
+      "transfer_id": "tr_m25_nexus_002",
+      "outbox_cursor": 2,
+      "agent_id": "nexus",
+      "source": "gateway:ingestion",
+      "destination": "bus:redis_outbox",
+      "backend_status": "OUTBOX_PERSISTED",
+      "frontend_status": "ANIMATING_TRANSIT",
+      "timestamp": "2026-11-07T02:19:51.833160+00:00"
+    },
+    {
+      "stage": 3,
+      "event_id": "306a93e5-9c04-4e9f-8084-1d7b2949feb3",
+      "workflow_id": "wf_m25_live_incident_001",
+      "transfer_id": "tr_m25_sentinel_003",
+      "outbox_cursor": 3,
+      "agent_id": "sentinel",
+      "source": "nexus:courier",
+      "destination": "soc:containment_dispatch",
+      "backend_status": "ALERT_STAGED",
+      "frontend_status": "ANIMATING_CONTAINMENT",
+      "timestamp": "2026-11-07T02:19:51.835480+00:00"
+    }
+  ]
+}

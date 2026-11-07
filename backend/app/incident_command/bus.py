@@ -23,8 +23,8 @@ logger = logging.getLogger(__name__)
 
 EVENT_CHANNEL: str = "hsx:events:broadcast"
 MAX_STRING_LENGTH: int = 1024
-REDIS_HOST: str = os.getenv("REDIS_HOST", "127.0.0.1")
-REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_HOST: str = os.getenv("REDIS_HOST", os.getenv("HONEYSHIELD_REDIS_HOST", "127.0.0.1"))
+REDIS_PORT: int = int(os.getenv("REDIS_PORT", os.getenv("HONEYSHIELD_REDIS_PORT", "6379")))
 
 
 def _sanitize_payload(obj: Any) -> Any:

@@ -1,0 +1,15 @@
+======================================================================
+HONEYSHIELD X — MILESTONE 20.1 PRODUCTION BUNDLE BUILD EVIDENCE
+======================================================================
+
+$ vite build
+vite v6.4.4 building for production...
+✓ 1725 modules transformed.
+rendering chunks (1)...computing gzip size (0)...computing gzip size (1)...computing gzip size (2)...computing gzip size (3)...
+dist/index.html                   0.99 kB │ gzip:   0.50 kB
+dist/assets/index-Dzrxl4pd.css  103.45 kB │ gzip:  17.54 kB
+dist/assets/index-BthfgE78.js   872.05 kB │ gzip: 201.65 kB
+
+✓ built in 5.65s
+======================================================================
+

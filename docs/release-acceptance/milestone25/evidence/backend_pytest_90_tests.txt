@@ -1,0 +1,33 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-9.1.1, pluggy-1.6.0
+rootdir: /home/liza/HoneyShield-X
+plugins: anyio-4.15.1
+collected 90 items
+
+backend/tests/test_digital_agent_live_events.py .........                [ 10%]
+backend/tests/test_milestone7_trust_boundaries.py .....                  [ 15%]
+backend/tests/test_phase5_e2e_integration.py ............                [ 28%]
+backend/tests/test_milestone8_operational_readiness.py ..........        [ 40%]
+backend/tests/test_milestone9_enterprise_orchestration.py ........       [ 48%]
+backend/tests/test_milestone11_distributed_hardening.py ..........       [ 60%]
+backend/tests/test_milestone15_threat_hunting_and_forensics.py ......... [ 70%]
+...                                                                      [ 73%]
+backend/tests/test_milestone16_forensics_and_reconciliation.py ......... [ 83%]
+...                                                                      [ 86%]
+backend/tests/test_milestone17_sdk_recovery_and_defense.py ............  [100%]
+
+=============================== warnings summary ===============================
+backend/tests/test_digital_agent_live_events.py: 22 warnings
+backend/tests/test_milestone7_trust_boundaries.py: 17 warnings
+backend/tests/test_phase5_e2e_integration.py: 22 warnings
+backend/tests/test_milestone8_operational_readiness.py: 1 warning
+backend/tests/test_milestone9_enterprise_orchestration.py: 14 warnings
+backend/tests/test_milestone11_distributed_hardening.py: 5 warnings
+backend/tests/test_milestone15_threat_hunting_and_forensics.py: 14 warnings
+backend/tests/test_milestone16_forensics_and_reconciliation.py: 14 warnings
+backend/tests/test_milestone17_sdk_recovery_and_defense.py: 4 warnings
+  /home/liza/HoneyShield-X/backend/.venv/lib/python3.13/site-packages/sqlalchemy/sql/schema.py:4296: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore[call-arg, no-any-return, no-untyped-call]  # noqa: E501
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================= 90 passed, 113 warnings in 148.64s (0:02:28) =================

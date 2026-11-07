@@ -1,10 +1,20 @@
 import os
+from pathlib import Path
+from urllib.parse import urlparse
+
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 import psycopg
 import redis
 from sqlalchemy import text
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session
+
+# Load .env file from backend or repository root if present
+_backend_dir = Path(__file__).resolve().parent.parent
+load_dotenv(_backend_dir / ".env")
+load_dotenv(_backend_dir.parent / ".env")
 
 from app.database import get_db
 from app.routers import (
@@ -107,15 +117,50 @@ app.include_router(pairing.router, prefix="/api/v1")
 app.include_router(emergency.router, prefix="/api/v1")
 app.include_router(system_observability.router, prefix="/api/v1")
 
-POSTGRES_HOST = os.getenv("POSTGRES_HOST", "127.0.0.1")
-POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
-POSTGRES_DB = os.getenv("POSTGRES_DB", "honeyshield")
-POSTGRES_USER = os.getenv("POSTGRES_USER", "honeyshield")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "change_this_password")
+def get_postgres_config() -> tuple[str, int, str, str, str]:
+    db_url_env = os.getenv("DATABASE_URL")
+    if db_url_env:
+        try:
+            parsed = make_url(db_url_env)
+            return (
+                parsed.host or "127.0.0.1",
+                int(parsed.port or 5432),
+                parsed.database or "honeyshield",
+                parsed.username or "honeyshield",
+                parsed.password or "change_this_password",
+            )
+        except Exception:
+            pass
+    return (
+        os.getenv("POSTGRES_HOST", "127.0.0.1"),
+        int(os.getenv("POSTGRES_PORT", "5432")),
+        os.getenv("POSTGRES_DB", "honeyshield"),
+        os.getenv("POSTGRES_USER", "honeyshield"),
+        os.getenv("POSTGRES_PASSWORD", "change_this_password"),
+    )
 
-REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
-REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
+
+def get_redis_config() -> tuple[str, int, str | None]:
+    redis_url_env = os.getenv("REDIS_URL")
+    if redis_url_env:
+        try:
+            parsed_r = urlparse(redis_url_env)
+            return (
+                parsed_r.hostname or "127.0.0.1",
+                int(parsed_r.port or 6379),
+                parsed_r.password,
+            )
+        except Exception:
+            pass
+    return (
+        os.getenv("REDIS_HOST", os.getenv("HONEYSHIELD_REDIS_HOST", "127.0.0.1")),
+        int(os.getenv("REDIS_PORT", os.getenv("HONEYSHIELD_REDIS_PORT", "6379"))),
+        os.getenv("REDIS_PASSWORD", os.getenv("HONEYSHIELD_REDIS_PASSWORD", None)),
+    )
+
+
+POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD = get_postgres_config()
+REDIS_HOST, REDIS_PORT, REDIS_PASSWORD = get_redis_config()
 
 
 @app.get("/health")
@@ -123,13 +168,16 @@ def health():
     postgres_status = "disconnected"
     redis_status = "disconnected"
 
+    pg_host, pg_port, pg_db, pg_user, pg_pass = get_postgres_config()
+    r_host, r_port, r_pass = get_redis_config()
+
     try:
         with psycopg.connect(
-            host=POSTGRES_HOST,
-            port=POSTGRES_PORT,
-            dbname=POSTGRES_DB,
-            user=POSTGRES_USER,
-            password=POSTGRES_PASSWORD,
+            host=pg_host,
+            port=pg_port,
+            dbname=pg_db,
+            user=pg_user,
+            password=pg_pass,
             connect_timeout=2,
         ) as connection:
             with connection.cursor() as cursor:
@@ -143,9 +191,9 @@ def health():
 
     try:
         redis_client = redis.Redis(
-            host=REDIS_HOST,
-            port=REDIS_PORT,
-            password=REDIS_PASSWORD,
+            host=r_host,
+            port=r_port,
+            password=r_pass,
             decode_responses=True,
             socket_connect_timeout=2.0,
         )

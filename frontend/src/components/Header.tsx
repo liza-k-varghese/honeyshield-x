@@ -1,21 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
-  ShieldAlert,
-  Activity,
-  Database,
-  Server,
-  RefreshCw,
+  Search,
+  Bell,
   User,
   LogOut,
-  Bell,
-  LayoutDashboard,
-  BarChart3,
-  Radio,
-  Sliders,
-  Layers,
-  CheckCircle2,
   Menu,
-  Sparkles,
+  ChevronDown,
+  CheckCircle2,
+  RefreshCw,
 } from 'lucide-react';
 import { SystemHealth, Alert } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -47,321 +39,323 @@ interface HeaderProps {
   onOpenLogin?: () => void;
   alerts?: Alert[];
   onOpenMobileDrawer?: () => void;
+  onSearchSubmit?: (query: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   health,
-  isFetching,
+  isFetching = false,
   activeView = 'overview',
   onViewChange,
   onOpenLogin,
   alerts = [],
   onOpenMobileDrawer,
+  onSearchSubmit,
 }) => {
   const { operator, logout } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   const unreadAlerts = alerts.filter((a) => a.status === 'open');
 
-  const getRoleBadgeColor = (role?: string) => {
-    switch (role) {
-      case 'viewer':
-        return 'bg-slate-800 text-slate-300 border-slate-700';
-      case 'analyst':
-        return 'bg-amber-950/70 text-amber-300 border-amber-800/60';
-      case 'incident_responder':
-        return 'bg-cyan-950/70 text-cyan-300 border-cyan-800/60';
-      case 'security_administrator':
-        return 'bg-purple-950/70 text-purple-300 border-purple-800/60';
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Page title mapping based on activeView
+  const getPageTitle = (view: string) => {
+    switch (view) {
+      case 'overview':
+        return { title: 'Security Overview', category: 'Operations' };
+      case 'universe':
+        return { title: 'Digital Agent Universe', category: 'Spatial SOC' };
+      case 'alerts':
+        return { title: 'Threats & Alerts', category: 'Operations' };
+      case 'deception':
+        return { title: 'Honeypots & Deception Grid', category: 'Defense' };
+      case 'intel':
+        return { title: 'Threat Intelligence', category: 'Intelligence' };
+      case 'investigation':
+        return { title: 'Forensic Investigations', category: 'Analysis' };
+      case 'command':
+        return { title: 'Incident Command', category: 'Response' };
+      case 'cases':
+        return { title: 'Case Management', category: 'Operations' };
+      case 'campaigns':
+      case 'hunts':
+        return { title: 'AI Threat Hunting & Campaigns', category: 'Intelligence' };
+      case 'integrations':
+        return { title: 'Defensive Integrations & SIEM', category: 'Configuration' };
+      case 'rules':
+        return { title: 'Detection Rules & Replay', category: 'Configuration' };
+      case 'analytics':
+      case 'dashboard':
+        return { title: 'Analytics & Reporting', category: 'Metrics' };
       default:
-        return 'bg-slate-800 text-slate-400 border-slate-700';
+        return { title: 'HoneyShield X Console', category: 'Operations' };
     }
   };
 
-  const formatRoleName = (role?: string) => {
+  const pageInfo = getPageTitle(activeView);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      if (onSearchSubmit) {
+        onSearchSubmit(searchQuery.trim());
+      } else if (onViewChange) {
+        onViewChange('investigation');
+      }
+    }
+  };
+
+  const getRoleLabel = (role?: string) => {
     switch (role) {
-      case 'viewer':
-        return 'Viewer';
+      case 'security_administrator':
+      case 'admin':
+        return 'Admin';
+      case 'incident_responder':
+      case 'responder':
+        return 'Responder';
+      case 'threat_analyst':
       case 'analyst':
         return 'Analyst';
-      case 'incident_responder':
-        return 'Responder';
-      case 'security_administrator':
-        return 'Sec Admin';
+      case 'readonly_observer':
+      case 'viewer':
+        return 'Viewer';
       default:
-        return role || 'Anonymous';
+        return role ? role.charAt(0).toUpperCase() + role.slice(1) : 'Operator';
     }
   };
 
-  const isNavActive = (key: string) => {
-    if (key === 'dashboard' && (activeView === 'overview' || activeView === 'dashboard')) return true;
-    if (key === 'analytics' && activeView === 'analytics') return true;
-    if (key === 'systems' && (activeView === 'systems' || activeView === 'integrations')) return true;
-    if (key === 'network' && (activeView === 'network' || activeView === 'command')) return true;
-    if (key === 'config' && (activeView === 'config' || activeView === 'rules')) return true;
-    return false;
+  const getRoleColor = (role?: string) => {
+    switch (role) {
+      case 'security_administrator':
+      case 'admin':
+        return 'bg-purple-500/20 text-purple-300 border-purple-500/40';
+      case 'incident_responder':
+      case 'responder':
+        return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40';
+      case 'threat_analyst':
+      case 'analyst':
+        return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+      case 'viewer':
+      default:
+        return 'bg-slate-700 text-slate-300 border-slate-600';
+    }
   };
 
   return (
-    <header className="bg-[#050814]/95 border-b border-cyan-500/20 px-3 sm:px-6 py-2.5 backdrop-blur-md sticky top-0 z-30 select-none">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
-        {/* Brand & Hamburger */}
-        <div className="flex items-center gap-2 sm:gap-5">
-          {/* Mobile Drawer Hamburger (lg:hidden) */}
+    <header className="bg-[#0B1020]/95 border-b border-slate-800/80 px-3 sm:px-6 py-2.5 backdrop-blur-md sticky top-0 z-30 select-none">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-6">
+        {/* Left: Mobile Drawer Trigger + Breadcrumb / Page Title */}
+        <div className="flex items-center gap-3 min-w-0">
           {onOpenMobileDrawer && (
             <button
               onClick={onOpenMobileDrawer}
-              className="lg:hidden p-2 rounded-lg bg-slate-950 border border-cyan-500/30 text-cyan-400 hover:text-white min-h-[42px] min-w-[42px] flex items-center justify-center transition-colors"
-              title="Open Navigation Menu"
+              className="lg:hidden p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition-colors"
+              title="Open Navigation"
+              aria-label="Open Navigation"
             >
               <Menu className="w-5 h-5" />
             </button>
           )}
 
-          {/* HoneyShield X Branding */}
-          <div
-            className="flex items-center space-x-2.5 cursor-pointer group"
-            onClick={() => onViewChange?.('overview')}
-          >
-            <div className="p-1.5 sm:p-2 rounded-lg bg-cyan-950/60 border border-cyan-500/40 text-cyan-400 shadow-nexus-cyan group-hover:border-cyan-400 transition-colors">
-              <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 drop-shadow-[0_0_6px_rgba(0,240,255,0.7)]" />
-            </div>
-            <div>
-              <div className="flex items-center space-x-1.5">
-                <h1 className="text-sm sm:text-base font-extrabold tracking-wider text-white font-mono flex items-center">
-                  <span>HoneyShield</span>
-                  <span className="text-cyan-400 ml-1">X</span>
-                </h1>
-                <span className="text-[8px] sm:text-[9px] font-mono uppercase bg-cyan-950/80 text-cyan-300 px-1.5 py-0.2 rounded border border-cyan-700/60">
-                  NEXUS SOC
-                </span>
-              </div>
-              <p className="hidden sm:block text-[10px] text-slate-400 font-mono">SOC COMMAND CENTRE // SYS-1 OPERATIONAL</p>
-            </div>
+          {/* Breadcrumb Title */}
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="hidden sm:inline-block text-xs font-mono text-slate-500 shrink-0">
+              {pageInfo.category} /
+            </span>
+            <h2 className="text-sm font-semibold text-white tracking-tight truncate font-sans">
+              {pageInfo.title}
+            </h2>
+            {isFetching && (
+              <RefreshCw className="w-3.5 h-3.5 text-cyan-400 animate-spin shrink-0 hidden sm:inline-block" />
+            )}
           </div>
-
-          {/* Top Navigation Links (hidden on mobile, visible on md+) */}
-          <nav className="hidden md:flex items-center space-x-1 bg-slate-950/80 p-1 rounded-lg border border-cyan-500/20 text-xs font-mono">
-            <button
-              onClick={() => onViewChange?.('overview')}
-              className={`px-3 py-1.5 rounded flex items-center space-x-1.5 transition-colors ${
-                isNavActive('dashboard')
-                  ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/50 shadow-nexus-cyan font-bold'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              <span>Dashboard</span>
-            </button>
-
-            <button
-              onClick={() => onViewChange?.('landing')}
-              className={`px-3 py-1.5 rounded flex items-center space-x-1.5 transition-colors ${
-                activeView === 'landing'
-                  ? 'bg-red-950/90 text-red-300 border border-red-500/60 shadow-[0_0_15px_rgba(239,68,68,0.4)] font-bold'
-                  : 'text-red-400/90 hover:text-red-300 hover:bg-red-950/30'
-              }`}
-              title="Launch Cinematic Landing Experience"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-red-400 animate-pulse" />
-              <span>Cinematic</span>
-            </button>
-
-            <button
-              onClick={() => onViewChange?.('universe')}
-              className={`px-3 py-1.5 rounded flex items-center space-x-1.5 transition-colors ${
-                activeView === 'universe'
-                  ? 'bg-cyan-600 text-white border border-cyan-400 shadow-nexus-cyan font-bold'
-                  : 'text-cyan-400 hover:text-white hover:bg-cyan-950/40'
-              }`}
-              title="Launch Digital Agent Universe"
-            >
-              <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-              <span>Agent Universe</span>
-            </button>
-
-            <button
-              onClick={() => onViewChange?.('analytics')}
-              className={`px-3 py-1.5 rounded flex items-center space-x-1.5 transition-colors ${
-                isNavActive('analytics')
-                  ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/50 shadow-nexus-cyan font-bold'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <BarChart3 className="w-3.5 h-3.5" />
-              <span>Analytics</span>
-            </button>
-
-            <button
-              onClick={() => onViewChange?.('systems')}
-              className={`px-3 py-1.5 rounded flex items-center space-x-1.5 transition-colors ${
-                isNavActive('systems')
-                  ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/50 shadow-nexus-cyan font-bold'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Systems</span>
-            </button>
-
-            <button
-              onClick={() => onViewChange?.('network')}
-              className={`px-3 py-1.5 rounded flex items-center space-x-1.5 transition-colors ${
-                isNavActive('network')
-                  ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/50 shadow-nexus-cyan font-bold'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <Radio className="w-3.5 h-3.5" />
-              <span>Network</span>
-            </button>
-
-            <button
-              onClick={() => onViewChange?.('config')}
-              className={`px-3 py-1.5 rounded flex items-center space-x-1.5 transition-colors ${
-                isNavActive('config')
-                  ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/50 shadow-nexus-cyan font-bold'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <Sliders className="w-3.5 h-3.5" />
-              <span>Configuration</span>
-            </button>
-          </nav>
         </div>
 
-        {/* Right Side: Notifications, Infrastructure Health & Operator Profile */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Notifications Button & Dropdown Trigger */}
-          <div className="relative">
+        {/* Center: Search Bar (Global Quick-Investigate) */}
+        <div className="hidden md:flex flex-1 max-w-md mx-auto">
+          <form onSubmit={handleSearch} className="w-full relative">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Quick search IP address, IOC hash, or event..."
+              className="w-full bg-slate-900/80 border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-400 focus:outline-none focus:border-cyan-500 font-mono transition-colors"
+            />
+          </form>
+        </div>
+
+        {/* Right: Status Pill, Notifications & User Profile */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* System Health Pill */}
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-xs font-mono">
+            <span
+              className={`w-2 h-2 rounded-full ${
+                (health?.offline_services ?? 0) > 0 || health?.api === 'down' || health?.postgresql === 'down'
+                  ? 'bg-rose-500'
+                  : (health?.degraded_services ?? 0) > 0 || health?.api === 'degraded'
+                  ? 'bg-amber-400'
+                  : 'bg-emerald-400'
+              }`}
+            />
+            <span className="text-slate-300 text-[11px]">
+              {(health?.offline_services ?? 0) > 0 || health?.api === 'down' || health?.postgresql === 'down'
+                ? 'System Critical'
+                : (health?.degraded_services ?? 0) > 0 || health?.api === 'degraded'
+                ? 'System Degraded'
+                : 'System Online'}
+            </span>
+          </div>
+
+          {/* Notifications Trigger */}
+          <div className="relative" ref={notificationsRef}>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="p-2 rounded-lg bg-slate-950 border border-cyan-500/20 text-slate-400 hover:text-cyan-300 hover:border-cyan-500/50 transition-colors relative min-h-[42px] min-w-[42px] flex items-center justify-center"
-              title="Threat Notifications"
+              className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition-colors relative"
+              title="Notifications"
+              aria-label="Notifications"
             >
               <Bell className="w-4 h-4" />
               {unreadAlerts.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-mono text-[9px] font-bold flex items-center justify-center animate-pulse">
-                  {unreadAlerts.length}
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center font-mono animate-pulse">
+                  {unreadAlerts.length > 9 ? '9+' : unreadAlerts.length}
                 </span>
               )}
             </button>
 
-            {/* Notifications Popover */}
+            {/* Notifications Dropdown */}
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-72 sm:w-80 max-w-[calc(100vw-1.5rem)] rounded-lg bg-[#0a1020]/95 border border-cyan-500/40 shadow-nexus-cyan p-3 z-50 text-xs font-mono backdrop-blur-md">
-                <div className="flex items-center justify-between pb-2 border-b border-cyan-500/20">
-                  <span className="font-bold text-white flex items-center space-x-1.5">
-                    <Bell className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Active Notifications</span>
-                  </span>
-                  <span className="text-[10px] text-cyan-400 font-semibold">
-                    {unreadAlerts.length} Unresolved
+              <div className="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-800 rounded-xl shadow-xl p-3 z-50 text-xs font-sans">
+                <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800">
+                  <span className="font-semibold text-white">Security Alerts</span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    {unreadAlerts.length} requiring triage
                   </span>
                 </div>
 
-                <div className="py-2 space-y-1.5 max-h-56 overflow-y-auto">
-                  {unreadAlerts.slice(0, 4).map((alert) => (
-                    <div
-                      key={alert.id}
-                      onClick={() => {
-                        setShowNotifications(false);
-                        onViewChange?.('alerts');
-                      }}
-                      className="p-2 rounded bg-slate-950/80 border border-slate-800 hover:border-cyan-500/40 cursor-pointer transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-slate-200 truncate">{alert.alert_type}</span>
-                        <span className="text-[9px] uppercase px-1 py-0.2 rounded bg-rose-950 text-rose-300 border border-rose-800">
-                          {alert.severity}
-                        </span>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {unreadAlerts.length === 0 ? (
+                    <div className="py-4 text-center text-slate-400 flex items-center justify-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span>Zero open alerts</span>
+                    </div>
+                  ) : (
+                    unreadAlerts.slice(0, 5).map((a) => (
+                      <div
+                        key={a.id}
+                        onClick={() => {
+                          setShowNotifications(false);
+                          if (onViewChange) onViewChange('alerts');
+                        }}
+                        className="p-2 rounded bg-slate-950/70 border border-slate-800 hover:border-slate-700 cursor-pointer transition-colors"
+                      >
+                        <div className="flex items-center justify-between gap-1">
+                          <span className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.2 rounded ${
+                            a.severity === 'critical' ? 'bg-red-500/20 text-red-300' : 'bg-amber-500/20 text-amber-300'
+                          }`}>
+                            {a.severity}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            {a.notified_at ? new Date(a.notified_at).toLocaleTimeString() : 'Recent'}
+                          </span>
+                        </div>
+                        <p className="text-slate-200 mt-1 truncate font-medium">
+                          {a.message}
+                        </p>
                       </div>
-                      <p className="text-[10px] text-slate-400 truncate mt-0.5">{alert.message}</p>
-                    </div>
-                  ))}
-                  {unreadAlerts.length === 0 && (
-                    <div className="py-4 text-center text-slate-500 text-[11px] flex items-center justify-center space-x-1">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>All threat notifications triaged</span>
-                    </div>
+                    ))
                   )}
                 </div>
 
-                <button
-                  onClick={() => {
-                    setShowNotifications(false);
-                    onViewChange?.('alerts');
-                  }}
-                  className="w-full mt-2 py-1.5 rounded bg-cyan-950/60 hover:bg-cyan-900/60 text-cyan-300 border border-cyan-800/40 text-[10px] font-bold text-center transition-colors"
-                >
-                  Open Full Alerts Console &rarr;
-                </button>
+                {unreadAlerts.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setShowNotifications(false);
+                      if (onViewChange) onViewChange('alerts');
+                    }}
+                    className="w-full mt-2.5 pt-2 border-t border-slate-800 text-center text-cyan-400 hover:text-cyan-300 font-medium text-[11px] block transition-colors"
+                  >
+                    View all in Alerts Console →
+                  </button>
+                )}
               </div>
             )}
           </div>
 
-          {/* Infrastructure Health Indicators */}
-          <div className="hidden lg:flex items-center space-x-2 text-xs font-mono">
-            {/* API Health */}
-            <div className="flex items-center space-x-1.5 px-2 py-1 rounded bg-slate-950 border border-slate-800/80">
-              <Activity className="w-3 h-3 text-emerald-400" />
-              <span className="text-slate-400 text-[10px]">API:</span>
-              <span className="text-emerald-400 font-bold text-[10px]">{health?.api === 'healthy' ? 'Online' : (health?.api || 'Online')}</span>
-            </div>
+          {/* User Profile / Menu */}
+          <div className="relative" ref={userMenuRef}>
+            {operator ? (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 pl-2 pr-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors text-xs"
+                >
+                  <div className="w-5 h-5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 flex items-center justify-center font-bold font-mono text-[10px]">
+                    {operator.username.slice(0, 2).toUpperCase()}
+                  </div>
+                  <span className="text-slate-200 font-medium hidden sm:inline-block">
+                    {operator.username}
+                  </span>
+                  <span className={`text-[9px] font-mono uppercase px-1.5 py-0.5 rounded border hidden md:inline-block ${getRoleColor(operator.role)}`}>
+                    {getRoleLabel(operator.role)}
+                  </span>
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
+                </button>
+                <button
+                  type="button"
+                  onClick={onOpenLogin}
+                  className="text-xs text-cyan-400 hover:text-cyan-300 underline font-mono px-1"
+                >
+                  Switch
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={onOpenLogin}
+                className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs transition-colors flex items-center gap-1.5"
+              >
+                <User className="w-3.5 h-3.5" />
+                <span>Sign In</span>
+              </button>
+            )}
 
-            {/* PostgreSQL */}
-            <div className="flex items-center space-x-1.5 px-2 py-1 rounded bg-slate-950 border border-slate-800/80">
-              <Database className="w-3 h-3 text-cyan-400" />
-              <span className="text-slate-400 text-[10px]">DB:</span>
-              <span className={health?.postgresql ? (health.postgresql.includes('connect') ? 'text-emerald-400 font-semibold text-[10px]' : 'text-rose-400 font-semibold text-[10px]') : 'text-emerald-400 font-semibold text-[10px]'}>
-                {health?.postgresql ? (health.postgresql.includes('connect') ? 'Connected' : 'Offline') : 'Connected'}
-              </span>
-            </div>
-
-            {/* Redis */}
-            <div className="flex items-center space-x-1.5 px-2 py-1 rounded bg-slate-950 border border-slate-800/80">
-              <Server className="w-3 h-3 text-purple-400" />
-              <span className="text-slate-400 text-[10px]">Redis:</span>
-              <span className={health?.redis ? (health.redis.includes('connect') ? 'text-emerald-400 font-semibold text-[10px]' : 'text-amber-400 font-semibold text-[10px]') : 'text-emerald-400 font-semibold text-[10px]'}>
-                {health?.redis ? (health.redis.includes('connect') ? 'Connected' : 'Offline') : 'Connected'}
-              </span>
-            </div>
-
-            {/* 5s Poll Pulse */}
-            <div className="flex items-center space-x-1 px-2 py-1 rounded bg-slate-950 text-[10px] text-slate-400 border border-slate-800/80">
-              <RefreshCw className={`w-3 h-3 text-cyan-400 ${isFetching ? 'animate-spin' : ''}`} />
-              <span>5s</span>
-            </div>
-          </div>
-
-          {/* Authenticated Operator Ribbon */}
-          <div
-            onClick={() => {
-              if (window.innerWidth < 640 && onOpenMobileDrawer) {
-                onOpenMobileDrawer();
-              }
-            }}
-            className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-2.5 py-1 rounded-lg bg-slate-950 border border-cyan-500/20 text-xs font-mono shrink-0 cursor-pointer sm:cursor-default"
-          >
-            <User className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="hidden sm:inline font-semibold text-slate-200">{operator?.username || 'Not logged in'}</span>
-            <span className={`text-[9px] px-1.5 py-0.2 rounded border uppercase font-bold ${getRoleBadgeColor(operator?.role)}`}>
-              {formatRoleName(operator?.role)}
-            </span>
-            <button
-              onClick={onOpenLogin}
-              title="Switch operator account or engage emergency break-glass"
-              className="hidden sm:inline text-[10px] text-cyan-400 hover:text-cyan-300 ml-0.5 px-1.5 py-0.2 rounded bg-cyan-950/40 border border-cyan-800/50 hover:bg-cyan-900/40 transition-colors"
-            >
-              Switch
-            </button>
-            <button
-              onClick={() => logout()}
-              title="Sign out of current session"
-              className="hidden sm:inline text-slate-400 hover:text-rose-400 p-0.5 transition-colors"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-            </button>
+            {/* User Dropdown */}
+            {showUserMenu && operator && (
+              <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-xl p-2 z-50 text-xs font-sans">
+                <div className="px-2 py-1.5 border-b border-slate-800 mb-1">
+                  <p className="font-semibold text-white">{operator.username}</p>
+                  <p className="text-[10px] text-slate-400 font-mono capitalize">{operator.role}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    logout();
+                  }}
+                  className="w-full text-left px-2 py-1.5 text-red-400 hover:bg-slate-800 rounded flex items-center gap-2 transition-colors"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 {
-  "verified_at": "2026-11-06T02:10:11.684471+00:00",
+  "verified_at": "2026-11-06T18:56:50.260733+00:00",
   "workflow_id": "wf_m13_cross_platform_001",
   "attack_id": 1,
   "alert_id": 1,
@@ -7,36 +7,36 @@
   "source_ip": "198.51.100.99",
   "agents": {
     "SCOUT": {
-      "event_id": "57d3aa16-09ab-4366-9440-1784748da398",
+      "event_id": "f93edef1-4fb6-4713-8af7-5b8d6e851507",
       "cursor": 1,
       "transfer_id": "tr_scout_1",
       "status": "completed",
       "stage": "collection",
-      "timestamp": "2026-11-06T02:10:11.679632+00:00"
+      "timestamp": "2026-11-06T18:56:50.255722+00:00"
     },
     "NEXUS": {
-      "event_id": "84c338a1-f69e-4047-95f9-136d3a40e7ae",
+      "event_id": "9555916c-7967-49ae-91d3-0feccfb7fe37",
       "cursor": 2,
       "transfer_id": "tr_nexus_1",
       "status": "completed",
       "stage": "normalization",
-      "timestamp": "2026-11-06T02:10:11.680486+00:00"
+      "timestamp": "2026-11-06T18:56:50.256693+00:00"
     },
     "ORACLE": {
-      "event_id": "e211d30a-1292-425c-9fe4-00e832bf28c7",
+      "event_id": "fa8d5009-e200-45cd-8de9-554c63a185b2",
       "cursor": 3,
       "transfer_id": "tr_oracle_1",
       "status": "completed",
       "stage": "intelligence",
-      "timestamp": "2026-11-06T02:10:11.680789+00:00"
+      "timestamp": "2026-11-06T18:56:50.257003+00:00"
     },
     "SENTINEL": {
-      "event_id": "9d1183eb-8795-4e00-b01c-5d8f8abf759a",
+      "event_id": "95b638d7-3032-48f2-9419-2befb4fe5bc4",
       "cursor": 4,
       "transfer_id": "tr_sentinel_1",
       "status": "completed",
       "stage": "alert",
-      "timestamp": "2026-11-06T02:10:11.681846+00:00"
+      "timestamp": "2026-11-06T18:56:50.258102+00:00"
     }
   },
   "monotonic_cursors": [

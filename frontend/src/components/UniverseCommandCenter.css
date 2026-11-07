@@ -498,13 +498,14 @@
 }
 
 .hsx-diagnostics-modal {
-  max-width: 680px;
+  max-width: 720px;
   width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
   background: #030712;
   border: 1px solid rgba(0, 229, 255, 0.35);
   box-shadow: 0 0 50px rgba(0, 229, 255, 0.2);
   border-radius: 16px;
-  overflow: hidden;
 }
 
 /* ==========================================================================

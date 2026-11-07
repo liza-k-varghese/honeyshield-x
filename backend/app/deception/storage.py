@@ -22,8 +22,8 @@ from app.schemas import CanaryHitEvent, CanaryToken
 
 logger = logging.getLogger(__name__)
 
-REDIS_HOST: str = os.getenv("REDIS_HOST", "127.0.0.1")
-REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_HOST: str = os.getenv("REDIS_HOST", os.getenv("HONEYSHIELD_REDIS_HOST", "127.0.0.1"))
+REDIS_PORT: int = int(os.getenv("REDIS_PORT", os.getenv("HONEYSHIELD_REDIS_PORT", "6379")))
 
 MAX_HITS_PER_CANARY: int = 100
 MAX_RECENT_GLOBAL_HITS: int = 500

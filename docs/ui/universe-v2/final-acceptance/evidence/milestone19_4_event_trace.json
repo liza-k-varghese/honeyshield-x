@@ -1,0 +1,129 @@
+{
+  "milestone": "19.4",
+  "evaluation_standard": "Telemetry Honesty & Zero Fictional Data",
+  "generated_at": "2026-11-07T01:47:26.502319+00:00",
+  "total_events_in_trace": 6,
+  "outbox_cursor_range": [
+    1,
+    6
+  ],
+  "verified_monotonic_cursors": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "profiles": [
+    {
+      "name": "Profile A: Full 4-Agent Incident Escalation",
+      "attack_id": 1,
+      "risk_score": 98.2,
+      "alert_id": 1,
+      "agents_involved": [
+        "scout",
+        "nexus",
+        "oracle",
+        "sentinel"
+      ],
+      "steps": [
+        {
+          "profile": "Profile A (Critical Escalation)",
+          "stage": 1,
+          "agent": "SCOUT",
+          "action": "Sensor Telemetry Collection",
+          "cursor": 1,
+          "event_id": "7bbbd86b-db66-4c45-ac4b-fefda0624a51",
+          "transfer_id": "tr_m19_4_scout_001",
+          "source": "sensor:cowrie-honeypot-dmz-01",
+          "destination": "gateway:ingestion",
+          "timestamp": "2026-11-07T01:47:26.482557+00:00",
+          "database_verified": true
+        },
+        {
+          "profile": "Profile A (Critical Escalation)",
+          "stage": 2,
+          "agent": "NEXUS",
+          "action": "Outbox ACID Persistence & Courier Relay",
+          "cursor": 2,
+          "event_id": "4767e3f8-1431-4f77-b024-c1287ce666ba",
+          "transfer_id": "tr_m19_4_scout_nexus_002",
+          "source": "gateway:ingestion",
+          "destination": "bus:redis_outbox",
+          "timestamp": "2026-11-07T01:47:26.485621+00:00",
+          "database_verified": true
+        },
+        {
+          "profile": "Profile A (Critical Escalation)",
+          "stage": 3,
+          "agent": "ORACLE",
+          "action": "STIX/TAXII Threat Intelligence Enrichment",
+          "cursor": 3,
+          "event_id": "62768e22-d778-40ec-90c8-564ef386c2a6",
+          "transfer_id": "tr_m19_4_nexus_oracle_003",
+          "source": "bus:redis_outbox",
+          "destination": "intel:stix_taxii",
+          "timestamp": "2026-11-07T01:47:26.486572+00:00",
+          "database_verified": true
+        },
+        {
+          "profile": "Profile A (Critical Escalation)",
+          "stage": 4,
+          "agent": "SENTINEL",
+          "action": "Alert Escalation & Mobile Containment Staging",
+          "cursor": 4,
+          "event_id": "31d47b53-0585-4650-8758-c5bf0e5bc02e",
+          "transfer_id": "tr_m19_4_oracle_sentinel_004",
+          "source": "intel:stix_taxii",
+          "destination": "soc:containment_dispatch",
+          "timestamp": "2026-11-07T01:47:26.494694+00:00",
+          "database_verified": true
+        }
+      ]
+    },
+    {
+      "name": "Profile B: Targeted 2-Agent Normalization",
+      "attack_id": 2,
+      "risk_score": 14.5,
+      "alert_id": null,
+      "agents_involved": [
+        "scout",
+        "nexus"
+      ],
+      "skipped_agents": [
+        "oracle",
+        "sentinel"
+      ],
+      "reason_skipped": "Risk score 14.5 < threshold 25.0; zero fake alerts fabricated",
+      "steps": [
+        {
+          "profile": "Profile B (Benign Normalization)",
+          "stage": 1,
+          "agent": "SCOUT",
+          "action": "Sensor Telemetry Collection",
+          "cursor": 5,
+          "event_id": "d9dd6813-0d30-48b9-9f98-9ccfd0f7281d",
+          "transfer_id": "tr_m19_4_scout_005",
+          "source": "sensor:snort-nids-edge-02",
+          "destination": "gateway:ingestion",
+          "timestamp": "2026-11-07T01:47:26.497823+00:00",
+          "database_verified": true
+        },
+        {
+          "profile": "Profile B (Benign Normalization)",
+          "stage": 2,
+          "agent": "NEXUS",
+          "action": "Audit Archival & Telemetry Normalization",
+          "cursor": 6,
+          "event_id": "6b28ec55-6e1d-41eb-8a86-9df80435701f",
+          "transfer_id": "tr_m19_4_nexus_006",
+          "source": "gateway:ingestion",
+          "destination": "storage:audit_log",
+          "timestamp": "2026-11-07T01:47:26.498669+00:00",
+          "database_verified": true
+        }
+      ]
+    }
+  ]
+}

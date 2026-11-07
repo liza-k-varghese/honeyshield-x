@@ -1,0 +1,85 @@
+
+ RUN  v5.0.3 /home/liza/HoneyShield-X/frontend
+
+ ✓ src/components/__tests__/deception.test.tsx (5 tests) 736ms
+   ✓ Module 3.7 Frontend: Active Deception Grid & Canary Orchestrator (5)
+     ✓ renders DeceptionGridView with KPI ribbon, filters, and canaries list 382ms
+ ✓ src/tests/campaigns.test.tsx (7 tests) 783ms
+ ✓ src/tests/milestone5_browser_integration.test.tsx (8 tests) 819ms
+   ✓ HoneyShield X — Milestone 5 Browser Integration & Contract Reconciliation (8)
+     ✓ Character Silhouette, Articulated Hands & Trajectory Navigation (2)
+       ✓ renders all four characters with articulated arms and distinct silhouettes 308ms
+ ✓ src/components/__tests__/cases.test.tsx (6 tests) 571ms
+ ✓ src/tests/digital_agents.test.tsx (14 tests) 832ms
+ ✓ src/tests/movement_prototype.test.tsx (8 tests) 1210ms
+ ✓ src/components/__tests__/command_center.test.tsx (13 tests) 803ms
+AggregateError: 
+    at internalConnectMultiple (node:net:1123:18)
+    at afterConnectMultiple (node:net:1683:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:3000
+        at createConnectionError (node:net:1646:14)
+        at afterConnectMultiple (node:net:1676:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 3000
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:3000
+        at createConnectionError (node:net:1646:14)
+        at afterConnectMultiple (node:net:1676:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 3000
+    }
+  ]
+}
+ ✓ src/tests/milestone4_browser_motion.test.tsx (13 tests) 1389ms
+ ✓ src/tests/security_overview.test.tsx (20 tests) 1846ms
+ ✓ src/tests/milestone3_universe.test.tsx (12 tests) 1889ms
+   ✓ Digital Agent Universe — Milestone 3 Cyber Intelligence Universe Tests (12)
+     ✓ Stage 2 & 3: Territory Navigation, Pan/Zoom & Node Inspection (4)
+       ✓ renders all 4 operational territories with distinct headers and agent avatars 356ms
+       ✓ opens NodeInspectorModal with accurate metrics when a service node is clicked 306ms
+stderr | src/tests/milestone6_1_secure_streaming.test.tsx > Milestone 6.1 — Secure Streaming & Token Protection Tests > CRITICAL: SSE fallback NEVER includes bearer tokens in URL query parameters
+[RealtimeWS] Ticket acquisition failed (503), attempting SSE fallback
+
+stderr | src/tests/milestone6_1_secure_streaming.test.tsx > Milestone 6.1 — Secure Streaming & Token Protection Tests > parses chunk-split SSE frames with multibyte UTF-8 characters
+[RealtimeWS] Ticket acquisition failed (503), attempting SSE fallback
+
+stderr | src/tests/milestone6_1_secure_streaming.test.tsx > Milestone 6.1 — Secure Streaming & Token Protection Tests > filters comment keepalives and system.heartbeat frames cleanly
+[RealtimeWS] Ticket acquisition failed (503), attempting SSE fallback
+
+stderr | src/tests/milestone6_1_secure_streaming.test.tsx > Milestone 6.1 — Secure Streaming & Token Protection Tests > disconnect() aborts the stream AbortController and resets connection state
+[RealtimeWS] Ticket acquisition failed (503), attempting SSE fallback
+
+ ✓ src/tests/milestone6_1_secure_streaming.test.tsx (7 tests) 179ms
+ ✓ src/components/__tests__/integrations.test.tsx (5 tests) 712ms
+ ✓ src/tests/universe_command_center.test.tsx (13 tests) 4043ms
+   ✓ UniverseCommandCenter — Universe 2.0 Living Observatory & Spatial SOC (13)
+     ✓ renders the central Event Singularity core and orbital rings with explicit state 456ms
+     ✓ opens and closes Holographic Core Diagnostics Modal when Event Singularity is clicked 440ms
+     ✓ supports Camera HUD navigation presets 333ms
+     ✓ opens and dismisses the Guided Universe Showcase modal 657ms
+ ✓ src/components/__tests__/auth.test.tsx (7 tests) 265ms
+ ✓ src/components/__tests__/incident_command.test.tsx (5 tests) 192ms
+ ✓ src/components/__tests__/investigation.test.tsx (5 tests) 277ms
+ ✓ src/components/__tests__/threat_intel.test.tsx (4 tests) 473ms
+ ✓ src/tests/hunting.test.tsx (5 tests) 618ms
+ ✓ src/components/__tests__/components.test.tsx (8 tests) 187ms
+ ✓ src/tests/cinematic_motion.test.tsx (6 tests) 470ms
+ ✓ src/tests/milestone2_live_integration.test.tsx (7 tests) 245ms
+ ✓ src/components/__tests__/module_3_3.test.tsx (5 tests) 130ms
+
+ Test Files  22 passed (22)
+      Tests  183 passed (183)
+   Start at  06:50:25
+   Duration  10.00s (import 41%, environment 24%, tests 22%, transform 12%)
+
+    Isolate  22 workers spawned · ~1.42s startup each (spawn + environment, per file)
+             at least ~1.42s faster with isolate: false — reuses workers across files instead of one per file
+

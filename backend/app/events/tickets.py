@@ -21,8 +21,8 @@ from app.observability.metrics import default_metrics_collector
 logger = logging.getLogger(__name__)
 
 TICKET_TTL_SECONDS: int = 60
-REDIS_HOST: str = os.getenv("REDIS_HOST", "127.0.0.1")
-REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_HOST: str = os.getenv("REDIS_HOST", os.getenv("HONEYSHIELD_REDIS_HOST", "127.0.0.1"))
+REDIS_PORT: int = int(os.getenv("REDIS_PORT", os.getenv("HONEYSHIELD_REDIS_PORT", "6379")))
 REDIS_TICKET_PREFIX: str = "hsx:ws_ticket:"
 
 HONEYSHIELD_STRICT_AUTH_COORDINATION: bool = (

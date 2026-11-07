@@ -1,0 +1,79 @@
+
+ RUN  v5.0.3 /home/liza/HoneyShield-X/frontend
+
+ ✓ src/components/__tests__/integrations.test.tsx (5 tests) 738ms
+ ✓ src/tests/hunting.test.tsx (5 tests) 716ms
+ ✓ src/tests/digital_agents.test.tsx (14 tests) 817ms
+ ✓ src/tests/campaigns.test.tsx (7 tests) 857ms
+ ✓ src/tests/movement_prototype.test.tsx (8 tests) 1246ms
+ ✓ src/tests/milestone5_browser_integration.test.tsx (8 tests) 1116ms
+   ✓ HoneyShield X — Milestone 5 Browser Integration & Contract Reconciliation (8)
+     ✓ Character Silhouette, Articulated Hands & Trajectory Navigation (2)
+       ✓ renders all four characters with articulated arms and distinct silhouettes 440ms
+ ✓ src/tests/security_overview.test.tsx (20 tests) 1590ms
+ ✓ src/tests/milestone21_e2e_flows.test.tsx (10 tests) 1270ms
+   ✓ Milestone 21 End-to-End User Journey Tests (E2E-01 through E2E-10) (10)
+     ✓ E2E-01 — Login and Overview: renders login form with operator accounts and mounts SecurityOverview upon auth 319ms
+ ✓ src/tests/milestone4_browser_motion.test.tsx (13 tests) 1455ms
+   ✓ Digital Agent Universe — Milestone 4 Browser Motion & Live Verification Tests (13)
+     ✓ Stage 3 & 4: Character Models & Physical Movement Engine (6)
+       ✓ executes full movement sequence (ready -> travelling -> waiting -> confirmed) 386ms
+       ✓ switches between all 4 agents in single character mode 315ms
+ ✓ src/tests/milestone3_universe.test.tsx (12 tests) 1828ms
+   ✓ Digital Agent Universe — Milestone 3 Cyber Intelligence Universe Tests (12)
+     ✓ Stage 2 & 3: Territory Navigation, Pan/Zoom & Node Inspection (4)
+       ✓ renders all 4 operational territories with distinct headers and agent avatars 310ms
+       ✓ opens NodeInspectorModal with accurate metrics when a service node is clicked 320ms
+ ✓ src/tests/universe_command_center.test.tsx (13 tests) 4285ms
+   ✓ UniverseCommandCenter — Universe 2.0 Living Observatory & Spatial SOC (13)
+     ✓ renders the central Event Singularity core and orbital rings with explicit state 480ms
+     ✓ renders all four agent quadrants with articulated robot presence 439ms
+     ✓ controls physical agent locomotion and updates transit state 332ms
+     ✓ opens and closes Holographic Core Diagnostics Modal when Event Singularity is clicked 418ms
+     ✓ supports Camera HUD navigation presets 329ms
+     ✓ correctly calculates and displays verified service health statuses 369ms
+     ✓ opens and dismisses the Guided Universe Showcase modal 509ms
+ ✓ src/tests/milestone2_live_integration.test.tsx (7 tests) 290ms
+ ✓ src/components/__tests__/auth.test.tsx (7 tests) 342ms
+ ✓ src/tests/cinematic_motion.test.tsx (6 tests) 614ms
+ ✓ src/components/__tests__/cases.test.tsx (6 tests) 485ms
+ ✓ src/components/__tests__/deception.test.tsx (5 tests) 538ms
+ ✓ src/components/__tests__/threat_intel.test.tsx (4 tests) 536ms
+ ✓ src/components/__tests__/incident_command.test.tsx (5 tests) 297ms
+ ✓ src/components/__tests__/components.test.tsx (8 tests) 152ms
+ ✓ src/components/__tests__/command_center.test.tsx (13 tests) 522ms
+DOMException [AbortError]: The operation was aborted.
+    at Fetch.onAsyncTaskManagerAbort (file:///home/liza/HoneyShield-X/frontend/node_modules/.pnpm/happy-dom@20.14.5/node_modules/happy-dom/lib/fetch/Fetch.js:546:23)
+    at Object.<anonymous> (file:///home/liza/HoneyShield-X/frontend/node_modules/.pnpm/happy-dom@20.14.5/node_modules/happy-dom/lib/fetch/Fetch.js:416:101)
+    at AsyncTaskManager.abortAll (file:///home/liza/HoneyShield-X/frontend/node_modules/.pnpm/happy-dom@20.14.5/node_modules/happy-dom/lib/async-task-manager/AsyncTaskManager.js:292:30)
+    at AsyncTaskManager.abort (file:///home/liza/HoneyShield-X/frontend/node_modules/.pnpm/happy-dom@20.14.5/node_modules/happy-dom/lib/async-task-manager/AsyncTaskManager.js:52:21)
+    at DetachedBrowserFrame.abort (file:///home/liza/HoneyShield-X/frontend/node_modules/.pnpm/happy-dom@20.14.5/node_modules/happy-dom/lib/browser/detached-browser/DetachedBrowserFrame.js:112:58)
+    at DetachedWindowAPI.abort (file:///home/liza/HoneyShield-X/frontend/node_modules/.pnpm/happy-dom@20.14.5/node_modules/happy-dom/lib/window/DetachedWindowAPI.js:51:35)
+    at teardownWindow (file:///home/liza/HoneyShield-X/frontend/node_modules/.pnpm/vitest@5.0.3_@types+node@22.20.5_happy-dom@20.14.5_jsdom@30.1.2_vite@6.4.4_@types+node@22.20.5_jiti@1.21.7_/node_modules/vitest/dist/chunks/index.k8L_ZRzq.js:1174:22)
+    at Object.teardown (file:///home/liza/HoneyShield-X/frontend/node_modules/.pnpm/vitest@5.0.3_@types+node@22.20.5_happy-dom@20.14.5_jsdom@30.1.2_vite@6.4.4_@types+node@22.20.5_jiti@1.21.7_/node_modules/vitest/dist/chunks/index.k8L_ZRzq.js:1236:10)
+    at file:///home/liza/HoneyShield-X/frontend/node_modules/.pnpm/vitest@5.0.3_@types+node@22.20.5_happy-dom@20.14.5_jsdom@30.1.2_vite@6.4.4_@types+node@22.20.5_jiti@1.21.7_/node_modules/vitest/dist/chunks/base.DhkQeZwd.js:167:65
+    at Traces.$ (file:///home/liza/HoneyShield-X/frontend/node_modules/.pnpm/vitest@5.0.3_@types+node@22.20.5_happy-dom@20.14.5_jsdom@30.1.2_vite@6.4.4_@types+node@22.20.5_jiti@1.21.7_/node_modules/vitest/dist/traces.js:143:27)
+ ✓ src/components/__tests__/module_3_3.test.tsx (5 tests) 223ms
+stderr | src/tests/milestone6_1_secure_streaming.test.tsx > Milestone 6.1 — Secure Streaming & Token Protection Tests > CRITICAL: SSE fallback NEVER includes bearer tokens in URL query parameters
+[RealtimeWS] Ticket acquisition failed (503), attempting SSE fallback
+
+stderr | src/tests/milestone6_1_secure_streaming.test.tsx > Milestone 6.1 — Secure Streaming & Token Protection Tests > parses chunk-split SSE frames with multibyte UTF-8 characters
+[RealtimeWS] Ticket acquisition failed (503), attempting SSE fallback
+
+stderr | src/tests/milestone6_1_secure_streaming.test.tsx > Milestone 6.1 — Secure Streaming & Token Protection Tests > filters comment keepalives and system.heartbeat frames cleanly
+[RealtimeWS] Ticket acquisition failed (503), attempting SSE fallback
+
+stderr | src/tests/milestone6_1_secure_streaming.test.tsx > Milestone 6.1 — Secure Streaming & Token Protection Tests > disconnect() aborts the stream AbortController and resets connection state
+[RealtimeWS] Ticket acquisition failed (503), attempting SSE fallback
+
+ ✓ src/tests/milestone6_1_secure_streaming.test.tsx (7 tests) 143ms
+ ✓ src/components/__tests__/investigation.test.tsx (5 tests) 216ms
+
+ Test Files  23 passed (23)
+      Tests  193 passed (193)
+   Start at  07:18:59
+   Duration  11.03s (import 41%, environment 23%, tests 22%, transform 14%)
+
+    Isolate  23 workers spawned · ~1.37s startup each (spawn + environment, per file)
+             at least ~1.49s faster with isolate: false — reuses workers across files instead of one per file
+

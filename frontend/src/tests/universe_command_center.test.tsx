@@ -422,6 +422,9 @@ describe('UniverseCommandCenter — Universe 2.0 Living Observatory & Spatial SO
     expect(screen.getByText(/CORE DIAGNOSTICS & TRUST VAULT/i)).toBeDefined();
     expect(screen.getByText('PostgreSQL 17')).toBeDefined();
     expect(screen.getByText('Redis Outbox Bus')).toBeDefined();
+    expect(screen.getByText(/OPERATOR VALIDATION & TELEMETRY AUDIT/i)).toBeDefined();
+    expect(screen.getAllByText('v1.0.0-rc5').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText(/COPY SANITIZED DIAGNOSTICS/i)).toBeDefined();
 
     // Click close button
     const closeBtn = screen.getByRole('button', { name: '' }).closest('button');
@@ -457,5 +460,150 @@ describe('UniverseCommandCenter — Universe 2.0 Living Observatory & Spatial SO
 
     const resetBtn = screen.getByTitle(/Reset Camera to Global Overview/i);
     fireEvent.click(resetBtn);
+  });
+
+  it('correctly calculates and displays verified service health statuses', () => {
+    // 1. All Healthy
+    const { rerender } = render(
+      <UniverseCommandCenter
+        stats={{
+          ...mockStats,
+          system_health: { api: 'healthy', postgresql: 'connected', redis: 'connected' },
+        }}
+        alerts={mockAlerts}
+        attacks={mockAttacks}
+        runtimeStatuses={mockRuntimeStatuses}
+        journeys={mockJourneys}
+        isDemoMode={false}
+        onToggleDemoMode={onToggleDemoMode}
+        onInvestigateIp={onInvestigateIp}
+        onNavigateView={onNavigateView}
+        onOpenNexusAssistant={onOpenNexusAssistant}
+      />
+    );
+    expect(screen.getByText('3/3 HEALTHY')).toBeDefined();
+
+    // 2. Degraded (Redis disconnected)
+    rerender(
+      <UniverseCommandCenter
+        stats={{
+          ...mockStats,
+          system_health: { api: 'healthy', postgresql: 'connected', redis: 'disconnected' },
+        }}
+        alerts={mockAlerts}
+        attacks={mockAttacks}
+        runtimeStatuses={mockRuntimeStatuses}
+        journeys={mockJourneys}
+        isDemoMode={false}
+        onToggleDemoMode={onToggleDemoMode}
+        onInvestigateIp={onInvestigateIp}
+        onNavigateView={onNavigateView}
+        onOpenNexusAssistant={onOpenNexusAssistant}
+      />
+    );
+    expect(screen.getByText('2/3 SERVICES (1 DEGRADED)')).toBeDefined();
+
+    // 3. Offline (Postgres error)
+    rerender(
+      <UniverseCommandCenter
+        stats={{
+          ...mockStats,
+          system_health: { api: 'healthy', postgresql: 'error: connection refused', redis: 'connected' },
+        }}
+        alerts={mockAlerts}
+        attacks={mockAttacks}
+        runtimeStatuses={mockRuntimeStatuses}
+        journeys={mockJourneys}
+        isDemoMode={false}
+        onToggleDemoMode={onToggleDemoMode}
+        onInvestigateIp={onInvestigateIp}
+        onNavigateView={onNavigateView}
+        onOpenNexusAssistant={onOpenNexusAssistant}
+      />
+    );
+    expect(screen.getByText('2/3 SERVICES (1 OFFLINE)')).toBeDefined();
+
+    // 4. Missing / Unknown
+    rerender(
+      <UniverseCommandCenter
+        stats={{ ...mockStats, system_health: undefined as any }}
+        alerts={mockAlerts}
+        attacks={mockAttacks}
+        runtimeStatuses={mockRuntimeStatuses}
+        journeys={mockJourneys}
+        isDemoMode={false}
+        onToggleDemoMode={onToggleDemoMode}
+        onInvestigateIp={onInvestigateIp}
+        onNavigateView={onNavigateView}
+        onOpenNexusAssistant={onOpenNexusAssistant}
+      />
+    );
+    expect(screen.getByText('SERVICES: UNKNOWN')).toBeDefined();
+  });
+
+  it('safely handles keyboard shortcuts and ignores input focus', () => {
+    render(
+      <div>
+        <input data-testid="test-input" />
+        <UniverseCommandCenter
+          stats={mockStats}
+          alerts={mockAlerts}
+          attacks={mockAttacks}
+          runtimeStatuses={mockRuntimeStatuses}
+          journeys={mockJourneys}
+          isDemoMode={false}
+          onToggleDemoMode={onToggleDemoMode}
+          onInvestigateIp={onInvestigateIp}
+          onNavigateView={onNavigateView}
+          onOpenNexusAssistant={onOpenNexusAssistant}
+        />
+      </div>
+    );
+
+    // Focus on input field
+    const input = screen.getByTestId('test-input');
+    input.focus();
+
+    // Dispatch keyboard shortcut '1' while inside input -> should NOT change agent or toggle demo
+    fireEvent.keyDown(input, { key: '1' });
+    fireEvent.keyDown(input, { key: 'd' });
+    expect(onToggleDemoMode).not.toHaveBeenCalled();
+
+    // Dispatch keyboard shortcut on window while NOT in input -> should toggle demo
+    fireEvent.keyDown(window, { key: 'd' });
+    expect(onToggleDemoMode).toHaveBeenCalledWith(true);
+  });
+
+  it('opens and dismisses the Guided Universe Showcase modal', () => {
+    render(
+      <UniverseCommandCenter
+        stats={mockStats}
+        alerts={mockAlerts}
+        attacks={mockAttacks}
+        runtimeStatuses={mockRuntimeStatuses}
+        journeys={mockJourneys}
+        isDemoMode={false}
+        onToggleDemoMode={onToggleDemoMode}
+        onInvestigateIp={onInvestigateIp}
+        onNavigateView={onNavigateView}
+        onOpenNexusAssistant={onOpenNexusAssistant}
+      />
+    );
+
+    // Click SHOWCASE GUIDE button
+    const guideBtn = screen.getByRole('button', { name: /SHOWCASE GUIDE/i });
+    fireEvent.click(guideBtn);
+
+    // Modal appears
+    expect(screen.getByText(/GUIDED OPERATOR DEMONSTRATION SHOWCASE/i)).toBeDefined();
+    expect(screen.getByText(/1\. SCOUT \/\/ SENSOR FRONTIER/i)).toBeDefined();
+    expect(screen.getByText(/2\. NEXUS \/\/ PROCESSING CORE/i)).toBeDefined();
+    expect(screen.getByText(/3\. ORACLE \/\/ INTELLIGENCE SANCTUM/i)).toBeDefined();
+    expect(screen.getByText(/4\. SENTINEL \/\/ RESPONSE BASTION/i)).toBeDefined();
+
+    // Dismiss modal
+    const enterBtn = screen.getByRole('button', { name: /ENTER UNIVERSE SHOWCASE/i });
+    fireEvent.click(enterBtn);
+    expect(screen.queryByText(/GUIDED OPERATOR DEMONSTRATION SHOWCASE/i)).toBeNull();
   });
 });
