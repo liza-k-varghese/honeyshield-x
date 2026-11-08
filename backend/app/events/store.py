@@ -61,7 +61,7 @@ class EventStore:
         self._buffer: deque[SecurityEventEnvelope] = deque(maxlen=buffer_size)
         self._redis_client: redis.Redis | None = None
         self._init_redis()
-        self._hydrate_from_db()
+        self._hydrate_from_db(db=kwargs.get("db"))
 
     def _init_redis(self) -> None:
         try:
@@ -87,6 +87,8 @@ class EventStore:
                 max_id = session.scalar(select(func.max(SecurityEventOutbox.id)))
                 if max_id:
                     self._cursor_counter = int(max_id)
+                else:
+                    self._cursor_counter = 0
 
                 # Fetch last N events in chronological order
                 stmt = (
@@ -98,6 +100,7 @@ class EventStore:
                 rows.reverse()
 
                 with self._lock:
+                    self._buffer.clear()
                     for row in rows:
                         try:
                             payload = json.loads(row.payload_json)

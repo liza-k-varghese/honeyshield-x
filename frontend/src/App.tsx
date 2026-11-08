@@ -32,7 +32,7 @@ import {
   NexusAssistantModal,
 } from './digital-agents';
 
-import { Reveal, CurtainTransition } from './components/CyberMotion';
+import { CurtainTransition } from './components/CyberMotion';
 import { HoneyShieldLanding } from './components/HoneyShieldLanding';
 import { UniverseCommandCenter } from './components/UniverseCommandCenter';
 import { SecurityOverview } from './components/SecurityOverview';
@@ -67,8 +67,29 @@ function DashboardContent() {
   const [activeView, setActiveView] = useState<HSXView>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('view') === 'landing') return 'landing';
-      if (window.location.hash === '#landing') return 'landing';
+      const viewParam = params.get('view');
+      const hashParam = window.location.hash.replace('#', '');
+      const candidate = (viewParam || hashParam) as HSXView;
+      const validViews: HSXView[] = [
+        'overview',
+        'landing',
+        'universe',
+        'analytics',
+        'alerts',
+        'dashboard',
+        'command',
+        'cases',
+        'deception',
+        'intel',
+        'integrations',
+        'campaigns',
+        'hunts',
+        'investigation',
+        'rules',
+      ];
+      if (candidate && validViews.includes(candidate)) {
+        return candidate;
+      }
     }
     return 'overview';
   });
@@ -300,25 +321,23 @@ function DashboardContent() {
         <main className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6 max-w-7xl w-full mx-auto pb-20 lg:pb-6">
           {activeView === 'overview' ? (
             /* Minimal, Premium Security Overview (Milestone 20 Flagship Experience) */
-            <Reveal direction="up" duration={260} distance={12}>
-              <SecurityOverview
-                stats={stats}
-                alerts={alerts}
-                attacks={attacks}
-                isStatsLoading={isStatsLoading}
-                isAlertsLoading={isAlertsLoading}
-                isStatsError={isStatsError}
-                isAlertsError={isAlertsError}
-                onInvestigateIp={handleDeepLinkInvestigate}
-                onNavigateView={(view) => setActiveView(view as HSXView)}
-                onSelectAlert={(alert) => setSelectedAlert(alert)}
-                streamConnectionState={streamConnectionState}
-                streamMetrics={streamMetrics}
-              />
-            </Reveal>
+            <SecurityOverview
+              stats={stats}
+              alerts={alerts}
+              attacks={attacks}
+              isStatsLoading={isStatsLoading}
+              isAlertsLoading={isAlertsLoading}
+              isStatsError={isStatsError}
+              isAlertsError={isAlertsError}
+              onInvestigateIp={handleDeepLinkInvestigate}
+              onNavigateView={(view) => setActiveView(view as HSXView)}
+              onSelectAlert={(alert) => setSelectedAlert(alert)}
+              streamConnectionState={streamConnectionState}
+              streamMetrics={streamMetrics}
+            />
           ) : activeView === 'universe' ? (
             /* Dedicated Immersive Digital Agent Universe (Universe 2.0 Command Center) */
-            <Reveal direction="up" duration={260} distance={12} className="space-y-4">
+            <div className="space-y-4">
               <UniverseCommandCenter
                 stats={stats}
                 alerts={alerts}
@@ -336,10 +355,10 @@ function DashboardContent() {
                 streamMetrics={streamMetrics}
                 onOpenNexusAssistant={() => setIsAssistantModalOpen(true)}
               />
-            </Reveal>
+            </div>
           ) : activeView === 'analytics' || activeView === 'dashboard' ? (
             /* Module 3.1 & Analytics Overview */
-            <Reveal direction="up" duration={260} distance={12} className="space-y-6">
+            <div className="space-y-6">
               <KpiRibbon stats={stats} isLoading={isStatsLoading} />
               <AlertTable
                 alerts={alerts}
@@ -348,10 +367,10 @@ function DashboardContent() {
                 statusFilter={statusFilter}
                 onStatusFilterChange={(status) => setStatusFilter(status)}
               />
-            </Reveal>
+            </div>
           ) : activeView === 'alerts' ? (
             /* Dedicated Alerts Feed */
-            <Reveal direction="up" duration={260} distance={12} className="space-y-6">
+            <div className="space-y-6">
               <div className="p-4 rounded-lg bg-slate-950/80 border border-cyan-500/20 flex items-center justify-between">
                 <div>
                   <h2 className="text-sm font-bold text-white uppercase font-mono tracking-wider">
@@ -372,50 +391,50 @@ function DashboardContent() {
                 statusFilter={statusFilter}
                 onStatusFilterChange={(status) => setStatusFilter(status)}
               />
-            </Reveal>
+            </div>
           ) : activeView === 'command' ? (
             /* Module 3.4 Live Incident Command Workspace */
-            <Reveal direction="up" duration={260} distance={12}>
+            <div>
               <LiveCommandCenterView
                 onInvestigateIp={handleDeepLinkInvestigate}
                 onReplayAttack={handleDeepLinkReplayAttack}
               />
-            </Reveal>
+            </div>
           ) : activeView === 'cases' ? (
             /* Module 3.6 Incident Case Management & Playbooks */
-            <Reveal direction="up" duration={260} distance={12}>
+            <div>
               <CaseManagementView
                 onInvestigateIp={handleDeepLinkInvestigate}
               />
-            </Reveal>
+            </div>
           ) : activeView === 'deception' ? (
             /* Module 3.7 Active Deception Grid & Canary Orchestrator (System 2) */
-            <Reveal direction="up" duration={260} distance={12}>
+            <div>
               <DeceptionGridView
                 onInvestigateIp={handleDeepLinkInvestigate}
                 onStageContainment={(ip) => {
                   handleDeepLinkInvestigate(ip);
                 }}
               />
-            </Reveal>
+            </div>
           ) : activeView === 'intel' ? (
             /* Module 3.8 Threat Intelligence & IOC Fusion (System 3) */
-            <Reveal direction="up" duration={260} distance={12}>
+            <div>
               <ThreatIntelView
                 onInvestigateIp={handleDeepLinkInvestigate}
                 onStageContainment={(ip) => {
                   handleDeepLinkInvestigate(ip);
                 }}
               />
-            </Reveal>
+            </div>
           ) : activeView === 'integrations' ? (
             /* Module 3.9 Enterprise Defensive Integration & SIEM-SOAR Gateway */
-            <Reveal direction="up" duration={260} distance={12}>
+            <div>
               <IntegrationsView />
-            </Reveal>
+            </div>
           ) : activeView === 'campaigns' || activeView === 'hunts' ? (
             /* AI Analysis Workspace: Campaigns & Threat Hunting */
-            <Reveal direction="up" duration={260} distance={12} className="space-y-6">
+            <div className="space-y-6">
               <div className="flex items-center space-x-2 border-b border-cyan-500/20 pb-3 text-xs font-mono font-medium">
                 <button
                   onClick={() => setAiSubTab('campaigns')}
@@ -446,9 +465,9 @@ function DashboardContent() {
               ) : (
                 <ThreatHuntingView onInvestigateIp={handleDeepLinkInvestigate} />
               )}
-            </Reveal>
+            </div>
           ) : activeView === 'investigation' ? (
-            <Reveal direction="up" duration={260} distance={12} className="space-y-6">
+            <div className="space-y-6">
               {/* IP Search / Query Ribbon */}
               <div className="p-4 rounded-lg bg-slate-950/90 border border-cyan-500/20 space-y-3">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -519,10 +538,10 @@ function DashboardContent() {
                   </p>
                 </div>
               )}
-            </Reveal>
+            </div>
           ) : (
             /* Module 3.3 Detection & Replay Workspace */
-            <Reveal direction="up" duration={260} distance={12} className="space-y-6">
+            <div className="space-y-6">
               {/* Sub-navigation tabs */}
               <div className="flex items-center space-x-2 border-b border-cyan-500/20 pb-3 text-xs font-mono font-medium">
                 <button
@@ -603,7 +622,7 @@ function DashboardContent() {
               )}
 
               {rulesSubTab === 'audit' && <AuditTrailView />}
-            </Reveal>
+            </div>
           )}
         </main>
       </div>

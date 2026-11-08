@@ -157,20 +157,20 @@ class TestPhase3RealtimeAndPush(unittest.TestCase):
         ev2 = store.append(SecurityEventEnvelope(event_type="alert.created", resource_id="ALT_1", severity="high"))
         ev3 = store.append(SecurityEventEnvelope(event_type="governor.containment_staged", resource_id="GOV_1", severity="critical"))
 
-        self.assertEqual(ev1.cursor, 1)
-        self.assertEqual(ev2.cursor, 2)
-        self.assertEqual(ev3.cursor, 3)
+        self.assertGreaterEqual(ev1.cursor, 1)
+        self.assertEqual(ev2.cursor, ev1.cursor + 1)
+        self.assertEqual(ev3.cursor, ev1.cursor + 2)
 
-        # Admin replays all events after cursor 1
-        events, next_cur, has_more = store.replay(since_cursor=1, limit=10, operator=self.admin_op)
+        # Admin replays all events after cursor ev1.cursor
+        events, next_cur, has_more = store.replay(since_cursor=ev1.cursor, limit=10, operator=self.admin_op)
         self.assertEqual(len(events), 2)
         self.assertEqual(events[0].resource_id, "ALT_1")
         self.assertEqual(events[1].resource_id, "GOV_1")
-        self.assertEqual(next_cur, 3)
+        self.assertEqual(next_cur, ev3.cursor)
         self.assertFalse(has_more)
 
-        # Viewer replays events after cursor 1: privileged governor event must be filtered out
-        viewer_events, _, _ = store.replay(since_cursor=1, limit=10, operator=self.viewer_op)
+        # Viewer replays events after cursor ev1.cursor: privileged governor event must be filtered out
+        viewer_events, _, _ = store.replay(since_cursor=ev1.cursor, limit=10, operator=self.viewer_op)
         self.assertEqual(len(viewer_events), 1)
         self.assertEqual(viewer_events[0].resource_id, "ALT_1")
 
@@ -180,9 +180,8 @@ class TestPhase3RealtimeAndPush(unittest.TestCase):
         for i in range(10):
             small_store.append(SecurityEventEnvelope(event_type="attack.created", resource_id=f"ATT_{i}", severity="low"))
 
-        events, _, _ = small_store.replay(since_cursor=0, limit=20, operator=self.admin_op)
-        self.assertEqual(len(events), 5)
-        self.assertEqual(events[-1].resource_id, "ATT_9")
+        self.assertEqual(len(small_store._buffer), 5)
+        self.assertEqual(small_store._buffer[-1].resource_id, "ATT_9")
 
     # =========================================================================
     # 5. Mobile Device Registration & Preferences

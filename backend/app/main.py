@@ -164,6 +164,7 @@ REDIS_HOST, REDIS_PORT, REDIS_PASSWORD = get_redis_config()
 
 
 @app.get("/health")
+@app.get("/api/v1/health")
 def health():
     postgres_status = "disconnected"
     redis_status = "disconnected"

@@ -87,6 +87,7 @@ def get_dashboard_stats(db: Session = Depends(get_db)) -> DashboardStatsResponse
         )
         events_outbox_24h = db.scalar(events_outbox_24h_stmt) or 0
     except Exception:
+        db.rollback()
         events_outbox_24h = 0
 
     attack_events_24h = 0
@@ -96,6 +97,7 @@ def get_dashboard_stats(db: Session = Depends(get_db)) -> DashboardStatsResponse
         )
         attack_events_24h = db.scalar(attack_events_24h_stmt) or 0
     except Exception:
+        db.rollback()
         attack_events_24h = 0
 
     events_processed_24h = events_outbox_24h + attack_events_24h

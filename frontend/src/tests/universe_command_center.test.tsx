@@ -606,4 +606,110 @@ describe('UniverseCommandCenter — Universe 2.0 Living Observatory & Spatial SO
     fireEvent.click(enterBtn);
     expect(screen.queryByText(/GUIDED OPERATOR DEMONSTRATION SHOWCASE/i)).toBeNull();
   });
+
+  describe('Milestones 27 & 28 — Deterministic Whole-Body Locomotion & Packet Attachment Engine', () => {
+    it('initializes in ready state with full docked agents and prominent return-to-overview action', () => {
+      render(
+        <UniverseCommandCenter
+          stats={mockStats}
+          alerts={mockAlerts}
+          attacks={mockAttacks}
+          runtimeStatuses={mockRuntimeStatuses}
+          journeys={mockJourneys}
+          isDemoMode={false}
+          onToggleDemoMode={onToggleDemoMode}
+          onInvestigateIp={onInvestigateIp}
+          onNavigateView={onNavigateView}
+          onOpenNexusAssistant={onOpenNexusAssistant}
+        />
+      );
+
+      // Verify prominent return-to-overview action
+      const returnBtn = screen.getByRole('button', { name: /RETURN TO OVERVIEW/i });
+      expect(returnBtn).toBeDefined();
+      fireEvent.click(returnBtn);
+      expect(onNavigateView).toHaveBeenCalledWith('overview');
+
+      // Verify initial ready locomotion state
+      expect(screen.getByText('CARRIER:')).toBeDefined();
+      expect(screen.getAllByText(/scout/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/ready/i).length).toBeGreaterThan(0);
+      expect(screen.getByText('0%')).toBeDefined();
+      expect(screen.getByText('RUN LOCOMOTION')).toBeDefined();
+    });
+
+    it('toggles locomotion playback and transitions dock into DEPLOYED / IN TRANSIT state', () => {
+      render(
+        <UniverseCommandCenter
+          stats={mockStats}
+          alerts={mockAlerts}
+          attacks={mockAttacks}
+          runtimeStatuses={mockRuntimeStatuses}
+          journeys={mockJourneys}
+          isDemoMode={false}
+          onToggleDemoMode={onToggleDemoMode}
+          onInvestigateIp={onInvestigateIp}
+          onNavigateView={onNavigateView}
+          onOpenNexusAssistant={onOpenNexusAssistant}
+        />
+      );
+
+      // Initially docked Scout has 4 Honeypot Traps
+      expect(screen.getByText('4 Honeypot Traps')).toBeDefined();
+
+      // Step Forward (+15%) to advance locomotion into transit
+      const stepBtn = screen.getByTitle(/Step Forward/i);
+      fireEvent.click(stepBtn);
+
+      // Scout dock pad transitions to DEPLOYED beacon in transit
+      expect(screen.getByText('DEPLOYED')).toBeDefined();
+      expect(screen.getByText('PAUSED')).toBeDefined();
+      expect(screen.getByText('Relaying Packet')).toBeDefined();
+      expect(screen.getByText('RESUME TRANSIT')).toBeDefined();
+
+      // Resume transit -> toggles to PAUSE TRANSIT and IN TRANSIT
+      const resumeBtn = screen.getByRole('button', { name: /RESUME TRANSIT/i });
+      fireEvent.click(resumeBtn);
+      expect(screen.getByText('PAUSE TRANSIT')).toBeDefined();
+      expect(screen.getByText('IN TRANSIT')).toBeDefined();
+    });
+
+    it('steps forward through relay chain, cycles speeds, and resets to origin', () => {
+      render(
+        <UniverseCommandCenter
+          stats={mockStats}
+          alerts={mockAlerts}
+          attacks={mockAttacks}
+          runtimeStatuses={mockRuntimeStatuses}
+          journeys={mockJourneys}
+          isDemoMode={false}
+          onToggleDemoMode={onToggleDemoMode}
+          onInvestigateIp={onInvestigateIp}
+          onNavigateView={onNavigateView}
+          onOpenNexusAssistant={onOpenNexusAssistant}
+        />
+      );
+
+      // Step Forward (+15%)
+      const stepBtn = screen.getByTitle(/Step Forward/i);
+      fireEvent.click(stepBtn);
+      expect(screen.getByText('15%')).toBeDefined();
+
+      // Speed cycle: 1X -> 2X -> 0.5X -> 1X
+      const speedBtn = screen.getByTitle(/Toggle Speed/i);
+      expect(speedBtn.textContent).toBe('1X');
+      fireEvent.click(speedBtn);
+      expect(speedBtn.textContent).toBe('2X');
+      fireEvent.click(speedBtn);
+      expect(speedBtn.textContent).toBe('0.5X');
+      fireEvent.click(speedBtn);
+      expect(speedBtn.textContent).toBe('1X');
+
+      // Reset restores 0% and SCOUT carrier
+      const resetBtn = screen.getByTitle(/Reset Locomotion/i);
+      fireEvent.click(resetBtn);
+      expect(screen.getByText('0%')).toBeDefined();
+      expect(screen.getByText('SCOUT')).toBeDefined();
+    });
+  });
 });

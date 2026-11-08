@@ -266,6 +266,7 @@ class TestMilestone16ForensicsAndReconciliation(unittest.TestCase):
         # Simulate tamper by mutating raw_payload in store
         retrieved = default_evidence_service.get_evidence(evidence.evidence_id, operator=self.analyst)
         retrieved.raw_payload["keystrokes"] = "TAMPERED_MODIFIED_CONTENT"
+        default_evidence_service.store.save_evidence(retrieved)
 
         # Verify tamper is flagged
         tampered_resp = verify_evidence(

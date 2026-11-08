@@ -186,7 +186,7 @@ class TestCorrelationEngine(unittest.TestCase):
 
     def test_6_clean_unobserved_ip(self):
         """Test 6: Querying an unobserved IP returns empty correlation with zero counts."""
-        ip = "198.51.100.99"
+        ip = "198.51.100.249"
         result = correlate_source_ip(self.db, source_ip=ip, window_hours=24)
 
         self.assertFalse(result["correlated"])

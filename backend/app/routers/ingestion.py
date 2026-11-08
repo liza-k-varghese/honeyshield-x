@@ -132,8 +132,9 @@ def ingest_event(
             },
             db=db,
         )
+        db.commit()
     except Exception:
-        pass
+        db.rollback()
 
     return db_event
 

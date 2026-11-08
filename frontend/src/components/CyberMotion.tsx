@@ -57,6 +57,11 @@ export const Reveal: React.FC<RevealProps> = ({
     const node = elementRef.current;
     if (!node) return;
 
+    // Safety fallback timer ensures content is never permanently hidden
+    const fallbackTimer = setTimeout(() => {
+      setIsVisible(true);
+    }, 150);
+
     // Use IntersectionObserver if available
     if (typeof IntersectionObserver !== 'undefined') {
       const observer = new IntersectionObserver(
@@ -64,6 +69,7 @@ export const Reveal: React.FC<RevealProps> = ({
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               setIsVisible(true);
+              clearTimeout(fallbackTimer);
               if (triggerOnce) {
                 observer.unobserve(entry.target);
               }
@@ -72,13 +78,17 @@ export const Reveal: React.FC<RevealProps> = ({
             }
           });
         },
-        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+        { threshold: 0, rootMargin: '0px' }
       );
 
       observer.observe(node);
-      return () => observer.disconnect();
+      return () => {
+        clearTimeout(fallbackTimer);
+        observer.disconnect();
+      };
     } else {
       // Fallback
+      clearTimeout(fallbackTimer);
       setIsVisible(true);
     }
   }, [prefersReduced, triggerOnce]);

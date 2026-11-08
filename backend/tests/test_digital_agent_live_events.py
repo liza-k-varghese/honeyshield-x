@@ -59,7 +59,7 @@ class TestDigitalAgentLiveEvents(unittest.TestCase):
     def setUp(self):
         self.db = self.SessionLocal()
         self.orig_store = default_event_store
-        self.store = EventStore(ring_buffer_size=100)
+        self.store = EventStore(ring_buffer_size=100, db=self.db)
         import app.events.service as ev_service
         import app.events.store as ev_store
         import app.routers.events as ev_routers

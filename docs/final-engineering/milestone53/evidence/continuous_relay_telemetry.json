@@ -1,0 +1,333 @@
+{
+  "telemetry": [
+    {
+      "elapsed_seconds": 0.0,
+      "carrier": "scout",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 0.508,
+      "carrier": "scout",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 0.863,
+      "carrier": "scout",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SCOUT \u2022 WAITING"
+    },
+    {
+      "elapsed_seconds": 1.218,
+      "carrier": "unknown",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_seconds": 1.572,
+      "carrier": "unknown",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_seconds": 1.927,
+      "carrier": "unknown",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_seconds": 2.282,
+      "carrier": "nexus",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #NEXUS \u2022 PICKUP"
+    },
+    {
+      "elapsed_seconds": 2.636,
+      "carrier": "nexus",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #NEXUS \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 3.125,
+      "carrier": "nexus",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #NEXUS \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 3.48,
+      "carrier": "nexus",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #NEXUS \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 3.835,
+      "carrier": "nexus",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #NEXUS \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 4.189,
+      "carrier": "nexus",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #NEXUS \u2022 WAITING"
+    },
+    {
+      "elapsed_seconds": 4.545,
+      "carrier": "nexus",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #NEXUS \u2022 DELIVERING"
+    },
+    {
+      "elapsed_seconds": 4.9,
+      "carrier": "unknown",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_seconds": 5.255,
+      "carrier": "unknown",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_seconds": 5.609,
+      "carrier": "oracle",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #ORACLE \u2022 PICKUP"
+    },
+    {
+      "elapsed_seconds": 5.965,
+      "carrier": "oracle",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #ORACLE \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 6.484,
+      "carrier": "oracle",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #ORACLE \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 6.84,
+      "carrier": "oracle",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #ORACLE \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 7.195,
+      "carrier": "oracle",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #ORACLE \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 7.55,
+      "carrier": "oracle",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #ORACLE \u2022 WAITING"
+    },
+    {
+      "elapsed_seconds": 7.904,
+      "carrier": "unknown",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_seconds": 8.259,
+      "carrier": "unknown",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_seconds": 8.614,
+      "carrier": "unknown",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_seconds": 8.977,
+      "carrier": "sentinel",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SENTINEL \u2022 PICKUP"
+    },
+    {
+      "elapsed_seconds": 9.332,
+      "carrier": "sentinel",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SENTINEL \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 9.845,
+      "carrier": "sentinel",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SENTINEL \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 10.201,
+      "carrier": "sentinel",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SENTINEL \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 10.557,
+      "carrier": "sentinel",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SENTINEL \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 10.917,
+      "carrier": "sentinel",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SENTINEL \u2022 DELIVERING"
+    },
+    {
+      "elapsed_seconds": 11.273,
+      "carrier": "unknown",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_seconds": 11.63,
+      "carrier": "unknown",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_seconds": 11.994,
+      "carrier": "unknown",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_seconds": 12.35,
+      "carrier": "scout",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 12.704,
+      "carrier": "scout",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 13.063,
+      "carrier": "scout",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 13.418,
+      "carrier": "scout",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 13.772,
+      "carrier": "scout",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_seconds": 14.127,
+      "carrier": "scout",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SCOUT \u2022 WAITING"
+    },
+    {
+      "elapsed_seconds": 14.483,
+      "carrier": "scout",
+      "phase": "",
+      "progress": "",
+      "coords": "",
+      "capsule": "PKT #SCOUT \u2022 DELIVERING"
+    }
+  ],
+  "performance": {
+    "totalFrames": 157,
+    "droppedFrames": 140,
+    "avgFrameDeltaMs": 94.3,
+    "minFrameDeltaMs": 0,
+    "maxFrameDeltaMs": 216.67,
+    "calculatedFps": 10.6,
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0"
+  }
+}

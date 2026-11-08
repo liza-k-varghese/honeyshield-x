@@ -9,3 +9,9 @@ __pycache__/
 .mypy_cache/
 .vscode/
 .idea/
+node_modules/
+dist/
+*.pem
+*.key
+*.cert
+.DS_Store
