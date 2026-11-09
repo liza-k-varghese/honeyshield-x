@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-11-08T15:30:38.921220+00:00",
+  "probe_ip": "198.51.100.244",
+  "attack_id": 9631,
+  "event_id": 41730,
+  "total_attacks_recorded": 72,
+  "is_synthetic": true,
+  "data_provenance": "synthetic_verification_probe",
+  "pipeline_stages": [
+    {
+      "stage": "FastAPI Ingestion Endpoint",
+      "status": "201 Created",
+      "entity": "Attack #9631"
+    },
+    {
+      "stage": "PostgreSQL Outbox Table",
+      "status": "Committed",
+      "agent_target": "SCOUT (Collection)",
+      "provenance": "tagged"
+    },
+    {
+      "stage": "Handoff Outbox Stream",
+      "status": "Monotonic Sequential",
+      "agent_target": "NEXUS (Normalization)"
+    },
+    {
+      "stage": "Mode Isolation",
+      "status": "Verified",
+      "note": "Benign probe activates only Scout->Nexus; ORACLE/SENTINEL un-triggered"
+    }
+  ]
+}

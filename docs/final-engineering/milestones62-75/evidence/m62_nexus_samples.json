@@ -1,0 +1,83 @@
+{
+  "agent": "nexus",
+  "sample_count": 11,
+  "trajectory": [
+    {
+      "elapsed_s": 1.981,
+      "progress": 0.027,
+      "x": 802.53,
+      "y": 133.22,
+      "attached": false
+    },
+    {
+      "elapsed_s": 2.335,
+      "progress": 0.144,
+      "x": 769.47,
+      "y": 147.9,
+      "attached": true
+    },
+    {
+      "elapsed_s": 2.691,
+      "progress": 0.144,
+      "x": 769.47,
+      "y": 147.9,
+      "attached": true
+    },
+    {
+      "elapsed_s": 3.048,
+      "progress": 0.224,
+      "x": 746.78,
+      "y": 158.39,
+      "attached": true
+    },
+    {
+      "elapsed_s": 3.406,
+      "progress": 0.357,
+      "x": 708.67,
+      "y": 176.71,
+      "attached": true
+    },
+    {
+      "elapsed_s": 3.899,
+      "progress": 0.533,
+      "x": 657.82,
+      "y": 202.53,
+      "attached": true
+    },
+    {
+      "elapsed_s": 4.254,
+      "progress": 0.587,
+      "x": 642.29,
+      "y": 210.73,
+      "attached": true
+    },
+    {
+      "elapsed_s": 4.654,
+      "progress": 0.747,
+      "x": 595.35,
+      "y": 236.33,
+      "attached": true
+    },
+    {
+      "elapsed_s": 5.009,
+      "progress": 0.832,
+      "x": 570.11,
+      "y": 250.61,
+      "attached": true
+    },
+    {
+      "elapsed_s": 5.367,
+      "progress": 0.917,
+      "x": 544.73,
+      "y": 265.33,
+      "attached": true
+    },
+    {
+      "elapsed_s": 5.722,
+      "progress": 0.992,
+      "x": 522.39,
+      "y": 278.57,
+      "attached": false
+    }
+  ]
+}

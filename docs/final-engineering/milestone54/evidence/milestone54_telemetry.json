@@ -1,0 +1,2784 @@
+{
+  "metadata": {
+    "milestone": "54",
+    "timestamp": "2026-11-08T06:57:54Z",
+    "browser": "Mozilla Firefox 140.16.0esr",
+    "total_samples": 40
+  },
+  "performance": {
+    "totalFrames": 141,
+    "droppedFrames": 114,
+    "longFrames": 70,
+    "avgFrameDeltaMs": 104.29,
+    "minFrameDeltaMs": 16.67,
+    "maxFrameDeltaMs": 300.01,
+    "effectiveFps": 9.6
+  },
+  "repeated_runs": {
+    "RUN_A_fresh_start": {
+      "status": "SUCCESS",
+      "carrier_count": 4
+    },
+    "RUN_B_continuous_loop": {
+      "status": "SUCCESS",
+      "cycles_completed": 1.2
+    },
+    "RUN_C_reset_and_restart": {
+      "status": "SUCCESS",
+      "verified": true
+    },
+    "RUN_D_pause_active": {
+      "status": "SUCCESS",
+      "verified": true,
+      "paused_coords": {
+        "x": 787.5355494399746,
+        "y": 139.79219968007666
+      }
+    },
+    "RUN_E_resume_from_pause": {
+      "status": "SUCCESS",
+      "verified": true
+    },
+    "RUN_F_pause_later_stage": {
+      "status": "SUCCESS"
+    },
+    "RUN_G_background_foreground": {
+      "status": "SUCCESS"
+    },
+    "RUN_H_viewport_resize": {
+      "status": "SUCCESS"
+    }
+  },
+  "agent_traces": {
+    "scout": [
+      {
+        "elapsed_ms": 0.0,
+        "position": {
+          "x": 359.7947575003003,
+          "y": 218.24605990030028
+        },
+        "progress": 0.635,
+        "packet_attached": true,
+        "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 527.1,
+        "position": {
+          "x": 401.00144893284653,
+          "y": 238.9723417328466
+        },
+        "progress": 0.763,
+        "packet_attached": true,
+        "capsule": "PKT #SCOUT \u2022 WAITING"
+      },
+      {
+        "elapsed_ms": 888.0,
+        "position": {
+          "x": 443.1912196873861,
+          "y": 260.6817028873861
+        },
+        "progress": 0.891,
+        "packet_attached": true,
+        "capsule": "PKT #SCOUT \u2022 DELIVERING"
+      },
+      {
+        "elapsed_ms": 11268.1,
+        "position": {
+          "x": 170,
+          "y": 130
+        },
+        "progress": 0,
+        "packet_attached": false,
+        "capsule": "NONE (DETACHED)"
+      },
+      {
+        "elapsed_ms": 11624.1,
+        "position": {
+          "x": 203.2670202540318,
+          "y": 144.49331145403184
+        },
+        "progress": 0.117,
+        "packet_attached": false,
+        "capsule": "NONE (DETACHED)"
+      },
+      {
+        "elapsed_ms": 11977.3,
+        "position": {
+          "x": 231.0999159472128,
+          "y": 156.96589994721282
+        },
+        "progress": 0.213,
+        "packet_attached": true,
+        "capsule": "PKT #SCOUT \u2022 PICKUP"
+      },
+      {
+        "elapsed_ms": 12331.6,
+        "position": {
+          "x": 265.8688629431787,
+          "y": 172.96113814317874
+        },
+        "progress": 0.331,
+        "packet_attached": true,
+        "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 12686.1,
+        "position": {
+          "x": 298.1938252481617,
+          "y": 188.21909244816177
+        },
+        "progress": 0.437,
+        "packet_attached": true,
+        "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 13040.3,
+        "position": {
+          "x": 336.21151232376315,
+          "y": 206.6097203237632
+        },
+        "progress": 0.56,
+        "packet_attached": true,
+        "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 13396.5,
+        "position": {
+          "x": 361.4920755249151,
+          "y": 219.09002752491512
+        },
+        "progress": 0.64,
+        "packet_attached": true,
+        "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 13750.7,
+        "position": {
+          "x": 407.96480799457566,
+          "y": 242.5222991945758
+        },
+        "progress": 0.784,
+        "packet_attached": true,
+        "capsule": "PKT #SCOUT \u2022 WAITING"
+      },
+      {
+        "elapsed_ms": 14113.6,
+        "position": {
+          "x": 443.191219687386,
+          "y": 260.68170288738605
+        },
+        "progress": 0.891,
+        "packet_attached": true,
+        "capsule": "PKT #SCOUT \u2022 DELIVERING"
+      }
+    ],
+    "nexus": [
+      {
+        "elapsed_ms": 1242.8,
+        "position": {
+          "x": 810,
+          "y": 130
+        },
+        "progress": 0,
+        "packet_attached": false,
+        "capsule": "NONE (DETACHED)"
+      },
+      {
+        "elapsed_ms": 1596.1,
+        "position": {
+          "x": 786.0333681094819,
+          "y": 140.45866687155407
+        },
+        "progress": 0.085,
+        "packet_attached": false,
+        "capsule": "NONE (DETACHED)"
+      },
+      {
+        "elapsed_ms": 1949.5,
+        "position": {
+          "x": 770.9802646641009,
+          "y": 147.21720920769738
+        },
+        "progress": 0.139,
+        "packet_attached": false,
+        "capsule": "NONE (DETACHED)"
+      },
+      {
+        "elapsed_ms": 2310.3,
+        "position": {
+          "x": 728.5289140220682,
+          "y": 167.0491107337953
+        },
+        "progress": 0.288,
+        "packet_attached": true,
+        "capsule": "PKT #NEXUS \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 2800.7,
+        "position": {
+          "x": 676.3812125118302,
+          "y": 192.92960406450996
+        },
+        "progress": 0.469,
+        "packet_attached": true,
+        "capsule": "PKT #NEXUS \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 3155.0,
+        "position": {
+          "x": 648.5073551802327,
+          "y": 207.42979365930188
+        },
+        "progress": 0.565,
+        "packet_attached": true,
+        "capsule": "PKT #NEXUS \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 3509.3,
+        "position": {
+          "x": 614.1889862068471,
+          "y": 225.90321097945903
+        },
+        "progress": 0.683,
+        "packet_attached": true,
+        "capsule": "PKT #NEXUS \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 3871.2,
+        "position": {
+          "x": 578.0162795949169,
+          "y": 246.0995644152494
+        },
+        "progress": 0.805,
+        "packet_attached": true,
+        "capsule": "PKT #NEXUS \u2022 WAITING"
+      },
+      {
+        "elapsed_ms": 4226.3,
+        "position": {
+          "x": 543.1346880933058,
+          "y": 266.26264932008235
+        },
+        "progress": 0.923,
+        "packet_attached": true,
+        "capsule": "PKT #NEXUS \u2022 DELIVERING"
+      },
+      {
+        "elapsed_ms": 4580.9,
+        "position": {
+          "x": 520.7939459487326,
+          "y": 279.52380055380274
+        },
+        "progress": 0.997,
+        "packet_attached": false,
+        "capsule": "NONE (DETACHED)"
+      },
+      {
+        "elapsed_ms": 14468.4,
+        "position": {
+          "x": 810,
+          "y": 130
+        },
+        "progress": 0,
+        "packet_attached": false,
+        "capsule": "NONE (DETACHED)"
+      }
+    ],
+    "oracle": [
+      {
+        "elapsed_ms": 4941.4,
+        "position": {
+          "x": 786.033368109482,
+          "y": 419.68697450948196
+        },
+        "progress": 0.085,
+        "packet_attached": false,
+        "capsule": "NONE (DETACHED)"
+      },
+      {
+        "elapsed_ms": 5294.5,
+        "position": {
+          "x": 764.9430937598975,
+          "y": 410.5436057598976
+        },
+        "progress": 0.16,
+        "packet_attached": true,
+        "capsule": "PKT #ORACLE \u2022 PICKUP"
+      },
+      {
+        "elapsed_ms": 5650.7,
+        "position": {
+          "x": 719.3741670395905,
+          "y": 390.57519103959044
+        },
+        "progress": 0.32,
+        "packet_attached": true,
+        "capsule": "PKT #ORACLE \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 6154.4,
+        "position": {
+          "x": 682.5503709175971,
+          "y": 374.23180451759714
+        },
+        "progress": 0.448,
+        "packet_attached": true,
+        "capsule": "PKT #ORACLE \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 6509.0,
+        "position": {
+          "x": 642.2881325497345,
+          "y": 356.15667654973447
+        },
+        "progress": 0.587,
+        "packet_attached": true,
+        "capsule": "PKT #ORACLE \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 6863.1,
+        "position": {
+          "x": 620.4491704757615,
+          "y": 346.2646200757616
+        },
+        "progress": 0.661,
+        "packet_attached": true,
+        "capsule": "PKT #ORACLE \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 7217.0,
+        "position": {
+          "x": 578.0162795949169,
+          "y": 326.8721899949169
+        },
+        "progress": 0.805,
+        "packet_attached": true,
+        "capsule": "PKT #ORACLE \u2022 WAITING"
+      },
+      {
+        "elapsed_ms": 7574.6,
+        "position": {
+          "x": 541.5426187229555,
+          "y": 310.0255883229553
+        },
+        "progress": 0.928,
+        "packet_attached": true,
+        "capsule": "PKT #ORACLE \u2022 DELIVERING"
+      }
+    ],
+    "sentinel": [
+      {
+        "elapsed_ms": 7929.0,
+        "position": {
+          "x": 171.49421656746694,
+          "y": 429.35970274417775
+        },
+        "progress": 0.005,
+        "packet_attached": false,
+        "capsule": "NONE (DETACHED)"
+      },
+      {
+        "elapsed_ms": 8282.0,
+        "position": {
+          "x": 186.53025266350795,
+          "y": 422.92544004549745
+        },
+        "progress": 0.059,
+        "packet_attached": false,
+        "capsule": "NONE (DETACHED)"
+      },
+      {
+        "elapsed_ms": 8634.9,
+        "position": {
+          "x": 221.76084159186126,
+          "y": 407.9107338693796
+        },
+        "progress": 0.181,
+        "packet_attached": true,
+        "capsule": "PKT #SENTINEL \u2022 PICKUP"
+      },
+      {
+        "elapsed_ms": 8988.9,
+        "position": {
+          "x": 259.4857937590149,
+          "y": 391.92234821366173
+        },
+        "progress": 0.309,
+        "packet_attached": true,
+        "capsule": "PKT #SENTINEL \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 9481.2,
+        "position": {
+          "x": 306.3817367577836,
+          "y": 372.1658402807388
+        },
+        "progress": 0.464,
+        "packet_attached": true,
+        "capsule": "PKT #SENTINEL \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 9836.8,
+        "position": {
+          "x": 337.8849360593018,
+          "y": 358.96249758023276
+        },
+        "progress": 0.565,
+        "packet_attached": true,
+        "capsule": "PKT #SENTINEL \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 10191.4,
+        "position": {
+          "x": 380.27521830132434,
+          "y": 341.27677683289187
+        },
+        "progress": 0.699,
+        "packet_attached": true,
+        "capsule": "PKT #SENTINEL \u2022 TRAVELLING"
+      },
+      {
+        "elapsed_ms": 10547.0,
+        "position": {
+          "x": 416.7074083577528,
+          "y": 326.145987080749
+        },
+        "progress": 0.811,
+        "packet_attached": true,
+        "capsule": "PKT #SENTINEL \u2022 WAITING"
+      },
+      {
+        "elapsed_ms": 10902.4,
+        "position": {
+          "x": 443.191219687386,
+          "y": 315.18467397087136
+        },
+        "progress": 0.891,
+        "packet_attached": true,
+        "capsule": "PKT #SENTINEL \u2022 DELIVERING"
+      }
+    ]
+  },
+  "raw_timeline": [
+    {
+      "elapsed_seconds": 0.0,
+      "carrier": "scout",
+      "stage": "travelling",
+      "progress": 0.635,
+      "position": {
+        "x": 359.7947575003003,
+        "y": 218.24605990030028
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.635,
+          "position": {
+            "x": 359.7947575003003,
+            "y": 218.24605990030028
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "nexus": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 0.527,
+      "carrier": "scout",
+      "stage": "travelling",
+      "progress": 0.763,
+      "position": {
+        "x": 401.00144893284653,
+        "y": 238.9723417328466
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 WAITING",
+      "all_agents": {
+        "scout": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.763,
+          "position": {
+            "x": 401.00144893284653,
+            "y": 238.9723417328466
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "nexus": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 0.888,
+      "carrier": "scout",
+      "stage": "delivering",
+      "progress": 0.891,
+      "position": {
+        "x": 443.1912196873861,
+        "y": 260.6817028873861
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 DELIVERING",
+      "all_agents": {
+        "scout": {
+          "status": "delivering",
+          "stage": "delivering",
+          "progress": 0.891,
+          "position": {
+            "x": 443.1912196873861,
+            "y": 260.6817028873861
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "nexus": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 1.243,
+      "carrier": "nexus",
+      "stage": "approaching",
+      "progress": 0,
+      "position": {
+        "x": 810,
+        "y": 130
+      },
+      "packet_attached": false,
+      "capsule_text": "NONE (DETACHED)",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "docked",
+          "stage": "approaching",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Movement active"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 1.596,
+      "carrier": "nexus",
+      "stage": "approaching",
+      "progress": 0.085,
+      "position": {
+        "x": 786.0333681094819,
+        "y": 140.45866687155407
+      },
+      "packet_attached": false,
+      "capsule_text": "NONE (DETACHED)",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "docked",
+          "stage": "approaching",
+          "progress": 0.085,
+          "position": {
+            "x": 786.0333681094819,
+            "y": 140.45866687155407
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Movement active"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 1.949,
+      "carrier": "nexus",
+      "stage": "approaching",
+      "progress": 0.139,
+      "position": {
+        "x": 770.9802646641009,
+        "y": 147.21720920769738
+      },
+      "packet_attached": false,
+      "capsule_text": "NONE (DETACHED)",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "docked",
+          "stage": "approaching",
+          "progress": 0.139,
+          "position": {
+            "x": 770.9802646641009,
+            "y": 147.21720920769738
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Movement active"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 2.31,
+      "carrier": "nexus",
+      "stage": "travelling",
+      "progress": 0.288,
+      "position": {
+        "x": 728.5289140220682,
+        "y": 167.0491107337953
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.288,
+          "position": {
+            "x": 728.5289140220682,
+            "y": 167.0491107337953
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 2.801,
+      "carrier": "nexus",
+      "stage": "travelling",
+      "progress": 0.469,
+      "position": {
+        "x": 676.3812125118302,
+        "y": 192.92960406450996
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.469,
+          "position": {
+            "x": 676.3812125118302,
+            "y": 192.92960406450996
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 3.155,
+      "carrier": "nexus",
+      "stage": "travelling",
+      "progress": 0.565,
+      "position": {
+        "x": 648.5073551802327,
+        "y": 207.42979365930188
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.565,
+          "position": {
+            "x": 648.5073551802327,
+            "y": 207.42979365930188
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 3.509,
+      "carrier": "nexus",
+      "stage": "travelling",
+      "progress": 0.683,
+      "position": {
+        "x": 614.1889862068471,
+        "y": 225.90321097945903
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.683,
+          "position": {
+            "x": 614.1889862068471,
+            "y": 225.90321097945903
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 3.871,
+      "carrier": "nexus",
+      "stage": "waiting",
+      "progress": 0.805,
+      "position": {
+        "x": 578.0162795949169,
+        "y": 246.0995644152494
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 WAITING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "docked",
+          "stage": "waiting",
+          "progress": 0.805,
+          "position": {
+            "x": 578.0162795949169,
+            "y": 246.0995644152494
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 4.226,
+      "carrier": "nexus",
+      "stage": "delivering",
+      "progress": 0.923,
+      "position": {
+        "x": 543.1346880933058,
+        "y": 266.26264932008235
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 DELIVERING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "delivering",
+          "stage": "delivering",
+          "progress": 0.923,
+          "position": {
+            "x": 543.1346880933058,
+            "y": 266.26264932008235
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 4.581,
+      "carrier": "nexus",
+      "stage": "confirmed",
+      "progress": 0.997,
+      "position": {
+        "x": 520.7939459487326,
+        "y": 279.52380055380274
+      },
+      "packet_attached": false,
+      "capsule_text": "NONE (DETACHED)",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "docked",
+          "stage": "confirmed",
+          "progress": 0.997,
+          "position": {
+            "x": 520.7939459487326,
+            "y": 279.52380055380274
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Movement active"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 4.941,
+      "carrier": "oracle",
+      "stage": "approaching",
+      "progress": 0.085,
+      "position": {
+        "x": 786.033368109482,
+        "y": 419.68697450948196
+      },
+      "packet_attached": false,
+      "capsule_text": "NONE (DETACHED)",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "docked",
+          "stage": "approaching",
+          "progress": 0.085,
+          "position": {
+            "x": 786.033368109482,
+            "y": 419.68697450948196
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Movement active"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for ORACLE (Leg 3/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 5.294,
+      "carrier": "oracle",
+      "stage": "pickup",
+      "progress": 0.16,
+      "position": {
+        "x": 764.9430937598975,
+        "y": 410.5436057598976
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 PICKUP",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "docked",
+          "stage": "pickup",
+          "progress": 0.16,
+          "position": {
+            "x": 764.9430937598975,
+            "y": 410.5436057598976
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for ORACLE (Leg 3/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 5.651,
+      "carrier": "oracle",
+      "stage": "travelling",
+      "progress": 0.32,
+      "position": {
+        "x": 719.3741670395905,
+        "y": 390.57519103959044
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.32,
+          "position": {
+            "x": 719.3741670395905,
+            "y": 390.57519103959044
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for ORACLE (Leg 3/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 6.154,
+      "carrier": "oracle",
+      "stage": "travelling",
+      "progress": 0.448,
+      "position": {
+        "x": 682.5503709175971,
+        "y": 374.23180451759714
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.448,
+          "position": {
+            "x": 682.5503709175971,
+            "y": 374.23180451759714
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for ORACLE (Leg 3/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 6.509,
+      "carrier": "oracle",
+      "stage": "travelling",
+      "progress": 0.587,
+      "position": {
+        "x": 642.2881325497345,
+        "y": 356.15667654973447
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.587,
+          "position": {
+            "x": 642.2881325497345,
+            "y": 356.15667654973447
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for ORACLE (Leg 3/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 6.863,
+      "carrier": "oracle",
+      "stage": "travelling",
+      "progress": 0.661,
+      "position": {
+        "x": 620.4491704757615,
+        "y": 346.2646200757616
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.661,
+          "position": {
+            "x": 620.4491704757615,
+            "y": 346.2646200757616
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for ORACLE (Leg 3/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 7.217,
+      "carrier": "oracle",
+      "stage": "waiting",
+      "progress": 0.805,
+      "position": {
+        "x": 578.0162795949169,
+        "y": 326.8721899949169
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 WAITING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "docked",
+          "stage": "waiting",
+          "progress": 0.805,
+          "position": {
+            "x": 578.0162795949169,
+            "y": 326.8721899949169
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for ORACLE (Leg 3/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 7.575,
+      "carrier": "oracle",
+      "stage": "delivering",
+      "progress": 0.928,
+      "position": {
+        "x": 541.5426187229555,
+        "y": 310.0255883229553
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 DELIVERING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "delivering",
+          "stage": "delivering",
+          "progress": 0.928,
+          "position": {
+            "x": 541.5426187229555,
+            "y": 310.0255883229553
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for ORACLE (Leg 3/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 7.929,
+      "carrier": "sentinel",
+      "stage": "approaching",
+      "progress": 0.005,
+      "position": {
+        "x": 171.49421656746694,
+        "y": 429.35970274417775
+      },
+      "packet_attached": false,
+      "capsule_text": "NONE (DETACHED)",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "sentinel": {
+          "status": "docked",
+          "stage": "approaching",
+          "progress": 0.005,
+          "position": {
+            "x": 171.49421656746694,
+            "y": 429.35970274417775
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Movement active"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 8.282,
+      "carrier": "sentinel",
+      "stage": "approaching",
+      "progress": 0.059,
+      "position": {
+        "x": 186.53025266350795,
+        "y": 422.92544004549745
+      },
+      "packet_attached": false,
+      "capsule_text": "NONE (DETACHED)",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "sentinel": {
+          "status": "docked",
+          "stage": "approaching",
+          "progress": 0.059,
+          "position": {
+            "x": 186.53025266350795,
+            "y": 422.92544004549745
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Movement active"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 8.635,
+      "carrier": "sentinel",
+      "stage": "pickup",
+      "progress": 0.181,
+      "position": {
+        "x": 221.76084159186126,
+        "y": 407.9107338693796
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 PICKUP",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "sentinel": {
+          "status": "docked",
+          "stage": "pickup",
+          "progress": 0.181,
+          "position": {
+            "x": 221.76084159186126,
+            "y": 407.9107338693796
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 8.989,
+      "carrier": "sentinel",
+      "stage": "travelling",
+      "progress": 0.309,
+      "position": {
+        "x": 259.4857937590149,
+        "y": 391.92234821366173
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "sentinel": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.309,
+          "position": {
+            "x": 259.4857937590149,
+            "y": 391.92234821366173
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 9.481,
+      "carrier": "sentinel",
+      "stage": "travelling",
+      "progress": 0.464,
+      "position": {
+        "x": 306.3817367577836,
+        "y": 372.1658402807388
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "sentinel": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.464,
+          "position": {
+            "x": 306.3817367577836,
+            "y": 372.1658402807388
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 9.837,
+      "carrier": "sentinel",
+      "stage": "travelling",
+      "progress": 0.565,
+      "position": {
+        "x": 337.8849360593018,
+        "y": 358.96249758023276
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "sentinel": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.565,
+          "position": {
+            "x": 337.8849360593018,
+            "y": 358.96249758023276
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 10.191,
+      "carrier": "sentinel",
+      "stage": "travelling",
+      "progress": 0.699,
+      "position": {
+        "x": 380.27521830132434,
+        "y": 341.27677683289187
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "sentinel": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.699,
+          "position": {
+            "x": 380.27521830132434,
+            "y": 341.27677683289187
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 10.547,
+      "carrier": "sentinel",
+      "stage": "waiting",
+      "progress": 0.811,
+      "position": {
+        "x": 416.7074083577528,
+        "y": 326.145987080749
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 WAITING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "sentinel": {
+          "status": "docked",
+          "stage": "waiting",
+          "progress": 0.811,
+          "position": {
+            "x": 416.7074083577528,
+            "y": 326.145987080749
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 10.902,
+      "carrier": "sentinel",
+      "stage": "delivering",
+      "progress": 0.891,
+      "position": {
+        "x": 443.191219687386,
+        "y": 315.18467397087136
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 DELIVERING",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "oracle": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "sentinel": {
+          "status": "delivering",
+          "stage": "delivering",
+          "progress": 0.891,
+          "position": {
+            "x": 443.191219687386,
+            "y": 315.18467397087136
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 11.268,
+      "carrier": "scout",
+      "stage": "approaching",
+      "progress": 0,
+      "position": {
+        "x": 170,
+        "y": 130
+      },
+      "packet_attached": false,
+      "capsule_text": "NONE (DETACHED)",
+      "all_agents": {
+        "scout": {
+          "status": "docked",
+          "stage": "approaching",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Movement active"
+        },
+        "nexus": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 11.624,
+      "carrier": "scout",
+      "stage": "approaching",
+      "progress": 0.117,
+      "position": {
+        "x": 203.2670202540318,
+        "y": 144.49331145403184
+      },
+      "packet_attached": false,
+      "capsule_text": "NONE (DETACHED)",
+      "all_agents": {
+        "scout": {
+          "status": "docked",
+          "stage": "approaching",
+          "progress": 0.117,
+          "position": {
+            "x": 203.2670202540318,
+            "y": 144.49331145403184
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Movement active"
+        },
+        "nexus": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 11.977,
+      "carrier": "scout",
+      "stage": "pickup",
+      "progress": 0.213,
+      "position": {
+        "x": 231.0999159472128,
+        "y": 156.96589994721282
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 PICKUP",
+      "all_agents": {
+        "scout": {
+          "status": "docked",
+          "stage": "pickup",
+          "progress": 0.213,
+          "position": {
+            "x": 231.0999159472128,
+            "y": 156.96589994721282
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "nexus": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 12.332,
+      "carrier": "scout",
+      "stage": "travelling",
+      "progress": 0.331,
+      "position": {
+        "x": 265.8688629431787,
+        "y": 172.96113814317874
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.331,
+          "position": {
+            "x": 265.8688629431787,
+            "y": 172.96113814317874
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "nexus": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 12.686,
+      "carrier": "scout",
+      "stage": "travelling",
+      "progress": 0.437,
+      "position": {
+        "x": 298.1938252481617,
+        "y": 188.21909244816177
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.437,
+          "position": {
+            "x": 298.1938252481617,
+            "y": 188.21909244816177
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "nexus": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 13.04,
+      "carrier": "scout",
+      "stage": "travelling",
+      "progress": 0.56,
+      "position": {
+        "x": 336.21151232376315,
+        "y": 206.6097203237632
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.56,
+          "position": {
+            "x": 336.21151232376315,
+            "y": 206.6097203237632
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "nexus": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 13.397,
+      "carrier": "scout",
+      "stage": "travelling",
+      "progress": 0.64,
+      "position": {
+        "x": 361.4920755249151,
+        "y": 219.09002752491512
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 TRAVELLING",
+      "all_agents": {
+        "scout": {
+          "status": "travelling",
+          "stage": "travelling",
+          "progress": 0.64,
+          "position": {
+            "x": 361.4920755249151,
+            "y": 219.09002752491512
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "nexus": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 13.751,
+      "carrier": "scout",
+      "stage": "waiting",
+      "progress": 0.784,
+      "position": {
+        "x": 407.96480799457566,
+        "y": 242.5222991945758
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 WAITING",
+      "all_agents": {
+        "scout": {
+          "status": "docked",
+          "stage": "waiting",
+          "progress": 0.784,
+          "position": {
+            "x": 407.96480799457566,
+            "y": 242.5222991945758
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "nexus": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 14.114,
+      "carrier": "scout",
+      "stage": "delivering",
+      "progress": 0.891,
+      "position": {
+        "x": 443.191219687386,
+        "y": 260.68170288738605
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 DELIVERING",
+      "all_agents": {
+        "scout": {
+          "status": "delivering",
+          "stage": "delivering",
+          "progress": 0.891,
+          "position": {
+            "x": 443.191219687386,
+            "y": 260.68170288738605
+          },
+          "packetAttached": true,
+          "reasonForWaiting": "Movement active"
+        },
+        "nexus": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for SCOUT (Leg 1/4) to complete transfer"
+        }
+      }
+    },
+    {
+      "elapsed_seconds": 14.468,
+      "carrier": "nexus",
+      "stage": "approaching",
+      "progress": 0,
+      "position": {
+        "x": 810,
+        "y": 130
+      },
+      "packet_attached": false,
+      "capsule_text": "NONE (DETACHED)",
+      "all_agents": {
+        "scout": {
+          "status": "completed",
+          "stage": "completed",
+          "progress": 1,
+          "position": {
+            "x": 170,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Stage completed; awaiting next cycle"
+        },
+        "nexus": {
+          "status": "docked",
+          "stage": "approaching",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 130
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Movement active"
+        },
+        "oracle": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 810,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        },
+        "sentinel": {
+          "status": "waiting_turn",
+          "stage": "waiting",
+          "progress": 0,
+          "position": {
+            "x": 170,
+            "y": 430
+          },
+          "packetAttached": false,
+          "reasonForWaiting": "Waiting for NEXUS (Leg 2/4) to complete transfer"
+        }
+      }
+    }
+  ]
+}

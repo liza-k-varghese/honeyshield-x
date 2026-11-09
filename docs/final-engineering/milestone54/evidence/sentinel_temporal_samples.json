@@ -1,0 +1,96 @@
+{
+  "agentId": "SENTINEL",
+  "total_samples": 9,
+  "samples": [
+    {
+      "elapsed_ms": 7929.0,
+      "position": {
+        "x": 171.49421656746694,
+        "y": 429.35970274417775
+      },
+      "progress": 0.005,
+      "packet_attached": false,
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_ms": 8282.0,
+      "position": {
+        "x": 186.53025266350795,
+        "y": 422.92544004549745
+      },
+      "progress": 0.059,
+      "packet_attached": false,
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_ms": 8634.9,
+      "position": {
+        "x": 221.76084159186126,
+        "y": 407.9107338693796
+      },
+      "progress": 0.181,
+      "packet_attached": true,
+      "capsule": "PKT #SENTINEL \u2022 PICKUP"
+    },
+    {
+      "elapsed_ms": 8988.9,
+      "position": {
+        "x": 259.4857937590149,
+        "y": 391.92234821366173
+      },
+      "progress": 0.309,
+      "packet_attached": true,
+      "capsule": "PKT #SENTINEL \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 9481.2,
+      "position": {
+        "x": 306.3817367577836,
+        "y": 372.1658402807388
+      },
+      "progress": 0.464,
+      "packet_attached": true,
+      "capsule": "PKT #SENTINEL \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 9836.8,
+      "position": {
+        "x": 337.8849360593018,
+        "y": 358.96249758023276
+      },
+      "progress": 0.565,
+      "packet_attached": true,
+      "capsule": "PKT #SENTINEL \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 10191.4,
+      "position": {
+        "x": 380.27521830132434,
+        "y": 341.27677683289187
+      },
+      "progress": 0.699,
+      "packet_attached": true,
+      "capsule": "PKT #SENTINEL \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 10547.0,
+      "position": {
+        "x": 416.7074083577528,
+        "y": 326.145987080749
+      },
+      "progress": 0.811,
+      "packet_attached": true,
+      "capsule": "PKT #SENTINEL \u2022 WAITING"
+    },
+    {
+      "elapsed_ms": 10902.4,
+      "position": {
+        "x": 443.191219687386,
+        "y": 315.18467397087136
+      },
+      "progress": 0.891,
+      "packet_attached": true,
+      "capsule": "PKT #SENTINEL \u2022 DELIVERING"
+    }
+  ]
+}

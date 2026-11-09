@@ -1,62 +1,151 @@
-import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { UniverseCommandCenter } from '../components/UniverseCommandCenter';
-import { DashboardStats, Alert, Attack, DigitalAgentRuntimeStatus, IncidentJourney } from '../types';
+import {
+  AgentId,
+  AgentRuntimeStatus,
+  EventJourneyRecord,
+} from '../digital-agents/types';
+import { Alert, Attack, DashboardStats } from '../types';
+
+const mockRuntimeStatuses: Record<AgentId, AgentRuntimeStatus> = {
+  scout: {
+    id: 'scout',
+    currentState: 'scanning',
+    connectionStatus: 'connected',
+    currentTaskId: 'task-1',
+    currentTaskDescription: 'Scanning honeypot perimeter',
+    tasksCompleted: 1420,
+    tasksFailed: 0,
+    tasksPending: 3,
+    lastActiveTimestamp: new Date().toISOString(),
+    recentActivity: [],
+  },
+  nexus: {
+    id: 'nexus',
+    currentState: 'processing',
+    connectionStatus: 'connected',
+    currentTaskId: 'task-2',
+    currentTaskDescription: 'ACID Outbox streaming',
+    tasksCompleted: 2890,
+    tasksFailed: 1,
+    tasksPending: 8,
+    lastActiveTimestamp: new Date().toISOString(),
+    recentActivity: [],
+  },
+  oracle: {
+    id: 'oracle',
+    currentState: 'analyzing',
+    connectionStatus: 'connected',
+    currentTaskId: 'task-3',
+    currentTaskDescription: 'Correlating threat actor campaigns',
+    tasksCompleted: 840,
+    tasksFailed: 0,
+    tasksPending: 2,
+    lastActiveTimestamp: new Date().toISOString(),
+    recentActivity: [],
+  },
+  sentinel: {
+    id: 'sentinel',
+    currentState: 'alerting',
+    connectionStatus: 'connected',
+    currentTaskId: 'task-4',
+    currentTaskDescription: 'Governor rate-limit containment',
+    tasksCompleted: 320,
+    tasksFailed: 0,
+    tasksPending: 1,
+    lastActiveTimestamp: new Date().toISOString(),
+    recentActivity: [],
+  },
+};
 
 const mockStats: DashboardStats = {
-  total_attacks: 1420,
+  total_attacks: 1250,
   active_alerts: 4,
-  critical_threats: 1,
-  defense_readiness: 98.4,
+  active_alerts_by_severity: {
+    critical: 2,
+    high: 2,
+    medium: 0,
+    low: 0,
+  },
+  unique_attacker_ips_24h: 38,
+  system_health: {
+    api: 'healthy',
+    postgresql: 'healthy',
+    redis: 'healthy',
+  },
 };
 
 const mockAlerts: Alert[] = [
   {
-    id: 1,
-    title: 'Unauthorized Privilege Escalation Attempt',
-    description: 'Suspicious sudo access attempt on honeypot cluster node 01',
+    id: 101,
+    attack_id: 501,
+    alert_type: 'brute_force',
     severity: 'critical',
     status: 'open',
-    source_ip: '198.51.100.89',
-    destination_ip: '10.0.0.12',
-    attack_type: 'Privilege Escalation',
-    confidence_score: 96,
-    created_at: '2026-11-08T00:00:00Z',
-    updated_at: '2026-11-08T00:05:00Z',
+    message: 'Distributed SSH Brute Force Surge from 198.51.100.44',
+    created_at: new Date().toISOString(),
   },
 ];
 
 const mockAttacks: Attack[] = [
   {
-    id: 1,
-    attack_type: 'Credential Stuffing',
-    source_ip: '198.51.100.89',
-    destination_ip: '10.0.0.12',
-    status: 'active',
+    id: 501,
+    attack_type: 'ssh_brute_force',
+    source_ip: '198.51.100.44',
+    destination_ip: '10.0.0.1',
+    protocol: 'SSH',
     severity: 'critical',
-    created_at: '2026-11-08T00:00:00Z',
+    risk_score: 9.2,
+    status: 'blocked',
+    detected_at: new Date().toISOString(),
   },
 ];
 
-const mockRuntimeStatuses: Record<'scout' | 'nexus' | 'oracle' | 'sentinel', DigitalAgentRuntimeStatus> = {
-  scout: { agentId: 'scout', currentState: 'hunting', activeTerritory: 'Perimeter Sensor Array', currentThreatLevel: 'elevated', packetCapacity: 5, tasksCompleted: 142, uptimeSeconds: 3600 },
-  nexus: { agentId: 'nexus', currentState: 'normalizing', activeTerritory: 'Outbox Event Broker', currentThreatLevel: 'nominal', packetCapacity: 8, tasksCompleted: 98, uptimeSeconds: 3600 },
-  oracle: { agentId: 'oracle', currentState: 'analyzing', activeTerritory: 'Threat Matrix Core', currentThreatLevel: 'nominal', packetCapacity: 4, tasksCompleted: 77, uptimeSeconds: 3600 },
-  sentinel: { agentId: 'sentinel', currentState: 'guarding', activeTerritory: 'Remediation Hub', currentThreatLevel: 'critical', packetCapacity: 3, tasksCompleted: 45, uptimeSeconds: 3600 },
-};
-
-const mockJourneys: IncidentJourney[] = [
+const mockJourneys: EventJourneyRecord[] = [
   {
-    journey_id: 'JRN-DEMO-001',
-    title: 'Compromised SSH Ingress Attack Chain',
+    eventId: 'evt-test-991',
+    eventType: 'sensor.ssh_honeypot',
     severity: 'critical',
-    current_stage: 'remediation',
+    sourceIp: '198.51.100.44',
+    startTime: new Date(Date.now() - 15000).toISOString(),
+    totalDurationMs: 280,
+    isComplete: true,
+    hasFailed: false,
+    currentStageIndex: 3,
     stages: [
-      { id: 'stg-1', name: 'Sensor Detection', agent: 'scout', status: 'completed', duration_ms: 1200, summary: 'Cowrie caught root password spray' },
-      { id: 'stg-2', name: 'Event Normalization', agent: 'nexus', status: 'completed', duration_ms: 800, summary: 'Parsed authentication logs' },
-      { id: 'stg-3', name: 'Threat Intelligence', agent: 'oracle', status: 'completed', duration_ms: 1500, summary: 'Matched Tor Exit Node 198.51.100.89' },
-      { id: 'stg-4', name: 'Active Mitigation', agent: 'sentinel', status: 'in_progress', duration_ms: 600, summary: 'Firewall drop rule deployed' },
+      {
+        stageId: 'step-1',
+        stageName: 'Sensor Detection',
+        responsibleAgent: 'scout',
+        details: 'Cowrie caught root password spray',
+        timestamp: new Date().toISOString(),
+        status: 'completed',
+      },
+      {
+        stageId: 'step-2',
+        stageName: 'Event Normalization',
+        responsibleAgent: 'nexus',
+        details: 'Parsed authentication logs',
+        timestamp: new Date().toISOString(),
+        status: 'completed',
+      },
+      {
+        stageId: 'step-3',
+        stageName: 'Threat Intelligence',
+        responsibleAgent: 'oracle',
+        details: 'Matched Tor Exit Node 198.51.100.89',
+        timestamp: new Date().toISOString(),
+        status: 'completed',
+      },
+      {
+        stageId: 'step-4',
+        stageName: 'Active Mitigation',
+        responsibleAgent: 'sentinel',
+        details: 'Firewall drop rule deployed',
+        timestamp: new Date().toISOString(),
+        status: 'active',
+      },
     ],
   },
 ];
@@ -125,7 +214,7 @@ describe('Milestone 54 — Autonomous Four-Robot Relay Verification Suite', () =
       />
     );
 
-    const playBtn = screen.getByTitle('Play/Pause Relay Animation');
+    const playBtn = screen.getByTitle('Toggle Physical Agent Locomotion [Space]');
     fireEvent.click(playBtn);
 
     // Initial state: Scout at origin

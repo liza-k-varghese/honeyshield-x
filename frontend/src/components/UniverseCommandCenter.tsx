@@ -3,7 +3,7 @@
  * Immersive Spatial SOC Universe, Articulated Robot Locomotion & Physical Event-Packet Handoffs
  */
 
-import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback, useReducer } from 'react';
 import {
   AgentId,
   AgentRuntimeStatus,
@@ -75,6 +75,130 @@ type CameraTarget = 'all' | 'singularity' | 'scout' | 'nexus' | 'oracle' | 'sent
 type CoreState = 'CONNECTED' | 'PROCESSING' | 'DEGRADED' | 'DISCONNECTED' | 'REPLAY' | 'DEMO';
 type LocomotionStage = 'ready' | 'approaching' | 'pickup' | 'travelling' | 'waiting' | 'delivering' | 'confirmed' | 'failed';
 
+export interface RelayEngineState {
+  agentIndex: number;
+  stageStepIndex: number;
+  locomotionStage: LocomotionStage;
+  runCount: number;
+  runId: string;
+  isPlaying: boolean;
+  isReplayingHistorical: boolean;
+}
+
+export type RelayEngineAction =
+  | { type: 'ADVANCE_STAGE'; totalAgents?: number }
+  | { type: 'SET_STAGE'; stage: LocomotionStage }
+  | { type: 'TOGGLE_PLAY' }
+  | { type: 'SET_PLAYING'; isPlaying: boolean }
+  | { type: 'TRIGGER_REPLAY' }
+  | { type: 'RESET' }
+  | { type: 'STEP_STAGE_MANUAL'; stepIndex: number };
+
+export function relayEngineReducer(
+  state: RelayEngineState,
+  action: RelayEngineAction
+): RelayEngineState {
+  switch (action.type) {
+    case 'ADVANCE_STAGE': {
+      const total = action.totalAgents || 4;
+      if (state.isReplayingHistorical && state.agentIndex === total - 1) {
+        return {
+          ...state,
+          isPlaying: false,
+          isReplayingHistorical: false,
+          locomotionStage: 'ready',
+        };
+      }
+
+      const nextAgentIndex = (state.agentIndex + 1) % total;
+      const isCycleComplete = nextAgentIndex === 0;
+      const nextRunCount = isCycleComplete ? state.runCount + 1 : state.runCount;
+      const nextRunId = isCycleComplete ? `RUN-${nextRunCount}` : state.runId;
+
+      return {
+        ...state,
+        agentIndex: nextAgentIndex,
+        stageStepIndex: (state.stageStepIndex + 1) % total,
+        locomotionStage: 'approaching',
+        runCount: nextRunCount,
+        runId: nextRunId,
+      };
+    }
+
+    case 'SET_STAGE': {
+      if (state.locomotionStage === action.stage) return state;
+      return {
+        ...state,
+        locomotionStage: action.stage,
+      };
+    }
+
+    case 'TOGGLE_PLAY': {
+      return {
+        ...state,
+        isPlaying: !state.isPlaying,
+      };
+    }
+
+    case 'SET_PLAYING': {
+      if (state.isPlaying === action.isPlaying) return state;
+      return {
+        ...state,
+        isPlaying: action.isPlaying,
+      };
+    }
+
+    case 'TRIGGER_REPLAY': {
+      return {
+        ...state,
+        agentIndex: 0,
+        stageStepIndex: 0,
+        locomotionStage: 'ready',
+        isPlaying: true,
+        isReplayingHistorical: true,
+      };
+    }
+
+    case 'RESET': {
+      const nextRunCount = state.runCount + 1;
+      return {
+        ...state,
+        agentIndex: 0,
+        stageStepIndex: 0,
+        locomotionStage: 'ready',
+        isPlaying: false,
+        isReplayingHistorical: false,
+        runCount: nextRunCount,
+        runId: `RUN-${nextRunCount}`,
+      };
+    }
+
+    case 'STEP_STAGE_MANUAL': {
+      return {
+        ...state,
+        stageStepIndex: action.stepIndex,
+      };
+    }
+
+    default:
+      return state;
+  }
+}
+
+/**
+ * Strict Environment Gate for Telemetry & Diagnostics Model.
+ * In production builds (import.meta.env.PROD), query parameters (?debug=1) and
+ * console window globals (window.__HSX_DEBUG__) cannot expose internal state.
+ */
+export function isTelemetryAuthorized(): boolean {
+  if (typeof window !== 'undefined' && typeof (window as any).__HSX_SIMULATE_PROD__ === 'boolean') {
+    return !(window as any).__HSX_SIMULATE_PROD__;
+  }
+  const isDev = Boolean((import.meta as any).env?.DEV);
+  const isTest = typeof process !== 'undefined' && Boolean(process.env && process.env.NODE_ENV === 'test');
+  return isDev || isTest;
+}
+
 export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
   stats,
   alerts = [],
@@ -101,8 +225,8 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
   const [isDiagnosticsModalOpen, setIsDiagnosticsModalOpen] = useState(false);
   const [isShowcaseGuideOpen, setIsShowcaseGuideOpen] = useState(false);
   const [copiedDiagnostics, setCopiedDiagnostics] = useState<boolean>(false);
-  const [activeStageStepIndex, setActiveStageStepIndex] = useState<number>(0);
   const [isDevDiagnosticsOpen, setIsDevDiagnosticsOpen] = useState<boolean>(() => {
+    if (!isTelemetryAuthorized()) return false;
     if (typeof window !== 'undefined') {
       const p = new URLSearchParams(window.location.search);
       return p.get('debug') === '1' || p.get('hud') === '1' || p.get('diagnostics') === '1';
@@ -110,14 +234,46 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
     return false;
   });
 
-  // Agent Locomotion & Packet Transit Engine State (Supports URL query param seeding for test and deep-linking)
-  const [isLocomotionPlaying, setIsLocomotionPlaying] = useState<boolean>(() => {
+  // Pure Relay Engine State & Reducer (Guarantees zero nested updaters, side-effects, or skips under React 19 Strict Mode)
+  const [relayState, dispatchRelay] = useReducer(relayEngineReducer, undefined, () => {
+    let carrier = 0;
+    let stage: LocomotionStage = 'ready';
+    let playing = false;
     if (typeof window !== 'undefined') {
       const p = new URLSearchParams(window.location.search);
-      return p.get('locomotion') === '1' || p.get('locomotion') === 'true';
+      const c = parseInt(p.get('carrier') || '0', 10);
+      if (!isNaN(c) && c >= 0 && c <= 3) carrier = c;
+
+      const prog = parseFloat(p.get('progress') || '0');
+      if (prog > 0.14 && prog < 0.26) stage = 'pickup';
+      else if (prog >= 0.26 && prog < 0.78) stage = 'travelling';
+      else if (prog >= 0.78 && prog < 0.88) stage = 'waiting';
+      else if (prog >= 0.88 && prog < 0.98) stage = 'delivering';
+      else if (prog >= 0.98) stage = 'confirmed';
+
+      playing = p.get('locomotion') === '1' || p.get('locomotion') === 'true';
     }
-    return false;
+
+    return {
+      agentIndex: carrier,
+      stageStepIndex: carrier,
+      locomotionStage: stage,
+      runCount: 1,
+      runId: 'RUN-1',
+      isPlaying: playing,
+      isReplayingHistorical: false,
+    };
   });
+
+  const {
+    agentIndex: relayAgentIndex,
+    stageStepIndex: activeStageStepIndex,
+    locomotionStage,
+    runId: relayRunId,
+    isPlaying: isLocomotionPlaying,
+    isReplayingHistorical,
+  } = relayState;
+
   const [locomotionProgress, setLocomotionProgress] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const val = parseFloat(new URLSearchParams(window.location.search).get('progress') || '0');
@@ -125,28 +281,13 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
     }
     return 0;
   }); // 0.0 to 1.0
-  const [locomotionStage, setLocomotionStage] = useState<LocomotionStage>(() => {
-    if (typeof window !== 'undefined') {
-      const p = parseFloat(new URLSearchParams(window.location.search).get('progress') || '0');
-      if (p > 0.14 && p < 0.26) return 'pickup';
-      if (p >= 0.26 && p < 0.78) return 'travelling';
-      if (p >= 0.78 && p < 0.88) return 'waiting';
-      if (p >= 0.88 && p < 0.98) return 'delivering';
-      if (p >= 0.98) return 'confirmed';
-    }
-    return 'ready';
-  });
+
   const [locomotionSpeed, setLocomotionSpeed] = useState<number>(1);
-  const [relayAgentIndex, setRelayAgentIndex] = useState<number>(() => {
-    if (typeof window !== 'undefined') {
-      const c = parseInt(new URLSearchParams(window.location.search).get('carrier') || '0', 10);
-      return !isNaN(c) && c >= 0 && c <= 3 ? c : 0;
-    }
-    return 0;
-  }); // 0: Scout, 1: Nexus, 2: Oracle, 3: Sentinel
-  const [isReplayingHistorical, setIsReplayingHistorical] = useState<boolean>(false);
-  const [relayRunId, setRelayRunId] = useState<string>(() => `RUN-${Date.now().toString(36).toUpperCase()}`);
   const runStartedAtRef = useRef<string>(new Date().toISOString());
+
+  useEffect(() => {
+    runStartedAtRef.current = new Date().toISOString();
+  }, [relayRunId]);
 
   // References
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -390,38 +531,32 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
       const nextProgress = progressRef.current + deltaTime * speedMultiplier;
 
       if (nextProgress >= 1.0) {
-        // Leg Complete: Seamlessly Advance Relay
+        // Leg Complete: Seamlessly Advance Relay via Pure Reducer
         progressRef.current = 0.0;
         setLocomotionProgress(0.0);
-
-        // If in single replay mode, finish after full cycle
-        if (isReplayingHistorical && relayAgentIndex === 3) {
-          setIsLocomotionPlaying(false);
-          setIsReplayingHistorical(false);
-          setLocomotionStage('ready');
-          return;
-        }
-
-        setRelayAgentIndex((prevIdx) => (prevIdx + 1) % relayChain.length);
-        setActiveStageStepIndex((prev) => (prev + 1) % 4);
-        setLocomotionStage('approaching');
+        dispatchRelay({ type: 'ADVANCE_STAGE', totalAgents: relayChain.length });
       } else {
         progressRef.current = nextProgress;
         setLocomotionProgress(nextProgress);
 
         // Stage Transitions along conduit
+        let nextStage: LocomotionStage = 'approaching';
         if (nextProgress < 0.14) {
-          setLocomotionStage('approaching');
+          nextStage = 'approaching';
         } else if (nextProgress < 0.26) {
-          setLocomotionStage('pickup');
+          nextStage = 'pickup';
         } else if (nextProgress < 0.78) {
-          setLocomotionStage('travelling');
+          nextStage = 'travelling';
         } else if (nextProgress < 0.88) {
-          setLocomotionStage('waiting');
+          nextStage = 'waiting';
         } else if (nextProgress < 0.96) {
-          setLocomotionStage('delivering');
+          nextStage = 'delivering';
         } else {
-          setLocomotionStage('confirmed');
+          nextStage = 'confirmed';
+        }
+
+        if (locomotionStage !== nextStage) {
+          dispatchRelay({ type: 'SET_STAGE', stage: nextStage });
         }
       }
 
@@ -429,7 +564,7 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
         animFrameRef.current = requestAnimationFrame(animateLocomotion);
       }
     },
-    [locomotionSpeed, isLocomotionPlaying, isReplayingHistorical, relayAgentIndex, relayChain.length]
+    [locomotionSpeed, isLocomotionPlaying, locomotionStage, relayChain.length]
   );
 
   useEffect(() => {
@@ -565,7 +700,7 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
           break;
         case ' ':
           e.preventDefault();
-          setIsLocomotionPlaying((prev) => !prev);
+          dispatchRelay({ type: 'TOGGLE_PLAY' });
           break;
       }
     };
@@ -577,12 +712,8 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
   // Replay Trigger Action
   const handleTriggerReplay = () => {
     progressRef.current = 0;
-    setIsReplayingHistorical(true);
-    setRelayAgentIndex(0);
-    setActiveStageStepIndex(0);
     setLocomotionProgress(0);
-    setLocomotionStage('ready');
-    setIsLocomotionPlaying(true);
+    dispatchRelay({ type: 'TRIGGER_REPLAY' });
   };
 
   // Safe Investigation Deep-Link
@@ -593,6 +724,27 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
   // Synchronize Observable Relay State Model for autonomous verification & diagnostics
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Strictly restrict diagnostic telemetry to development or test environments.
+      // In production builds (import.meta.env.PROD), client-side queries (?debug) or
+      // console globals (window.__HSX_DEBUG__) cannot expose internal telemetry or relay state.
+      const scrubIfUnauthorized = () => {
+        if (!isTelemetryAuthorized()) {
+          if ((window as any).__HSX_RELAY_STATE__) {
+            delete (window as any).__HSX_RELAY_STATE__;
+          }
+          return true;
+        }
+        return false;
+      };
+
+      if (scrubIfUnauthorized()) {
+        return;
+      }
+
+      const onSecurityLockdown = () => {
+        scrubIfUnauthorized();
+      };
+      window.addEventListener('hsx:security-lockdown', onSecurityLockdown);
       const agentStates: Record<string, any> = {};
       relayChain.forEach((step, idx) => {
         const isCurrent = idx === relayAgentIndex;
@@ -652,6 +804,7 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
       });
 
       (window as any).__HSX_RELAY_STATE__ = {
+        engineVersion: '1.0.0-rc5-state-purity',
         mode: isDemoMode
           ? 'DEMO'
           : isReplayingHistorical
@@ -672,6 +825,10 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
           : 'relay.cycle.sync',
         failureReason: null,
         agents: agentStates,
+      };
+
+      return () => {
+        window.removeEventListener('hsx:security-lockdown', onSecurityLockdown);
       };
     }
   }, [
@@ -1527,7 +1684,7 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
             {/* Left: VCR Buttons */}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setIsLocomotionPlaying(!isLocomotionPlaying)}
+                onClick={() => dispatchRelay({ type: 'TOGGLE_PLAY' })}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-600/90 hover:bg-cyan-500 text-white font-bold transition-all shadow-[0_0_12px_rgba(0,229,255,0.3)]"
                 title="Toggle Physical Agent Locomotion [Space]"
               >
@@ -1540,19 +1697,21 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
                   const next = progressRef.current + 0.15;
                   if (next >= 1.0) {
                     progressRef.current = 0.05;
-                    setRelayAgentIndex((p) => (p + 1) % relayChain.length);
-                    setActiveStageStepIndex((p) => (p + 1) % 4);
                     setLocomotionProgress(0.05);
-                    setLocomotionStage('approaching');
+                    dispatchRelay({ type: 'ADVANCE_STAGE', totalAgents: relayChain.length });
                   } else {
                     progressRef.current = next;
                     setLocomotionProgress(next);
-                    if (next < 0.14) setLocomotionStage('approaching');
-                    else if (next < 0.26) setLocomotionStage('pickup');
-                    else if (next < 0.78) setLocomotionStage('travelling');
-                    else if (next < 0.88) setLocomotionStage('waiting');
-                    else if (next < 0.96) setLocomotionStage('delivering');
-                    else setLocomotionStage('confirmed');
+                    let nextStage: LocomotionStage = 'approaching';
+                    if (next < 0.14) nextStage = 'approaching';
+                    else if (next < 0.26) nextStage = 'pickup';
+                    else if (next < 0.78) nextStage = 'travelling';
+                    else if (next < 0.88) nextStage = 'waiting';
+                    else if (next < 0.96) nextStage = 'delivering';
+                    else nextStage = 'confirmed';
+                    if (locomotionStage !== nextStage) {
+                      dispatchRelay({ type: 'SET_STAGE', stage: nextStage });
+                    }
                   }
                 }}
                 className="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-300 text-xs"
@@ -1574,14 +1733,8 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
               <button
                 onClick={() => {
                   progressRef.current = 0;
-                  setIsLocomotionPlaying(false);
                   setLocomotionProgress(0);
-                  setLocomotionStage('ready');
-                  setRelayAgentIndex(0);
-                  setActiveStageStepIndex(0);
-                  setIsReplayingHistorical(false);
-                  setRelayRunId(`RUN-${Date.now().toString(36).toUpperCase()}`);
-                  runStartedAtRef.current = new Date().toISOString();
+                  dispatchRelay({ type: 'RESET' });
                 }}
                 className="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white"
                 title="Reset Locomotion to Origin"
@@ -1589,18 +1742,20 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
 
-              <button
-                onClick={() => setIsDevDiagnosticsOpen((prev) => !prev)}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono transition-all border ${
-                  isDevDiagnosticsOpen
-                    ? 'bg-amber-950/80 text-amber-300 border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]'
-                    : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-slate-200 hover:border-slate-600'
-                }`}
-                title="Toggle Developer Diagnostics HUD [H]"
-              >
-                <Terminal className="w-3.5 h-3.5 text-amber-400" />
-                <span>DEV HUD</span>
-              </button>
+              {isTelemetryAuthorized() && (
+                <button
+                  onClick={() => setIsDevDiagnosticsOpen((prev) => !prev)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono transition-all border ${
+                    isDevDiagnosticsOpen
+                      ? 'bg-amber-950/80 text-amber-300 border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]'
+                      : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-slate-200 hover:border-slate-600'
+                  }`}
+                  title="Toggle Developer Diagnostics HUD [H]"
+                >
+                  <Terminal className="w-3.5 h-3.5 text-amber-400" />
+                  <span>DEV HUD</span>
+                </button>
+              )}
             </div>
 
             {/* Middle: Compact Relay Status Indicator (Milestone 53) */}
@@ -1841,7 +1996,7 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Stage 1: SCOUT */}
           <div
-            onClick={() => setActiveStageStepIndex(0)}
+            onClick={() => dispatchRelay({ type: 'STEP_STAGE_MANUAL', stepIndex: 0 })}
             className={`p-3.5 rounded-xl bg-slate-950/80 border transition-all cursor-pointer ${
               activeStageStepIndex === 0
                 ? 'border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
@@ -1865,7 +2020,7 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
 
           {/* Stage 2: NEXUS */}
           <div
-            onClick={() => setActiveStageStepIndex(1)}
+            onClick={() => dispatchRelay({ type: 'STEP_STAGE_MANUAL', stepIndex: 1 })}
             className={`p-3.5 rounded-xl bg-slate-950/80 border transition-all cursor-pointer ${
               activeStageStepIndex === 1
                 ? 'border-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.25)]'
@@ -1889,7 +2044,7 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
 
           {/* Stage 3: ORACLE */}
           <div
-            onClick={() => setActiveStageStepIndex(2)}
+            onClick={() => dispatchRelay({ type: 'STEP_STAGE_MANUAL', stepIndex: 2 })}
             className={`p-3.5 rounded-xl bg-slate-950/80 border transition-all cursor-pointer ${
               activeStageStepIndex === 2
                 ? 'border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.25)]'
@@ -1913,7 +2068,7 @@ export const UniverseCommandCenter: React.FC<UniverseCommandCenterProps> = ({
 
           {/* Stage 4: SENTINEL */}
           <div
-            onClick={() => setActiveStageStepIndex(3)}
+            onClick={() => dispatchRelay({ type: 'STEP_STAGE_MANUAL', stepIndex: 3 })}
             className={`p-3.5 rounded-xl bg-slate-950/80 border transition-all cursor-pointer ${
               activeStageStepIndex === 3
                 ? 'border-red-400 shadow-[0_0_15px_rgba(239,68,68,0.25)]'

@@ -1,0 +1,116 @@
+{
+  "agentId": "NEXUS",
+  "total_samples": 11,
+  "samples": [
+    {
+      "elapsed_ms": 1242.8,
+      "position": {
+        "x": 810,
+        "y": 130
+      },
+      "progress": 0,
+      "packet_attached": false,
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_ms": 1596.1,
+      "position": {
+        "x": 786.0333681094819,
+        "y": 140.45866687155407
+      },
+      "progress": 0.085,
+      "packet_attached": false,
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_ms": 1949.5,
+      "position": {
+        "x": 770.9802646641009,
+        "y": 147.21720920769738
+      },
+      "progress": 0.139,
+      "packet_attached": false,
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_ms": 2310.3,
+      "position": {
+        "x": 728.5289140220682,
+        "y": 167.0491107337953
+      },
+      "progress": 0.288,
+      "packet_attached": true,
+      "capsule": "PKT #NEXUS \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 2800.7,
+      "position": {
+        "x": 676.3812125118302,
+        "y": 192.92960406450996
+      },
+      "progress": 0.469,
+      "packet_attached": true,
+      "capsule": "PKT #NEXUS \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 3155.0,
+      "position": {
+        "x": 648.5073551802327,
+        "y": 207.42979365930188
+      },
+      "progress": 0.565,
+      "packet_attached": true,
+      "capsule": "PKT #NEXUS \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 3509.3,
+      "position": {
+        "x": 614.1889862068471,
+        "y": 225.90321097945903
+      },
+      "progress": 0.683,
+      "packet_attached": true,
+      "capsule": "PKT #NEXUS \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 3871.2,
+      "position": {
+        "x": 578.0162795949169,
+        "y": 246.0995644152494
+      },
+      "progress": 0.805,
+      "packet_attached": true,
+      "capsule": "PKT #NEXUS \u2022 WAITING"
+    },
+    {
+      "elapsed_ms": 4226.3,
+      "position": {
+        "x": 543.1346880933058,
+        "y": 266.26264932008235
+      },
+      "progress": 0.923,
+      "packet_attached": true,
+      "capsule": "PKT #NEXUS \u2022 DELIVERING"
+    },
+    {
+      "elapsed_ms": 4580.9,
+      "position": {
+        "x": 520.7939459487326,
+        "y": 279.52380055380274
+      },
+      "progress": 0.997,
+      "packet_attached": false,
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_ms": 14468.4,
+      "position": {
+        "x": 810,
+        "y": 130
+      },
+      "progress": 0,
+      "packet_attached": false,
+      "capsule": "NONE (DETACHED)"
+    }
+  ]
+}

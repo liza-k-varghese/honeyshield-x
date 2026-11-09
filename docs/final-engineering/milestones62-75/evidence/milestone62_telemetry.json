@@ -1,0 +1,525 @@
+{
+  "milestone": "Milestone 62",
+  "browser": "Mozilla Firefox 140.16.0esr",
+  "window": "1920x1080",
+  "total_samples": 39,
+  "performance": {
+    "averageFps": 8,
+    "totalFrames": 115,
+    "droppedFrames": 94,
+    "longFrames": 66
+  },
+  "lockdown_audit": {
+    "hasRelayState": false,
+    "hudElementPresent": true
+  },
+  "samples": [
+    {
+      "elapsed_s": 0.0,
+      "carrier": "scout",
+      "stage": 1,
+      "progress": 0.555,
+      "carrier_pos": {
+        "x": 334.54,
+        "y": 205.79
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 0.534,
+      "carrier": "scout",
+      "stage": 1,
+      "progress": 0.731,
+      "carrier_pos": {
+        "x": 390.61,
+        "y": 233.7
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 0.888,
+      "carrier": "scout",
+      "stage": 1,
+      "progress": 0.795,
+      "carrier_pos": {
+        "x": 411.46,
+        "y": 244.31
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 WAITING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 1.241,
+      "carrier": "scout",
+      "stage": 1,
+      "progress": 0.891,
+      "carrier_pos": {
+        "x": 443.19,
+        "y": 260.68
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SCOUT \u2022 DELIVERING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 1.614,
+      "carrier": "scout",
+      "stage": 1,
+      "progress": 0.971,
+      "carrier_pos": {
+        "x": 470.06,
+        "y": 274.75
+      },
+      "packet_attached": false,
+      "capsule_text": "None",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 1.981,
+      "carrier": "nexus",
+      "stage": 2,
+      "progress": 0.027,
+      "carrier_pos": {
+        "x": 802.53,
+        "y": 133.22
+      },
+      "packet_attached": false,
+      "capsule_text": "None",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 2.335,
+      "carrier": "nexus",
+      "stage": 2,
+      "progress": 0.144,
+      "carrier_pos": {
+        "x": 769.47,
+        "y": 147.9
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 PICKUP",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 2.691,
+      "carrier": "nexus",
+      "stage": 2,
+      "progress": 0.144,
+      "carrier_pos": {
+        "x": 769.47,
+        "y": 147.9
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 PICKUP",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 3.048,
+      "carrier": "nexus",
+      "stage": 2,
+      "progress": 0.224,
+      "carrier_pos": {
+        "x": 746.78,
+        "y": 158.39
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 PICKUP",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 3.406,
+      "carrier": "nexus",
+      "stage": 2,
+      "progress": 0.357,
+      "carrier_pos": {
+        "x": 708.67,
+        "y": 176.71
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 3.899,
+      "carrier": "nexus",
+      "stage": 2,
+      "progress": 0.533,
+      "carrier_pos": {
+        "x": 657.82,
+        "y": 202.53
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 4.254,
+      "carrier": "nexus",
+      "stage": 2,
+      "progress": 0.587,
+      "carrier_pos": {
+        "x": 642.29,
+        "y": 210.73
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 4.654,
+      "carrier": "nexus",
+      "stage": 2,
+      "progress": 0.747,
+      "carrier_pos": {
+        "x": 595.35,
+        "y": 236.33
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 5.009,
+      "carrier": "nexus",
+      "stage": 2,
+      "progress": 0.832,
+      "carrier_pos": {
+        "x": 570.11,
+        "y": 250.61
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 WAITING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 5.367,
+      "carrier": "nexus",
+      "stage": 2,
+      "progress": 0.917,
+      "carrier_pos": {
+        "x": 544.73,
+        "y": 265.33
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #NEXUS \u2022 DELIVERING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 5.722,
+      "carrier": "nexus",
+      "stage": 2,
+      "progress": 0.992,
+      "carrier_pos": {
+        "x": 522.39,
+        "y": 278.57
+      },
+      "packet_attached": false,
+      "capsule_text": "None",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 6.078,
+      "carrier": "oracle",
+      "stage": 3,
+      "progress": 0.0,
+      "carrier_pos": {
+        "x": 810,
+        "y": 430
+      },
+      "packet_attached": false,
+      "capsule_text": "None",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 6.435,
+      "carrier": "oracle",
+      "stage": 3,
+      "progress": 0.032,
+      "carrier_pos": {
+        "x": 801.03,
+        "y": 426.15
+      },
+      "packet_attached": false,
+      "capsule_text": "None",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 6.789,
+      "carrier": "oracle",
+      "stage": 3,
+      "progress": 0.16,
+      "carrier_pos": {
+        "x": 764.94,
+        "y": 410.54
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 PICKUP",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 7.165,
+      "carrier": "oracle",
+      "stage": 3,
+      "progress": 0.203,
+      "carrier_pos": {
+        "x": 752.84,
+        "y": 405.27
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 PICKUP",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 7.519,
+      "carrier": "oracle",
+      "stage": 3,
+      "progress": 0.283,
+      "carrier_pos": {
+        "x": 730.05,
+        "y": 395.28
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 8.05,
+      "carrier": "oracle",
+      "stage": 3,
+      "progress": 0.437,
+      "carrier_pos": {
+        "x": 685.63,
+        "y": 375.61
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 8.404,
+      "carrier": "oracle",
+      "stage": 3,
+      "progress": 0.544,
+      "carrier_pos": {
+        "x": 654.72,
+        "y": 361.76
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 8.761,
+      "carrier": "oracle",
+      "stage": 3,
+      "progress": 0.656,
+      "carrier_pos": {
+        "x": 622.01,
+        "y": 346.97
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 9.135,
+      "carrier": "oracle",
+      "stage": 3,
+      "progress": 0.784,
+      "carrier_pos": {
+        "x": 584.33,
+        "y": 329.77
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 WAITING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 9.489,
+      "carrier": "oracle",
+      "stage": 3,
+      "progress": 0.864,
+      "carrier_pos": {
+        "x": 560.61,
+        "y": 318.85
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 WAITING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 9.843,
+      "carrier": "oracle",
+      "stage": 3,
+      "progress": 0.933,
+      "carrier_pos": {
+        "x": 539.95,
+        "y": 309.29
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #ORACLE \u2022 DELIVERING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 10.198,
+      "carrier": "sentinel",
+      "stage": 4,
+      "progress": 0.011,
+      "carrier_pos": {
+        "x": 172.99,
+        "y": 428.72
+      },
+      "packet_attached": false,
+      "capsule_text": "None",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 10.552,
+      "carrier": "sentinel",
+      "stage": 4,
+      "progress": 0.112,
+      "carrier_pos": {
+        "x": 201.74,
+        "y": 416.43
+      },
+      "packet_attached": false,
+      "capsule_text": "None",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 10.909,
+      "carrier": "sentinel",
+      "stage": 4,
+      "progress": 0.181,
+      "carrier_pos": {
+        "x": 221.76,
+        "y": 407.91
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 PICKUP",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 11.266,
+      "carrier": "sentinel",
+      "stage": 4,
+      "progress": 0.299,
+      "carrier_pos": {
+        "x": 256.3,
+        "y": 393.27
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 11.774,
+      "carrier": "sentinel",
+      "stage": 4,
+      "progress": 0.379,
+      "carrier_pos": {
+        "x": 280.33,
+        "y": 383.13
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 12.127,
+      "carrier": "sentinel",
+      "stage": 4,
+      "progress": 0.453,
+      "carrier_pos": {
+        "x": 303.1,
+        "y": 373.54
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 12.48,
+      "carrier": "sentinel",
+      "stage": 4,
+      "progress": 0.608,
+      "carrier_pos": {
+        "x": 351.33,
+        "y": 353.34
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 12.834,
+      "carrier": "sentinel",
+      "stage": 4,
+      "progress": 0.683,
+      "carrier_pos": {
+        "x": 375.13,
+        "y": 343.42
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 TRAVELLING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 13.187,
+      "carrier": "sentinel",
+      "stage": 4,
+      "progress": 0.837,
+      "carrier_pos": {
+        "x": 425.49,
+        "y": 322.51
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 WAITING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 13.543,
+      "carrier": "sentinel",
+      "stage": 4,
+      "progress": 0.859,
+      "carrier_pos": {
+        "x": 432.55,
+        "y": 319.58
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 WAITING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 13.899,
+      "carrier": "sentinel",
+      "stage": 4,
+      "progress": 0.907,
+      "carrier_pos": {
+        "x": 448.53,
+        "y": 312.98
+      },
+      "packet_attached": true,
+      "capsule_text": "PKT #SENTINEL \u2022 DELIVERING",
+      "run_id": "RUN-1"
+    },
+    {
+      "elapsed_s": 14.257,
+      "carrier": "scout",
+      "stage": 1,
+      "progress": 0.0,
+      "carrier_pos": {
+        "x": 170,
+        "y": 130
+      },
+      "packet_attached": false,
+      "capsule_text": "None",
+      "run_id": "RUN-2"
+    }
+  ]
+}

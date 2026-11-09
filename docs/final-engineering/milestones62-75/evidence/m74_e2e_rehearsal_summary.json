@@ -1,0 +1,56 @@
+{
+  "timestamp": "2026-11-08T15:53:53.502404+00:00",
+  "overall_status": "ALL_WORKFLOWS_PASSED",
+  "workflows": {
+    "workflow_a_auth": {
+      "status": "PASSED",
+      "user": "admin_chief",
+      "role": "security_administrator"
+    },
+    "workflow_b_overview": {
+      "status": "PASSED",
+      "total_attacks": 73,
+      "health": {
+        "api": "healthy",
+        "postgresql": "connected",
+        "redis": "connected",
+        "total_services": 3,
+        "healthy_services": 3,
+        "degraded_services": 0,
+        "offline_services": 0
+      }
+    },
+    "workflow_c_deception": {
+      "status": "PASSED",
+      "http_status": 200,
+      "canary_count": 44
+    },
+    "workflow_d_threat_intel": {
+      "status": "PASSED",
+      "http_status": 200,
+      "indicator_count": 8
+    },
+    "workflow_e_investigations": {
+      "status": "PASSED",
+      "case_id": "CASE-2026-2726"
+    },
+    "workflow_f_incident_command": {
+      "status": "PASSED",
+      "governor_status": null
+    },
+    "workflow_g_digital_universe": {
+      "status": "PASSED",
+      "samples": 39
+    },
+    "workflow_h_live_event": {
+      "status": "PASSED",
+      "attack_id": 9633,
+      "event_id": 41732
+    },
+    "workflow_i_failure_handling": {
+      "status": "PASSED",
+      "unauth_status": 401,
+      "bad_pw_status": 401
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-11-08T07:06:22.652132+00:00",
+  "probe_ip": "198.51.100.244",
+  "attack_id": 9485,
+  "event_id": 41165,
+  "pipeline_stages": [
+    {
+      "stage": "FastAPI Ingestion Endpoint",
+      "status": "201 Created",
+      "entity": "Attack #9485"
+    },
+    {
+      "stage": "PostgreSQL Outbox Table",
+      "status": "Committed",
+      "agent_target": "SCOUT (Collection)"
+    },
+    {
+      "stage": "Handoff Outbox Stream",
+      "status": "Monotonic Sequential",
+      "agent_target": "NEXUS (Normalization)"
+    },
+    {
+      "stage": "Mode Isolation",
+      "status": "Verified",
+      "note": "Benign event activates only Scout->Nexus; ORACLE/SENTINEL un-triggered"
+    }
+  ]
+}

@@ -287,8 +287,48 @@ class OperatorRegistry:
         self._seed_default_operators()
 
     def _seed_default_operators(self) -> None:
-        """Seed baseline SOC operational personas."""
-        # Use fixed salts/iterations for fast startup while retaining full PBKDF2 structure
+        """Seed baseline SOC operational personas.
+
+        Security Hardening (Milestone 62):
+        In production environments (APP_ENV=production or HONEYSHIELD_ENV=production),
+        in-memory demo operators with default passwords are strictly rejected.
+        HONEYSHIELD_OPERATORS_JSON must be explicitly supplied with production credentials.
+        """
+        app_env = os.getenv("APP_ENV", os.getenv("HONEYSHIELD_ENV", "development")).lower()
+        is_production = app_env in ("production", "prod")
+
+        with self._lock:
+            self._operators.clear()
+
+        # Check for env-configured operators
+        env_ops = os.getenv("HONEYSHIELD_OPERATORS_JSON")
+        if env_ops:
+            try:
+                data = json.loads(env_ops)
+                with self._lock:
+                    for item in data:
+                        op = Operator(
+                            username=item["username"],
+                            role=item.get("role", "viewer"),
+                            email=item.get("email", f"{item['username']}@honeyshield.local"),
+                            password_hash=item.get("password_hash") or hash_password(item.get("password", "DefaultPass123!")),
+                            is_active=item.get("is_active", True),
+                        )
+                        self._operators[op.username] = op
+            except Exception as e:
+                logger.error("Failed to parse HONEYSHIELD_OPERATORS_JSON: %s", str(e))
+                if is_production:
+                    raise RuntimeError(f"FATAL: Invalid HONEYSHIELD_OPERATORS_JSON in production: {e}") from e
+
+        if is_production:
+            if not self._operators:
+                raise RuntimeError(
+                    "FATAL: Production mode (APP_ENV=production) requires HONEYSHIELD_OPERATORS_JSON with valid operators. "
+                    "Insecure default operator seeds are disabled in production."
+                )
+            return
+
+        # Baseline demo/testing SOC operational personas (development and test only)
         defaults = [
             Operator(
                 username="viewer_dan",
@@ -316,27 +356,9 @@ class OperatorRegistry:
             ),
         ]
         with self._lock:
-            self._operators.clear()
             for op in defaults:
-                self._operators[op.username] = op
-
-        # Check for optional env-configured operators
-        env_ops = os.getenv("HONEYSHIELD_OPERATORS_JSON")
-        if env_ops:
-            try:
-                data = json.loads(env_ops)
-                with self._lock:
-                    for item in data:
-                        op = Operator(
-                            username=item["username"],
-                            role=item.get("role", "viewer"),
-                            email=item.get("email", f"{item['username']}@honeyshield.local"),
-                            password_hash=item.get("password_hash") or hash_password(item.get("password", "DefaultPass123!")),
-                            is_active=item.get("is_active", True),
-                        )
-                        self._operators[op.username] = op
-            except Exception as e:
-                logger.error("Failed to parse HONEYSHIELD_OPERATORS_JSON: %s", str(e))
+                if op.username not in self._operators:
+                    self._operators[op.username] = op
 
     def get_operator(self, username: str) -> Operator | None:
         """Retrieve operator by username."""

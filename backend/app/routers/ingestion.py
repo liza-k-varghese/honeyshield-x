@@ -85,6 +85,19 @@ def ingest_event(
     # Milestone 2: Emit Digital Agent Universe lifecycle events
     try:
         from app.events.service import publish_lifecycle_event, publish_handoff_event
+        from app.events.provenance import tag_event_provenance, is_synthetic_test_ip
+
+        is_synth = is_synthetic_test_ip(event_in.source_ip)
+        scout_payload = tag_event_provenance(
+            {
+                "source_ip": event_in.source_ip,
+                "event_type": event_in.event_type,
+                "attack_id": target_attack_id,
+                "message": event_in.message,
+            },
+            source_ip=event_in.source_ip,
+        )
+
         # 1. SCOUT collection completed
         publish_lifecycle_event(
             agent="SCOUT",
@@ -96,12 +109,7 @@ def ingest_event(
             workflow_id=f"wf_attack_{target_attack_id}",
             transfer_id=f"tr_scout_{db_event.id}",
             severity="info",
-            payload={
-                "source_ip": event_in.source_ip,
-                "event_type": event_in.event_type,
-                "attack_id": target_attack_id,
-                "message": event_in.message,
-            },
+            payload=scout_payload,
             db=db,
         )
         # 2. Verified Handoff: SCOUT -> NEXUS
@@ -129,6 +137,8 @@ def ingest_event(
                 "attack_id": target_attack_id,
                 "event_id": db_event.id,
                 "normalized": True,
+                "is_synthetic": is_synth,
+                "data_provenance": "synthetic_verification_probe" if is_synth else "operational_sensor",
             },
             db=db,
         )

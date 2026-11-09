@@ -1,0 +1,48 @@
+{
+  "agent": "scout",
+  "sample_count": 6,
+  "trajectory": [
+    {
+      "elapsed_s": 0.0,
+      "progress": 0.555,
+      "x": 334.54,
+      "y": 205.79,
+      "attached": true
+    },
+    {
+      "elapsed_s": 0.534,
+      "progress": 0.731,
+      "x": 390.61,
+      "y": 233.7,
+      "attached": true
+    },
+    {
+      "elapsed_s": 0.888,
+      "progress": 0.795,
+      "x": 411.46,
+      "y": 244.31,
+      "attached": true
+    },
+    {
+      "elapsed_s": 1.241,
+      "progress": 0.891,
+      "x": 443.19,
+      "y": 260.68,
+      "attached": true
+    },
+    {
+      "elapsed_s": 1.614,
+      "progress": 0.971,
+      "x": 470.06,
+      "y": 274.75,
+      "attached": false
+    },
+    {
+      "elapsed_s": 14.257,
+      "progress": 0.0,
+      "x": 170,
+      "y": 130,
+      "attached": false
+    }
+  ]
+}

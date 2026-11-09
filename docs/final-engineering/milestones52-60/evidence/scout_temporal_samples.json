@@ -1,0 +1,126 @@
+{
+  "agentId": "SCOUT",
+  "total_samples": 12,
+  "samples": [
+    {
+      "elapsed_ms": 0.0,
+      "position": {
+        "x": 359.7947575003003,
+        "y": 218.24605990030028
+      },
+      "progress": 0.635,
+      "packet_attached": true,
+      "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 527.1,
+      "position": {
+        "x": 401.00144893284653,
+        "y": 238.9723417328466
+      },
+      "progress": 0.763,
+      "packet_attached": true,
+      "capsule": "PKT #SCOUT \u2022 WAITING"
+    },
+    {
+      "elapsed_ms": 888.0,
+      "position": {
+        "x": 443.1912196873861,
+        "y": 260.6817028873861
+      },
+      "progress": 0.891,
+      "packet_attached": true,
+      "capsule": "PKT #SCOUT \u2022 DELIVERING"
+    },
+    {
+      "elapsed_ms": 11268.1,
+      "position": {
+        "x": 170,
+        "y": 130
+      },
+      "progress": 0,
+      "packet_attached": false,
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_ms": 11624.1,
+      "position": {
+        "x": 203.2670202540318,
+        "y": 144.49331145403184
+      },
+      "progress": 0.117,
+      "packet_attached": false,
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_ms": 11977.3,
+      "position": {
+        "x": 231.0999159472128,
+        "y": 156.96589994721282
+      },
+      "progress": 0.213,
+      "packet_attached": true,
+      "capsule": "PKT #SCOUT \u2022 PICKUP"
+    },
+    {
+      "elapsed_ms": 12331.6,
+      "position": {
+        "x": 265.8688629431787,
+        "y": 172.96113814317874
+      },
+      "progress": 0.331,
+      "packet_attached": true,
+      "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 12686.1,
+      "position": {
+        "x": 298.1938252481617,
+        "y": 188.21909244816177
+      },
+      "progress": 0.437,
+      "packet_attached": true,
+      "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 13040.3,
+      "position": {
+        "x": 336.21151232376315,
+        "y": 206.6097203237632
+      },
+      "progress": 0.56,
+      "packet_attached": true,
+      "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 13396.5,
+      "position": {
+        "x": 361.4920755249151,
+        "y": 219.09002752491512
+      },
+      "progress": 0.64,
+      "packet_attached": true,
+      "capsule": "PKT #SCOUT \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 13750.7,
+      "position": {
+        "x": 407.96480799457566,
+        "y": 242.5222991945758
+      },
+      "progress": 0.784,
+      "packet_attached": true,
+      "capsule": "PKT #SCOUT \u2022 WAITING"
+    },
+    {
+      "elapsed_ms": 14113.6,
+      "position": {
+        "x": 443.191219687386,
+        "y": 260.68170288738605
+      },
+      "progress": 0.891,
+      "packet_attached": true,
+      "capsule": "PKT #SCOUT \u2022 DELIVERING"
+    }
+  ]
+}

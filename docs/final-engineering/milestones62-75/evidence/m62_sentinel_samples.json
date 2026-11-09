@@ -1,0 +1,83 @@
+{
+  "agent": "sentinel",
+  "sample_count": 11,
+  "trajectory": [
+    {
+      "elapsed_s": 10.198,
+      "progress": 0.011,
+      "x": 172.99,
+      "y": 428.72,
+      "attached": false
+    },
+    {
+      "elapsed_s": 10.552,
+      "progress": 0.112,
+      "x": 201.74,
+      "y": 416.43,
+      "attached": false
+    },
+    {
+      "elapsed_s": 10.909,
+      "progress": 0.181,
+      "x": 221.76,
+      "y": 407.91,
+      "attached": true
+    },
+    {
+      "elapsed_s": 11.266,
+      "progress": 0.299,
+      "x": 256.3,
+      "y": 393.27,
+      "attached": true
+    },
+    {
+      "elapsed_s": 11.774,
+      "progress": 0.379,
+      "x": 280.33,
+      "y": 383.13,
+      "attached": true
+    },
+    {
+      "elapsed_s": 12.127,
+      "progress": 0.453,
+      "x": 303.1,
+      "y": 373.54,
+      "attached": true
+    },
+    {
+      "elapsed_s": 12.48,
+      "progress": 0.608,
+      "x": 351.33,
+      "y": 353.34,
+      "attached": true
+    },
+    {
+      "elapsed_s": 12.834,
+      "progress": 0.683,
+      "x": 375.13,
+      "y": 343.42,
+      "attached": true
+    },
+    {
+      "elapsed_s": 13.187,
+      "progress": 0.837,
+      "x": 425.49,
+      "y": 322.51,
+      "attached": true
+    },
+    {
+      "elapsed_s": 13.543,
+      "progress": 0.859,
+      "x": 432.55,
+      "y": 319.58,
+      "attached": true
+    },
+    {
+      "elapsed_s": 13.899,
+      "progress": 0.907,
+      "x": 448.53,
+      "y": 312.98,
+      "attached": true
+    }
+  ]
+}

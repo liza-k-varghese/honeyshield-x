@@ -1,0 +1,86 @@
+{
+  "agentId": "ORACLE",
+  "total_samples": 8,
+  "samples": [
+    {
+      "elapsed_ms": 4941.4,
+      "position": {
+        "x": 786.033368109482,
+        "y": 419.68697450948196
+      },
+      "progress": 0.085,
+      "packet_attached": false,
+      "capsule": "NONE (DETACHED)"
+    },
+    {
+      "elapsed_ms": 5294.5,
+      "position": {
+        "x": 764.9430937598975,
+        "y": 410.5436057598976
+      },
+      "progress": 0.16,
+      "packet_attached": true,
+      "capsule": "PKT #ORACLE \u2022 PICKUP"
+    },
+    {
+      "elapsed_ms": 5650.7,
+      "position": {
+        "x": 719.3741670395905,
+        "y": 390.57519103959044
+      },
+      "progress": 0.32,
+      "packet_attached": true,
+      "capsule": "PKT #ORACLE \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 6154.4,
+      "position": {
+        "x": 682.5503709175971,
+        "y": 374.23180451759714
+      },
+      "progress": 0.448,
+      "packet_attached": true,
+      "capsule": "PKT #ORACLE \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 6509.0,
+      "position": {
+        "x": 642.2881325497345,
+        "y": 356.15667654973447
+      },
+      "progress": 0.587,
+      "packet_attached": true,
+      "capsule": "PKT #ORACLE \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 6863.1,
+      "position": {
+        "x": 620.4491704757615,
+        "y": 346.2646200757616
+      },
+      "progress": 0.661,
+      "packet_attached": true,
+      "capsule": "PKT #ORACLE \u2022 TRAVELLING"
+    },
+    {
+      "elapsed_ms": 7217.0,
+      "position": {
+        "x": 578.0162795949169,
+        "y": 326.8721899949169
+      },
+      "progress": 0.805,
+      "packet_attached": true,
+      "capsule": "PKT #ORACLE \u2022 WAITING"
+    },
+    {
+      "elapsed_ms": 7574.6,
+      "position": {
+        "x": 541.5426187229555,
+        "y": 310.0255883229553
+      },
+      "progress": 0.928,
+      "packet_attached": true,
+      "capsule": "PKT #ORACLE \u2022 DELIVERING"
+    }
+  ]
+}
