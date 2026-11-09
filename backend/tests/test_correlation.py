@@ -21,7 +21,7 @@ from sqlalchemy.orm import Session
 
 from app.correlation.service import correlate_attack, correlate_source_ip
 from app.database import SessionLocal
-from app.models import Attack, AttackEvent, SystemEvent
+from app.models import Alert, Attack, AttackEvent, SystemEvent
 from app.routers.correlation import correlate_attack_endpoint, correlate_ip_endpoint
 from app.schemas import CorrelationResultResponse
 
@@ -34,6 +34,13 @@ class TestCorrelationEngine(unittest.TestCase):
         self.created_attack_ids: list[int] = []
         # Clear test audit events from correlation engine
         self.db.query(SystemEvent).filter(SystemEvent.source == "correlation_engine").delete()
+        # Clean pre-existing test fixture attacks for test IPs to ensure test isolation
+        test_ips = ["198.51.100.50", "198.51.100.51", "198.51.100.52", "198.51.100.53", "198.51.100.54", "198.51.100.55"]
+        old_attacks = self.db.query(Attack).filter(Attack.source_ip.in_(test_ips)).all()
+        for a in old_attacks:
+            self.db.query(Alert).filter(Alert.attack_id == a.id).delete()
+            self.db.query(AttackEvent).filter(AttackEvent.attack_id == a.id).delete()
+            self.db.delete(a)
         self.db.commit()
 
     def tearDown(self):

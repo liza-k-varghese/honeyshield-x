@@ -289,19 +289,23 @@ class OperatorRegistry:
     def _seed_default_operators(self) -> None:
         """Seed baseline SOC operational personas.
 
-        Security Hardening (Milestone 62):
-        In production environments (APP_ENV=production or HONEYSHIELD_ENV=production),
+        Security Hardening (Milestones 62, 78):
+        In isolated environments:
+        - Production (APP_ENV=production or HONEYSHIELD_ENV=production)
+        - Staging (APP_ENV=staging or HONEYSHIELD_ENV=staging or ENVIRONMENT=staging)
         in-memory demo operators with default passwords are strictly rejected.
-        HONEYSHIELD_OPERATORS_JSON must be explicitly supplied with production credentials.
+        HONEYSHIELD_OPERATORS_JSON must be explicitly supplied with dedicated credentials.
         """
-        app_env = os.getenv("APP_ENV", os.getenv("HONEYSHIELD_ENV", "development")).lower()
+        app_env = os.getenv("APP_ENV", os.getenv("HONEYSHIELD_ENV", os.getenv("ENVIRONMENT", "development"))).lower()
         is_production = app_env in ("production", "prod")
+        is_staging = app_env in ("staging", "stage")
+        is_isolated_env = is_production or is_staging
 
         with self._lock:
             self._operators.clear()
 
         # Check for env-configured operators
-        env_ops = os.getenv("HONEYSHIELD_OPERATORS_JSON")
+        env_ops = os.getenv("HONEYSHIELD_STAGING_OPERATORS_JSON") if (is_staging and os.getenv("HONEYSHIELD_STAGING_OPERATORS_JSON")) else os.getenv("HONEYSHIELD_OPERATORS_JSON")
         if env_ops:
             try:
                 data = json.loads(env_ops)
@@ -317,14 +321,23 @@ class OperatorRegistry:
                         self._operators[op.username] = op
             except Exception as e:
                 logger.error("Failed to parse HONEYSHIELD_OPERATORS_JSON: %s", str(e))
-                if is_production:
-                    raise RuntimeError(f"FATAL: Invalid HONEYSHIELD_OPERATORS_JSON in production: {e}") from e
+                if is_isolated_env:
+                    env_name = "production" if is_production else "staging"
+                    raise RuntimeError(f"FATAL: Invalid HONEYSHIELD_OPERATORS_JSON in {env_name}: {e}") from e
 
         if is_production:
             if not self._operators:
                 raise RuntimeError(
                     "FATAL: Production mode (APP_ENV=production) requires HONEYSHIELD_OPERATORS_JSON with valid operators. "
                     "Insecure default operator seeds are disabled in production."
+                )
+            return
+
+        if is_staging:
+            if not self._operators:
+                raise RuntimeError(
+                    "FATAL: Staging mode (APP_ENV=staging) requires HONEYSHIELD_OPERATORS_JSON with dedicated staging operators. "
+                    "Insecure default operator seeds are disabled in staging."
                 )
             return
 
