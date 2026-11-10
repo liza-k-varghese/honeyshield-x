@@ -1,0 +1,297 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0D1117;
+  --surface: #1C2730;
+  --surface-dark: #080B0F;
+  --surface-elevated: #24323D;
+  --accent: #C8AA73;
+  --accent-highlight: #E6D2B0;
+  --accent-shadow: #8C6F34;
+  --text-primary: #F0E9DD;
+  --text-secondary: #AEB8BC;
+
+  /* Controlled translucent tokens */
+  --surface-glass: rgba(28, 39, 48, 0.82);
+  --surface-glass-border: rgba(200, 170, 115, 0.22);
+  --border-subtle: rgba(200, 170, 115, 0.15);
+  --border-medium: rgba(200, 170, 115, 0.32);
+  --border-slate: rgba(174, 184, 188, 0.18);
+  --accent-soft: rgba(200, 170, 115, 0.12);
+  --accent-gradient: linear-gradient(135deg, #E6D2B0 0%, #C8AA73 50%, #9B7E48 100%);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background);
+}
+
+/* Typography styles */
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Cinzel', serif;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Luxury Gold Text Gradient */
+.text-gold-gradient {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Disciplined Glass Panels */
+.glass-panel {
+  background: var(--surface-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--surface-glass-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.glass-panel-hover {
+  transition: all 0.25s ease;
+}
+
+.glass-panel-hover:hover {
+  border-color: rgba(200, 170, 115, 0.45);
+  box-shadow: 0 6px 28px rgba(200, 170, 115, 0.12);
+}
+
+/* Architectural Hairline Dividers */
+.hairline-divider-gold {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(200, 170, 115, 0.3) 25%, rgba(200, 170, 115, 0.3) 75%, transparent 100%);
+  width: 100%;
+}
+
+.hairline-divider-slate {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(174, 184, 188, 0.2) 20%, rgba(174, 184, 188, 0.2) 80%, transparent 100%);
+  width: 100%;
+}
+
+/* Blueprint Schematic Corner Brackets */
+.blueprint-frame {
+  position: relative;
+}
+
+.blueprint-frame::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #C8AA73;
+  border-left: 2px solid #C8AA73;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.blueprint-frame::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid #C8AA73;
+  border-right: 2px solid #C8AA73;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* HUD Panels & Metric Cards */
+.chronos-hud {
+  background: rgba(28, 39, 48, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(200, 170, 115, 0.28);
+}
+
+.metric-tile {
+  background: #1C2730;
+  border: 1px solid rgba(200, 170, 115, 0.2);
+  border-radius: 4px;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+}
+
+.metric-tile:hover {
+  border-color: rgba(200, 170, 115, 0.45);
+  background: #24323D;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface);
+  border: 1px solid var(--surface-glass-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Buttons */
+.btn-gold {
+  background: var(--accent);
+  color: var(--background);
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 10px rgba(200, 170, 115, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-transform: uppercase;
+}
+
+.btn-gold:hover {
+  background: #D8BC85;
+  box-shadow: 0 4px 16px rgba(200, 170, 115, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-gold:active {
+  transform: translateY(0);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-primary);
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  padding: 9px 20px;
+  border: 1px solid var(--border-medium);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-transform: uppercase;
+}
+
+.btn-outline:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-wireframe {
+  background: rgba(28, 39, 48, 0.6);
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  border: 1px solid rgba(200, 170, 115, 0.25);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-wireframe:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  background: rgba(36, 50, 61, 0.8);
+}
+
+.btn-wireframe.active {
+  background: var(--accent);
+  color: var(--background);
+  font-weight: bold;
+  border-color: var(--accent);
+}
+
+/* 3D Canvas Container */
+.canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  touch-action: none;
+}
+
+/* Accessibility: Visible Keyboard Focus Indicators */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Accessibility: Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Touch Friendly Targets */
+@media (max-width: 768px) {
+  button,
+  a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

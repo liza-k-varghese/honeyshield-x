@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "url": "http://127.0.0.1:5175/",
+  "title": "CHRONOS \u2014 The Architecture of Time",
+  "webgl_active": true,
+  "canvas_found": true,
+  "screenshots": {
+    "desktop": "/home/liza/HoneyShield-X/chronos/screenshots/desktop_verified.png",
+    "mobile": "/home/liza/HoneyShield-X/chronos/screenshots/mobile_verified.png",
+    "epochs": "/home/liza/HoneyShield-X/chronos/screenshots/tab_epochs.png"
+  }
+}

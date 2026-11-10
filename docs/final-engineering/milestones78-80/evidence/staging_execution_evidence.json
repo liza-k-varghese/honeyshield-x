@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-11-09T09:42:12Z",
+  "staging_status": "OPERATIONAL",
+  "frontend_port": 5174,
+  "backend_port": 8001,
+  "postgres_port": 5433,
+  "redis_port": 6380,
+  "frontend_http_code": 200,
+  "backend_health_response": {"status":"ok","service":"HoneyShield X API","postgresql":"connected","redis":"connected"}
+}
