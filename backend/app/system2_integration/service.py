@@ -29,12 +29,13 @@ except ImportError:
     redis = None  # type: ignore
 
 from fastapi import HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.audit.service import record_operator_audit
 from app.events.provenance import is_synthetic_test_ip, tag_event_provenance
 from app.events.service import publish_handoff_event, publish_lifecycle_event
-from app.models import Alert, Attack, AttackEvent, SecurityEventOutbox
+from app.models import Alert, Attack, AttackEvent, SecurityEventOutbox, System2IngestedEvent
 from app.system2_integration.schemas import (
     System2AttackCategory,
     System2DataProvenance,
@@ -145,19 +146,22 @@ class System2IntegrationService:
         db: Session,
     ) -> System2TelemetryIngestResponse:
         """Ingest, validate, normalize, and process a System 2 sensor event."""
-        # 1. Deduplication Gate (Distributed Redis with thread-safe in-memory fallback)
+        # 1. Deduplication Gate: Multi-Tier Distributed Idempotency
         now_ts = time.time()
+
+        # Tier 1a: Fast Distributed In-Memory Cache (Redis)
         if self._redis_client is not None:
             try:
                 cached_json = self._redis_client.get(f"hsx:system2:dedup:{event.event_id}")
                 if cached_json:
-                    logger.info("Deduplicating System 2 event via Redis: %s", event.event_id)
+                    logger.info("Deduplicating System 2 event via Redis cache: %s", event.event_id)
                     cached_resp = json.loads(cached_json)
                     cached_resp["status"] = "deduplicated"
                     return System2TelemetryIngestResponse(**cached_resp)
             except Exception as e:
                 logger.debug("Redis dedup check error: %s", e)
 
+        # Tier 1b: Thread-Safe Process-Local LRU Cache (In case Redis is down or in testing)
         with self._lock:
             if event.event_id in self._dedup_cache:
                 cached_time, cached_resp = self._dedup_cache[event.event_id]
@@ -167,6 +171,46 @@ class System2IntegrationService:
                     return System2TelemetryIngestResponse(**cached_resp)
                 else:
                     self._dedup_cache.pop(event.event_id, None)
+
+        # Tier 2: Durable Relational Idempotency Ledger (PostgreSQL)
+        # Guarantees permanent idempotency beyond Redis TTL expiration and process restarts
+        try:
+            existing_ingested = (
+                db.query(System2IngestedEvent)
+                .filter(System2IngestedEvent.event_id == event.event_id)
+                .first()
+            )
+            if existing_ingested is not None:
+                # Detect ID reuse with conflicting attributes
+                if (
+                    existing_ingested.sensor_id != event.sensor_id
+                    or existing_ingested.source_ip != event.source_ip
+                ):
+                    logger.warning(
+                        "Deduplication anomaly: Event ID %s reused with conflicting attributes (Original: sensor=%s, ip=%s; Incoming: sensor=%s, ip=%s)",
+                        event.event_id,
+                        existing_ingested.sensor_id,
+                        existing_ingested.source_ip,
+                        event.sensor_id,
+                        event.source_ip,
+                    )
+                logger.info("Deduplicating System 2 event via durable database ledger: %s", event.event_id)
+                cached_resp = json.loads(existing_ingested.response_json)
+                cached_resp["status"] = "deduplicated"
+
+                # Re-hydrate distributed Redis cache for future fast-path hits
+                if self._redis_client is not None:
+                    try:
+                        self._redis_client.set(
+                            f"hsx:system2:dedup:{event.event_id}",
+                            existing_ingested.response_json,
+                            ex=int(DEDUPLICATION_WINDOW_SECONDS),
+                        )
+                    except Exception:
+                        pass
+                return System2TelemetryIngestResponse(**cached_resp)
+        except Exception as e:
+            logger.debug("Database idempotency ledger check note: %s", e)
 
         # 2. Provenance Determination
         is_synth = (
@@ -331,15 +375,47 @@ class System2IntegrationService:
             "ingested_at": datetime.now(timezone.utc),
         }
 
-        # 8. Cache response for distributed deduplication (Redis + local fallback)
+        # 8. Persist to Durable Idempotency Ledger (PostgreSQL)
+        serializable_resp = dict(response_dict)
+        if isinstance(serializable_resp.get("ingested_at"), datetime):
+            serializable_resp["ingested_at"] = serializable_resp["ingested_at"].isoformat()
+        resp_json = json.dumps(serializable_resp)
+
+        try:
+            ingested_record = System2IngestedEvent(
+                sensor_id=event.sensor_id,
+                event_id=event.event_id,
+                source_ip=event.source_ip,
+                attack_id=attack.id,
+                attack_event_id=attack_event.id,
+                alert_id=alert_id,
+                correlation_id=correlation_id,
+                response_json=resp_json,
+            )
+            db.add(ingested_record)
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+            logger.info("Concurrent ingestion race resolved via unique constraint on event: %s", event.event_id)
+            existing_ingested = (
+                db.query(System2IngestedEvent)
+                .filter(System2IngestedEvent.event_id == event.event_id)
+                .first()
+            )
+            if existing_ingested is not None:
+                cached_resp = json.loads(existing_ingested.response_json)
+                cached_resp["status"] = "deduplicated"
+                return System2TelemetryIngestResponse(**cached_resp)
+            raise
+        except Exception as exc:
+            logger.debug("Idempotency ledger commit note: %s", exc)
+
+        # 9. Cache response for distributed fast-path deduplication (Redis + local fallback)
         if self._redis_client is not None:
             try:
-                redis_dict = dict(response_dict)
-                if isinstance(redis_dict.get("ingested_at"), datetime):
-                    redis_dict["ingested_at"] = redis_dict["ingested_at"].isoformat()
                 self._redis_client.set(
                     f"hsx:system2:dedup:{event.event_id}",
-                    json.dumps(redis_dict),
+                    resp_json,
                     ex=int(DEDUPLICATION_WINDOW_SECONDS),
                 )
             except Exception as e:

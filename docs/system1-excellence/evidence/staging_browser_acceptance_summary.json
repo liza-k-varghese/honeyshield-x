@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-11T01:56:44Z",
+  "timestamp": "2026-11-11T04:04:23Z",
   "staging_frontend_url": "http://127.0.0.1:5174",
   "browser": "Mozilla Firefox 140.16.0esr",
   "auth_hardening_verified": true,
@@ -17,7 +17,7 @@
       "view": "universe",
       "description": "Digital Agent Universe (SCOUT/NEXUS/ORACLE/SENTINEL)",
       "screenshot": "03_staging_digital_universe.png",
-      "dom_nodes": 928,
+      "dom_nodes": 938,
       "error_banner": "9+",
       "status": "WARN"
     },
@@ -25,7 +25,7 @@
       "view": "alerts",
       "description": "Active Alerts & Incident Triage",
       "screenshot": "04_staging_alerts_triage.png",
-      "dom_nodes": 1706,
+      "dom_nodes": 2488,
       "error_banner": "9+",
       "status": "WARN"
     },
@@ -73,7 +73,7 @@
       "view": "rules",
       "description": "Detection Rule Engine & Replay",
       "screenshot": "10_staging_detection_rules.png",
-      "dom_nodes": 563,
+      "dom_nodes": 333,
       "error_banner": null,
       "status": "PASS"
     },

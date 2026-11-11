@@ -4,17 +4,20 @@ FROM nginx:alpine-slim
 # Copy pre-compiled production distribution
 COPY dist /usr/share/nginx/html
 
-# Lightweight Nginx configuration proxying /api/v1 to backend-staging
+# Lightweight Nginx configuration proxying /api/ to backend-staging with dynamic DNS resolution
 RUN echo 'server { \
     listen 80; \
     server_name localhost; \
+    resolver 10.89.0.1 valid=30s ipv6=off; \
+    resolver_timeout 5s; \
     location / { \
         root /usr/share/nginx/html; \
         index index.html; \
         try_files $uri $uri/ /index.html; \
     } \
     location /api/ { \
-        proxy_pass http://backend-staging:8000/api/; \
+        set $backend_upstream "http://backend-staging:8000"; \
+        proxy_pass $backend_upstream$request_uri; \
         proxy_http_version 1.1; \
         proxy_set_header Upgrade $http_upgrade; \
         proxy_set_header Connection "upgrade"; \

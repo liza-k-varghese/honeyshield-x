@@ -82,6 +82,7 @@ def main():
     parser.add_argument("--role", default="security_administrator", help="Operator role")
     parser.add_argument("--password", default=None, help="Explicit password (leave blank to auto-generate)")
     parser.add_argument("--output", default=None, help="Target env file path (default: docker/staging.env)")
+    parser.add_argument("--credential-file", default=None, help="Optional path to write raw password for automated testing (mode 0600)")
     parser.add_argument("--show-password", action="store_true", help="Print generated password to stdout (operator terminal only)")
 
     args = parser.parse_args()
@@ -92,6 +93,13 @@ def main():
         password=args.password,
         output_file=args.output,
     )
+
+    if args.credential_file:
+        flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC
+        mode = stat.S_IRUSR | stat.S_IWUSR  # 0600
+        with os.fdopen(os.open(args.credential_file, flags, mode), "w") as f:
+            f.write(password)
+        print(f"[OK] Staging credential written to runtime file: {args.credential_file} (mode 0600)")
 
     target_path = args.output or os.path.join(REPO_ROOT, "docker", "staging.env")
     print(f"[OK] Staging operator '{username}' ({args.role}) provisioned successfully.")

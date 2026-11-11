@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-11-11T01:52:43.507410+00:00",
-  "target_url": "http://127.0.0.1:8000",
-  "correlation_id": "corr-e2e-trace-9aaa4bec1cff",
+  "timestamp": "2026-11-11T05:00:28.030723+00:00",
+  "target_url": "http://127.0.0.1:8001",
+  "correlation_id": "corr-e2e-trace-8644301bbbcd",
   "overall_status": "VERIFIED_PASS",
   "stages_passed": 13,
   "total_stages": 13,
@@ -9,7 +9,7 @@
     "stage_01_submission": {
       "status": "PASS",
       "http_code": 201,
-      "event_id": "evt-e2e-f8417e87d231"
+      "event_id": "evt-e2e-e00de5c2bca2"
     },
     "stage_02_auth_validation": {
       "status": "PASS",
@@ -22,8 +22,8 @@
     },
     "stage_04_postgres_persistence": {
       "status": "PASS",
-      "attack_id": 10174,
-      "attack_event_id": 43560
+      "attack_id": 80,
+      "attack_event_id": 80
     },
     "stage_05_detection_rules": {
       "status": "PASS",
@@ -32,17 +32,17 @@
     "stage_06_correlation": {
       "status": "PASS",
       "correlated_ip": "198.51.100.99",
-      "first_event": 43560,
-      "second_event": 43561
+      "first_event": 80,
+      "second_event": 81
     },
     "stage_07_alert_generation": {
       "status": "PASS",
       "alert_generated": true,
-      "alert_id": 5130
+      "alert_id": 80
     },
     "stage_08_threat_intel_link": {
       "status": "PASS",
-      "event_ref": "atk-10174",
+      "event_ref": "atk-80",
       "verdict": "benign",
       "country": "XX"
     },
@@ -53,7 +53,7 @@
     },
     "stage_10_dashboard_metrics": {
       "status": "PASS",
-      "events_processed_24h": 824,
+      "events_processed_24h": 379,
       "active_attacks_count": null,
       "open_alerts_count": null
     },
@@ -64,12 +64,12 @@
     },
     "stage_12_digital_universe": {
       "status": "PASS",
-      "workflow_id": "wf_system2_corr-e2e-trace-9aaa4bec1cff",
+      "workflow_id": "wf_system2_corr-e2e-trace-8644301bbbcd",
       "journey_event_count": 2
     },
     "stage_13_stable_correlation": {
       "status": "PASS",
-      "correlation_id": "corr-e2e-trace-9aaa4bec1cff",
+      "correlation_id": "corr-e2e-trace-8644301bbbcd",
       "preserved_across_all_stages": true
     }
   }
