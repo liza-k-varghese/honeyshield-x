@@ -13,7 +13,7 @@ permissions:
 jobs:
   secret-scanning:
     name: Zero-Secrets & Credential Security Gate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Source Revision
         uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
 
   frontend-qa:
     name: Frontend Quality Assurance
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: frontend
@@ -45,7 +45,7 @@ jobs:
           node-version: '20'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -71,7 +71,7 @@ jobs:
 
   backend-qa:
     name: Backend Quality Assurance
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:17-alpine
@@ -138,7 +138,7 @@ jobs:
 
   system2-contract-qa:
     name: System 2 Integration Contract & Schema Enforcement
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:17-alpine
@@ -197,7 +197,7 @@ jobs:
 
   chronos-qa:
     name: CHRONOS WebGL Application & Staging Release Package QA
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: chronos

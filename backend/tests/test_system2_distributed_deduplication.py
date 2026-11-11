@@ -32,11 +32,6 @@ from app.system2_integration.service import System2IntegrationService
 VALID_SENSOR_KEY = "hsx-system2-sensor-token-secret-key-2026"
 
 
-@pytest.fixture(scope="module", autouse=True)
-def setup_tables():
-    Base.metadata.create_all(bind=engine)
-
-
 def mock_request(client_ip="127.0.0.1"):
     req = MagicMock()
     req.client.host = client_ip
