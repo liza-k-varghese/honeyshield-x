@@ -36,6 +36,7 @@ IGNORE_PATHS = {
     "build",
     ".cache",
     "__pycache__",
+    "certs",
     ".staging_operator.key",  # runtime ephemeral key generated mode 0600, excluded by .gitignore
 }
 

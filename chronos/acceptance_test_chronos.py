@@ -299,17 +299,20 @@ def main():
             results.has_navigation = !!document.querySelector('nav');
             results.has_footer = !!document.querySelector('footer');
 
-            // 3. Test keyboard navigation event
-            const initialTab = document.querySelector('nav button[aria-current=\"page\"]')?.textContent || '';
-            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
-            const nextTab = document.querySelector('nav button[aria-current=\"page\"]')?.textContent || '';
-            results.keyboard_arrow_nav_works = initialTab !== nextTab;
+            return results;
+        """)
 
-            // Return to origins
+        # 3. Test keyboard navigation event
+        initial_tab = client.execute_script("return document.querySelector('nav button[aria-current=\"page\"]')?.textContent || '';")
+        client.execute_script("window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));")
+        time.sleep(0.5)
+        next_tab = client.execute_script("return document.querySelector('nav button[aria-current=\"page\"]')?.textContent || '';")
+        interaction_res["keyboard_arrow_nav_works"] = (initial_tab != next_tab)
+
+        # Return to origins
+        client.execute_script("""
             const originsBtn = Array.from(document.querySelectorAll('header nav button, header button')).find(b => b.textContent.includes('Origins'));
             if (originsBtn) originsBtn.click();
-
-            return results;
         """)
         results["interaction_and_a11y"] = interaction_res
         print(f"  A11y & Interaction: {interaction_res}")

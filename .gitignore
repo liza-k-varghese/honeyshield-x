@@ -15,4 +15,6 @@ dist/
 *.pem
 *.key
 *.cert
+*.crt
+certs/
 .DS_Store
