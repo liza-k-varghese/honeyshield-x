@@ -93,10 +93,11 @@ def main():
     ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env)
 
     client = None
+    target_url = os.getenv("CHRONOS_URL", "http://127.0.0.1:5175/")
     results = {
         "acceptance_verdict": "PENDING",
         "tested_environment": "Parrot OS / Intel Iris Xe Graphics (Alder Lake-UP3 GT2)",
-        "target_url": "http://127.0.0.1:5175/ (Production Build)",
+        "target_url": f"{target_url} (Production Build)",
         "webgl_device_info": {},
         "core_web_vitals": {},
         "transferred_assets": {},
@@ -128,7 +129,7 @@ def main():
         print("[3/10] Loading production build and capturing WebGL context info...")
         client.send("WebDriver:SetWindowRect", {"width": 1440, "height": 900})
         t_nav_start = time.time()
-        client.send("WebDriver:Navigate", {"url": "http://127.0.0.1:5175/"})
+        client.send("WebDriver:Navigate", {"url": target_url})
         time.sleep(2.5)
 
         # Inspect WebGL Context

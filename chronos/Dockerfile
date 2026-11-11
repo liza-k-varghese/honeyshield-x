@@ -2,7 +2,7 @@
 # Multi-stage production build for CHRONOS
 
 # Stage 1: Build Application
-FROM node:20-alpine AS builder
+FROM docker.io/library/node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ RUN npm run check
 RUN npm run build
 
 # Stage 2: Minimalist Production Nginx Runtime
-FROM nginx:1.27-alpine AS runner
+FROM docker.io/library/nginx:1.27-alpine AS runner
 
 # Remove default nginx config
 RUN rm -rf /etc/nginx/conf.d/default.conf

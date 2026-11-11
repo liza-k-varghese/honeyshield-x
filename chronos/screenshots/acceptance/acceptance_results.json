@@ -1,7 +1,7 @@
 {
   "acceptance_verdict": "ACCEPTED \u2014 PRODUCTION CLIENT READY",
   "tested_environment": "Parrot OS / Intel Iris Xe Graphics (Alder Lake-UP3 GT2)",
-  "target_url": "http://127.0.0.1:5175/ (Production Build)",
+  "target_url": "http://127.0.0.1:8080/ (Production Build)",
   "webgl_device_info": {
     "context_type": "WebGL 2.0",
     "max_texture_size": 2048,
@@ -13,111 +13,111 @@
     "alpha_enabled": true
   },
   "core_web_vitals": {
-    "ttfb_ms": 17,
-    "dom_interactive_ms": 100,
-    "dom_complete_ms": 750,
+    "ttfb_ms": 0,
+    "dom_interactive_ms": 33,
+    "dom_complete_ms": 967,
     "first_paint_ms": null,
-    "first_contentful_paint_ms": 250,
-    "total_transferred_bytes": 235485,
-    "total_transferred_kb": 229.97
+    "first_contentful_paint_ms": 400,
+    "total_transferred_bytes": 368676,
+    "total_transferred_kb": 360.04
   },
   "transferred_assets": [
     {
-      "name": "css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+      "name": "index-uDi_XX9P.css",
       "type": "link",
-      "size_bytes": 0,
+      "size_bytes": 8160,
+      "duration_ms": 17
+    },
+    {
+      "name": "vendor-three-MBenChda.js",
+      "type": "link",
+      "size_bytes": 156140,
       "duration_ms": 33
     },
     {
       "name": "vendor-icons-Cra8mrVs.js",
       "type": "link",
-      "size_bytes": 3171,
-      "duration_ms": 50
-    },
-    {
-      "name": "index-BO88qnm5.js",
-      "type": "script",
-      "size_bytes": 26231,
-      "duration_ms": 50
-    },
-    {
-      "name": "index-uDi_XX9P.css",
-      "type": "link",
-      "size_bytes": 6687,
-      "duration_ms": 50
+      "size_bytes": 3393,
+      "duration_ms": 33
     },
     {
       "name": "vendor-react-CEfoZQ0_.js",
       "type": "link",
-      "size_bytes": 69396,
-      "duration_ms": 67
+      "size_bytes": 81357,
+      "duration_ms": 33
     },
     {
-      "name": "vendor-three-MBenChda.js",
+      "name": "index-BO88qnm5.js",
+      "type": "script",
+      "size_bytes": 31851,
+      "duration_ms": 233
+    },
+    {
+      "name": "css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
       "type": "link",
-      "size_bytes": 129117,
-      "duration_ms": 83
+      "size_bytes": 300,
+      "duration_ms": 350
     },
     {
       "name": "favicon.svg",
       "type": "other",
-      "size_bytes": 684,
-      "duration_ms": 200
+      "size_bytes": 984,
+      "duration_ms": 483
     },
     {
       "name": "LDIoaomQNQcsA88c7O9yZ4KMCoOg4Ko20yw.woff2",
       "type": "other",
-      "size_bytes": 27348,
-      "duration_ms": 0
+      "size_bytes": 27648,
+      "duration_ms": 133
     },
     {
       "name": "8vIJ7ww63mVu7gt79mT7.woff2",
       "type": "other",
-      "size_bytes": 25904,
-      "duration_ms": 0
+      "size_bytes": 26204,
+      "duration_ms": 100
+    },
+    {
+      "name": "tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+      "type": "other",
+      "size_bytes": 31732,
+      "duration_ms": 100
     },
     {
       "name": "tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
       "type": "other",
       "size_bytes": 31432,
-      "duration_ms": 0
-    },
-    {
-      "name": "tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
-      "type": "other",
-      "size_bytes": 31432,
-      "duration_ms": 0
+      "duration_ms": 100
     },
     {
       "name": "8vIJ7ww63mVu7gt79mT7.woff2",
       "type": "other",
       "size_bytes": 25904,
-      "duration_ms": 0
+      "duration_ms": 100
     },
     {
       "name": "8vIJ7ww63mVu7gt79mT7.woff2",
       "type": "other",
       "size_bytes": 25904,
-      "duration_ms": 0
+      "duration_ms": 100
     },
     {
       "name": "8vIJ7ww63mVu7gt79mT7.woff2",
       "type": "other",
       "size_bytes": 25904,
-      "duration_ms": 0
+      "duration_ms": 100
     }
   ],
   "gpu_frame_analysis": {
     "sample_count": 180,
-    "effective_fps": 55,
-    "mean_frame_time_ms": 18.15,
+    "effective_fps": 54,
+    "mean_frame_time_ms": 18.43,
     "min_frame_time_ms": 16.67,
-    "max_frame_time_ms": 50,
+    "max_frame_time_ms": 33.33,
     "median_frame_time_ms": 16.67,
     "p95_frame_time_ms": 33.33,
-    "jitter_std_dev_ms": 5.06,
-    "dropped_frames_gt_33ms": 15,
-    "rendering_stability_percent": 92
+    "jitter_std_dev_ms": 5.12,
+    "dropped_frames_gt_33ms": 19,
+    "rendering_stability_percent": 89
   },
   "threejs_scene_metrics": {},
   "scientific_validation": {
