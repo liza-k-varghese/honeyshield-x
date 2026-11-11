@@ -1,13 +1,30 @@
 name: HoneyShield X Continuous Integration & Quality Assurance
 
-on:
+'on':
   push:
-    branches: [ main ]
+    branches: [ main, 'system1-*' ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, 'system1-*' ]
   workflow_dispatch:
 
 jobs:
+  secret-scanning:
+    name: Zero-Secrets & Credential Security Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Execute Automated Zero-Secrets Scanner
+        run: python scripts/audit_git_secrets.py
+
   frontend-qa:
     name: Frontend Quality Assurance
     runs-on: ubuntu-latest
@@ -115,3 +132,63 @@ jobs:
           name: pytest-failure-logs
           path: backend/tests/
           retention-days: 7
+
+  system2-contract-qa:
+    name: System 2 Integration Contract & Schema Enforcement
+    runs-on: ubuntu-latest
+    needs: [backend-qa]
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: honeyshield
+          POSTGRES_USER: honeyshield
+          POSTGRES_PASSWORD: change_this_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Source Revision
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install pytest pytest-subtests pytest-asyncio
+
+      - name: Apply Database Migrations (Alembic)
+        env:
+          DATABASE_URL: postgresql+psycopg://honeyshield:change_this_password@localhost:5432/honeyshield
+        run: |
+          cd backend
+          alembic upgrade head
+
+      - name: Verify System 2 API & Deduplication Contracts
+        env:
+          DATABASE_URL: postgresql+psycopg://honeyshield:change_this_password@localhost:5432/honeyshield
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          APP_ENV: test
+        run: |
+          PYTHONPATH=backend pytest backend/tests/test_system2_integration.py backend/tests/test_system2_distributed_deduplication.py -v --tb=short
