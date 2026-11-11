@@ -54,12 +54,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, isSessi
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 select-none">
-      <div className="w-full max-w-md bg-[#0B1020] border border-slate-800 rounded-2xl shadow-2xl p-6 text-slate-100 relative">
+      <div className="w-full max-w-md bg-[#111C29] border border-[#1E2D3D] rounded-2xl shadow-soc-lg p-6 text-[#F0F5F8] relative">
         {/* Close Button if dismissible */}
         {onClose && !isSessionExpired && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="absolute top-4 right-4 p-1.5 rounded-lg text-[#94A6B8] hover:text-[#F0F5F8] hover:bg-[#192737] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#00D6C9]"
             title="Close"
           >
             <X className="w-4 h-4" />
@@ -68,43 +68,43 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, isSessi
 
         {/* Brand Header */}
         <div className="flex items-start space-x-3 mb-6">
-          <div className="p-2.5 bg-cyan-500/10 border border-cyan-500/30 rounded-xl text-cyan-400 shrink-0">
+          <div className="p-2.5 bg-[#00D6C9]/10 border border-[#00D6C9]/30 rounded-xl text-[#00D6C9] shrink-0">
             <Shield className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-white font-sans">
+            <h2 className="text-xl font-bold tracking-tight text-[#F0F5F8] font-sans">
               HoneyShield-X SOC Console
             </h2>
-            <p className="text-xs text-slate-400 font-sans">
+            <p className="text-xs text-[#94A6B8] font-sans">
               Unified Security Operations
             </p>
-            <p className="text-[11px] font-mono text-cyan-400 mt-0.5">
+            <p className="text-[11px] font-mono text-[#00D6C9] mt-0.5">
               Detect. Deceive. Defend.
             </p>
           </div>
         </div>
 
         {isSessionExpired && (
-          <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center space-x-2 text-amber-300 text-xs font-medium">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
+          <div className="mb-4 p-3 bg-[#E5B65A]/15 border border-[#E5B65A]/35 rounded-xl flex items-center space-x-2 text-[#E5B65A] text-xs font-medium">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-[#E5B65A]" />
             <span>Your SOC session has expired. Please re-authenticate.</span>
           </div>
         )}
 
         {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-xs">
+          <div className="mb-4 p-3 bg-[#EF6268]/15 border border-[#EF6268]/35 rounded-xl text-[#EF6268] text-xs font-mono">
             {error}
           </div>
         )}
 
         {/* Tab Controls: Operator Login vs Break-Glass */}
-        <div className="flex border-b border-slate-800 mb-5 text-xs font-mono">
+        <div className="flex border-b border-[#1E2D3D] mb-5 text-xs font-mono">
           <button
             type="button"
             className={`pb-2.5 px-3 font-medium transition-colors ${
               !isBreakGlassMode
-                ? 'border-b-2 border-cyan-400 text-cyan-300 font-bold'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'border-b-2 border-[#00D6C9] text-[#00D6C9] font-bold'
+                : 'text-[#94A6B8] hover:text-[#F0F5F8]'
             }`}
             onClick={() => setIsBreakGlassMode(false)}
           >
@@ -114,8 +114,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, isSessi
             type="button"
             className={`pb-2.5 px-3 font-medium transition-colors flex items-center space-x-1.5 ${
               isBreakGlassMode
-                ? 'border-b-2 border-red-500 text-red-400 font-bold'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'border-b-2 border-[#EF6268] text-[#EF6268] font-bold'
+                : 'text-[#94A6B8] hover:text-[#F0F5F8]'
             }`}
             onClick={() => setIsBreakGlassMode(true)}
           >
@@ -128,34 +128,34 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, isSessi
           {!isBreakGlassMode ? (
             <>
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                <label className="block text-xs font-medium text-[#F0F5F8] mb-1.5">
                   Operator Username
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-2.5 w-4 h-4 text-slate-500 pointer-events-none" />
+                  <User className="absolute left-3 top-2.5 w-4 h-4 text-[#94A6B8] pointer-events-none" />
                   <input
                     type="text"
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full bg-slate-900/90 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono transition-colors"
+                    className="w-full bg-[#080D14] border border-[#1E2D3D] rounded-lg pl-9 pr-3 py-2 text-xs text-[#F0F5F8] placeholder-[#5A6E82] focus:outline-none focus:border-[#00D6C9] focus:ring-1 focus:ring-[#00D6C9] font-mono transition-colors"
                     placeholder="e.g. analyst_sarah"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                <label className="block text-xs font-medium text-[#F0F5F8] mb-1.5">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500 pointer-events-none" />
+                  <Lock className="absolute left-3 top-2.5 w-4 h-4 text-[#94A6B8] pointer-events-none" />
                   <input
                     type="password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-slate-900/90 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono transition-colors"
+                    className="w-full bg-[#080D14] border border-[#1E2D3D] rounded-lg pl-9 pr-3 py-2 text-xs text-[#F0F5F8] placeholder-[#5A6E82] focus:outline-none focus:border-[#00D6C9] focus:ring-1 focus:ring-[#00D6C9] font-mono transition-colors"
                     placeholder="••••••••••••"
                   />
                 </div>
@@ -163,41 +163,41 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, isSessi
 
               {/* Seeded Quick Personas */}
               <div className="pt-1">
-                <span className="text-[11px] text-slate-400 block mb-1.5 font-mono">
+                <span className="text-[11px] text-[#94A6B8] block mb-1.5 font-mono">
                   Seeded Operator Accounts:
                 </span>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <button
                     type="button"
                     onClick={() => handleQuickPersona('responder_alex', 'ResponderPass123!')}
-                    className="p-2 bg-slate-900 hover:bg-slate-850 text-cyan-300 rounded-lg border border-slate-800 hover:border-cyan-500/40 text-left transition-colors font-mono"
+                    className="p-2 bg-[#192737] hover:bg-[#1E2D3D] text-[#00D6C9] rounded-lg border border-[#1E2D3D] hover:border-[#00D6C9]/40 text-left transition-colors font-mono"
                   >
                     <span className="font-semibold block text-[11px]">Responder Alex</span>
-                    <span className="text-[10px] text-slate-500 block">Incident Triage</span>
+                    <span className="text-[10px] text-[#94A6B8] block">Incident Triage</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleQuickPersona('analyst_sarah', 'AnalystPass123!')}
-                    className="p-2 bg-slate-900 hover:bg-slate-850 text-amber-300 rounded-lg border border-slate-800 hover:border-amber-500/40 text-left transition-colors font-mono"
+                    className="p-2 bg-[#192737] hover:bg-[#1E2D3D] text-[#E5B65A] rounded-lg border border-[#1E2D3D] hover:border-[#E5B65A]/40 text-left transition-colors font-mono"
                   >
                     <span className="font-semibold block text-[11px]">Analyst Sarah</span>
-                    <span className="text-[10px] text-slate-500 block">Threat Intel</span>
+                    <span className="text-[10px] text-[#94A6B8] block">Threat Intel</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleQuickPersona('admin_chief', 'AdminPass123!')}
-                    className="p-2 bg-slate-900 hover:bg-slate-850 text-purple-300 rounded-lg border border-slate-800 hover:border-purple-500/40 text-left transition-colors font-mono"
+                    className="p-2 bg-[#192737] hover:bg-[#1E2D3D] text-[#A78BFA] rounded-lg border border-[#1E2D3D] hover:border-[#8B5CF6]/40 text-left transition-colors font-mono"
                   >
                     <span className="font-semibold block text-[11px]">Admin Chief</span>
-                    <span className="text-[10px] text-slate-500 block">Sec Administrator</span>
+                    <span className="text-[10px] text-[#94A6B8] block">Sec Administrator</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleQuickPersona('viewer_dan', 'ViewerPass123!')}
-                    className="p-2 bg-slate-900 hover:bg-slate-850 text-slate-300 rounded-lg border border-slate-800 hover:border-slate-700 text-left transition-colors font-mono"
+                    className="p-2 bg-[#192737] hover:bg-[#1E2D3D] text-[#94A6B8] rounded-lg border border-[#1E2D3D] hover:border-[#5A6E82] text-left transition-colors font-mono"
                   >
                     <span className="font-semibold block text-[11px]">Viewer Dan</span>
-                    <span className="text-[10px] text-slate-500 block">Read-Only Observer</span>
+                    <span className="text-[10px] text-[#94A6B8] block">Read-Only Observer</span>
                   </button>
                 </div>
               </div>
@@ -205,24 +205,24 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, isSessi
           ) : (
             <>
               <div>
-                <label className="block text-xs font-semibold text-red-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#EF6268] mb-1.5">
                   Break-Glass Passphrase
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-2.5 w-4 h-4 text-red-500 pointer-events-none" />
+                  <Lock className="absolute left-3 top-2.5 w-4 h-4 text-[#EF6268] pointer-events-none" />
                   <input
                     type="password"
                     required
                     value={passphrase}
                     onChange={(e) => setPassphrase(e.target.value)}
-                    className="w-full bg-slate-900 border border-red-900/60 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-red-500 font-mono"
+                    className="w-full bg-[#080D14] border border-[#EF6268]/40 rounded-lg pl-9 pr-3 py-2 text-xs text-[#F0F5F8] placeholder-[#5A6E82] focus:outline-none focus:border-[#EF6268] font-mono"
                     placeholder="Sealed emergency passphrase"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#F0F5F8] mb-1.5">
                   Emergency Justification (minimum 20 characters)
                 </label>
                 <textarea
@@ -230,12 +230,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, isSessi
                   rows={2}
                   value={justification}
                   onChange={(e) => setJustification(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-red-500 font-sans"
+                  className="w-full bg-[#080D14] border border-[#1E2D3D] rounded-lg p-2.5 text-xs text-[#F0F5F8] placeholder-[#5A6E82] focus:outline-none focus:border-[#EF6268] font-sans"
                   placeholder="Detail the operational security emergency..."
                 />
               </div>
 
-              <div className="p-3 bg-red-950/40 border border-red-900/50 rounded-lg text-xs text-red-300 leading-relaxed font-sans">
+              <div className="p-3 bg-[#EF6268]/10 border border-[#EF6268]/30 rounded-lg text-xs text-[#EF6268] leading-relaxed font-sans">
                 Emergency Break-Glass issues a time-boxed 30-minute Security Administrator session and broadcasts an immutable audit log to all active SOC screens.
               </div>
             </>
@@ -246,7 +246,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, isSessi
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-medium rounded-lg transition-colors border border-slate-800"
+                className="px-4 py-2 bg-[#192737] hover:bg-[#1E2D3D] text-[#94A6B8] hover:text-[#F0F5F8] text-xs font-medium rounded-lg transition-colors border border-[#1E2D3D]"
               >
                 Cancel
               </button>
@@ -254,10 +254,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, isSessi
             <button
               type="submit"
               disabled={loading}
-              className={`px-4 py-2 text-slate-950 font-bold text-xs rounded-lg transition-colors flex items-center space-x-2 font-mono ${
+              className={`px-4 py-2 font-bold text-xs rounded-lg transition-colors flex items-center space-x-2 font-mono ${
                 isBreakGlassMode
-                  ? 'bg-red-500 hover:bg-red-400 text-white'
-                  : 'bg-cyan-400 hover:bg-cyan-300 text-slate-950'
+                  ? 'bg-[#EF6268] hover:bg-[#EF6268]/90 text-[#F0F5F8]'
+                  : 'bg-[#00D6C9] hover:bg-[#00BFB3] text-[#080D14]'
               } disabled:opacity-50`}
             >
               <span>{loading ? 'Authenticating...' : isBreakGlassMode ? 'Engage Emergency Break-Glass' : 'Sign In'}</span>

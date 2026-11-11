@@ -1,182 +1,149 @@
-
-/* HoneyShield X — Midnight / Ivory / Neon Lime */
+/* ==========================================================================
+   HONEYSHIELD X — PRECISION CYBERSECURITY DESIGN SYSTEM
+   Theme: Dark Enterprise Command Center
+   Tokens:
+     Background:       #080D14
+     Surface:          #111C29
+     Elevated Surface: #192737
+     Primary Accent:   #00D6C9
+     Primary Text:     #F0F5F8
+     Secondary Text:   #94A6B8
+     Critical:         #EF6268
+     Warning:          #E5B65A
+     Healthy:          #48C99B
+     Border:           #1E2D3D
+     Subtle Border:    rgba(255, 255, 255, 0.07)
+   ========================================================================== */
 
 :root {
   color-scheme: dark;
-  --hsx-black: #080D0B;
-  --hsx-surface: #121A16;
-  --hsx-ivory: #F5F0E6;
-  --hsx-muted: #B3BDB1;
-  --hsx-lime: #B7FF3C;
-  --hsx-border: #304437;
+  --soc-bg: #080D14;
+  --soc-surface: #111C29;
+  --soc-elevated: #192737;
+  --soc-accent: #00D6C9;
+  --soc-accent-hover: #00BFB3;
+  --soc-accent-muted: rgba(0, 214, 201, 0.12);
+  --soc-text: #F0F5F8;
+  --soc-muted: #94A6B8;
+  --soc-dim: #5A6E82;
+  --soc-critical: #EF6268;
+  --soc-warning: #E5B65A;
+  --soc-healthy: #48C99B;
+  --soc-border: #1E2D3D;
+  --soc-border-subtle: rgba(255, 255, 255, 0.07);
 }
 
 html, body, #root {
-  background-color: var(--hsx-black) !important;
-  color: var(--hsx-ivory);
+  background-color: #080D14 !important;
+  color: #F0F5F8 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.01em;
 }
 
-/* Existing dark cards and panels */
-#root [class*="bg-slate-9"],
-#root [class*="bg-slate-8"],
+/* Base surface styling */
+#root [class*="bg-slate-950"],
+#root [class*="bg-slate-900"],
 #root [class*="bg-[#0B1020]"],
-#root [class*="bg-[#111827]"],
-#root [class*="bg-[#020617]"] {
-  background-color: var(--hsx-surface) !important;
+#root [class*="bg-[#060913]"],
+#root [class*="bg-[#0a1020]"],
+#root [class*="bg-[#05070e]"],
+#root [class*="bg-[#03050a]"] {
+  background-color: #111C29;
 }
 
-/* Main typography */
+#root [class*="bg-slate-800"] {
+  background-color: #192737;
+}
+
+/* High-contrast precision text */
 #root [class*="text-white"],
 #root [class*="text-slate-100"],
 #root [class*="text-slate-200"] {
-  color: var(--hsx-ivory) !important;
+  color: #F0F5F8;
 }
 
 #root [class*="text-slate-400"],
 #root [class*="text-slate-500"] {
-  color: var(--hsx-muted) !important;
+  color: #94A6B8;
 }
 
-/* Cyan branding becomes neon lime */
-#root [class*="text-cyan-"] {
-  color: var(--hsx-lime) !important;
+/* Accent: #00D6C9 (Precision Teal / Cyan) */
+#root [class*="text-cyan-"],
+#root [class*="text-sky-"] {
+  color: #00D6C9;
 }
 
-#root [class*="border-cyan-"] {
-  border-color: rgba(183, 255, 60, 0.5) !important;
+#root [class*="border-cyan-"],
+#root [class*="border-sky-"] {
+  border-color: rgba(0, 214, 201, 0.35);
 }
 
-/* Primary actions */
 #root [class~="bg-cyan-600"],
-#root [class~="bg-cyan-500"] {
-  background-color: var(--hsx-lime) !important;
-  color: var(--hsx-black) !important;
+#root [class~="bg-cyan-500"],
+#root [class~="bg-sky-600"],
+#root [class~="bg-sky-500"] {
+  background-color: #00D6C9;
+  color: #080D14;
 }
 
-#root [class~="bg-cyan-500/10"],
-#root [class~="bg-cyan-600/10"] {
-  background-color: rgba(183, 255, 60, 0.1) !important;
+#root [class*="bg-cyan-500/"],
+#root [class*="bg-cyan-600/"],
+#root [class*="bg-sky-500/"],
+#root [class*="bg-sky-600/"] {
+  background-color: rgba(0, 214, 201, 0.12);
 }
 
-#root [class*="border-slate-7"],
-#root [class*="border-slate-8"],
-#root [class*="border-[#263449]"] {
-  border-color: var(--hsx-border) !important;
+/* Precise enterprise borders */
+#root [class*="border-slate-800"],
+#root [class*="border-slate-700"],
+#root [class*="border-[#142036]"],
+#root [class*="border-[#1E2D3D]"] {
+  border-color: #1E2D3D;
 }
 
-/* Accessible keyboard focus */
+/* Status colors */
+#root [class*="text-red-"],
+#root [class*="text-rose-"] {
+  color: #EF6268;
+}
+
+#root [class*="text-emerald-"],
+#root [class*="text-green-"] {
+  color: #48C99B;
+}
+
+#root [class*="text-amber-"],
+#root [class*="text-yellow-"],
+#root [class*="text-orange-"] {
+  color: #E5B65A;
+}
+
+/* Accessible focus styling */
 #root button:focus-visible,
 #root input:focus-visible,
+#root select:focus-visible,
+#root textarea:focus-visible,
 #root a:focus-visible {
-  outline: 2px solid var(--hsx-lime) !important;
+  outline: 2px solid #00D6C9 !important;
   outline-offset: 2px;
 }
 
-
-/* HSX ELECTRIC BLUE ACCENT */
-:root {
-  --hsx-electric-blue: #2979FF;
-  --hsx-blue-glow: rgba(41, 121, 255, 0.25);
+/* Precision scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-/* Blue telemetry and data highlights */
-#root [class*="text-blue-"],
-#root [class*="text-sky-"] {
-  color: var(--hsx-electric-blue) !important;
+::-webkit-scrollbar-track {
+  background: #080D14;
 }
 
-/* Secondary electric-blue surfaces */
-#root [class~="bg-blue-500"],
-#root [class~="bg-blue-600"] {
-  background-color: var(--hsx-electric-blue) !important;
+::-webkit-scrollbar-thumb {
+  background: #192737;
+  border-radius: 3px;
+  border: 1px solid #1E2D3D;
 }
 
-/* Electric-blue outlines */
-#root [class*="border-blue-"],
-#root [class*="border-sky-"] {
-  border-color: var(--hsx-electric-blue) !important;
-}
-
-/* Selected navigation and tabs */
-#root [aria-current="page"],
-#root [aria-selected="true"] {
-  box-shadow: inset 3px 0 0 var(--hsx-electric-blue);
-}
-
-/* Header accent */
-#root header {
-  border-bottom-color: rgba(41, 121, 255, 0.35);
-}
-
-/* Standard link accents */
-#root a {
-  text-decoration-color: var(--hsx-electric-blue);
-}
-
-
-/* HSX WINE RED ACCENT */
-:root {
-  --hsx-wine-red: #722F37;
-  --hsx-wine-highlight: #C87082;
-  --hsx-wine-glow: rgba(114, 47, 55, 0.25);
-}
-
-/* Premium five-color accent across the top */
-#root::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  z-index: 9999;
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    var(--hsx-wine-red),
-    var(--hsx-electric-blue, #2979FF) 55%,
-    var(--hsx-lime, #B7FF3C)
-  );
-}
-
-/* Optional wine-red styling for selected panels */
-#root .hsx-wine-accent {
-  border-color: var(--hsx-wine-red);
-  background-color: rgba(114, 47, 55, 0.12);
-  box-shadow: 0 0 20px var(--hsx-wine-glow);
-}
-
-
-/* HSX METALLIC SILVER ACCENT */
-:root {
-  --hsx-silver: #C0C0C0;
-  --hsx-silver-bright: #E2E5E8;
-  --hsx-silver-border: rgba(192,192,192,0.28);
-}
-
-/* Premium metallic panel borders */
-#root [class~="border-slate-700"],
-#root [class~="border-slate-800"] {
-  border-color: var(--hsx-silver-border) !important;
-}
-
-/* Secondary text */
-#root [class~="text-slate-400"] {
-  color: var(--hsx-silver) !important;
-}
-
-/* Metallic header separation */
-#root header {
-  border-bottom-color: var(--hsx-silver-border) !important;
-}
-
-/* Reusable silver accent */
-#root .hsx-silver-accent {
-  color: var(--hsx-silver-bright);
-  border: 1px solid var(--hsx-silver-border);
-  background: linear-gradient(
-    135deg,
-    rgba(192,192,192,0.12),
-    rgba(192,192,192,0.02)
-  );
+::-webkit-scrollbar-thumb:hover {
+  background: #25394E;
 }

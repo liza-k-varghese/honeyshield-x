@@ -82,22 +82,22 @@ export const IntegrationsView: React.FC = () => {
     switch (state) {
       case 'open':
         return (
-          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-950/80 text-rose-300 border border-rose-800">
-            <AlertTriangle className="w-3 h-3 text-rose-400" />
+          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-semibold font-mono bg-[#EF6268]/15 text-[#EF6268] border border-[#EF6268]/40">
+            <AlertTriangle className="w-3 h-3 text-[#EF6268]" />
             <span>CIRCUIT OPEN</span>
           </span>
         );
       case 'half_open':
         return (
-          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-950/80 text-amber-300 border border-amber-800">
-            <Radio className="w-3 h-3 text-amber-400" />
+          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-semibold font-mono bg-[#E5B65A]/15 text-[#E5B65A] border border-[#E5B65A]/40">
+            <Radio className="w-3 h-3 text-[#E5B65A]" />
             <span>HALF-OPEN (PROBING)</span>
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-800">
-            <CheckCircle className="w-3 h-3 text-emerald-400" />
+          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-semibold font-mono bg-[#48C99B]/15 text-[#48C99B] border border-[#48C99B]/40">
+            <CheckCircle className="w-3 h-3 text-[#48C99B]" />
             <span>HEALTHY</span>
           </span>
         );
@@ -107,32 +107,32 @@ export const IntegrationsView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* View Header & Primary Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-xl bg-[#111C29] border border-[#1E2D3D] shadow-soc-sm">
         <div>
-          <h2 className="text-lg font-bold text-white flex items-center space-x-2">
-            <Globe className="w-5 h-5 text-sky-400" />
+          <h2 className="text-lg font-bold text-[#F0F5F8] font-mono tracking-tight flex items-center space-x-2">
+            <Globe className="w-5 h-5 text-[#00D6C9]" />
             <span>SIEM & SOAR Integration Gateway</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-[#94A6B8] mt-0.5">
             Enterprise outbound webhook orchestrator with HMAC payload signing, SSRF defense, and bounded DLQ retries.
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5">
           <button
             onClick={() => setIsDlqDrawerOpen(true)}
-            className="px-3.5 py-1.5 bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/80 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-colors"
+            className="px-3.5 py-1.5 bg-[#EF6268]/15 hover:bg-[#EF6268]/25 text-[#EF6268] border border-[#EF6268]/40 rounded-lg text-xs font-semibold font-mono flex items-center space-x-1.5 transition-colors"
           >
-            <AlertOctagon className="w-4 h-4 text-rose-400" />
+            <AlertOctagon className="w-4 h-4 text-[#EF6268]" />
             <span>DLQ ({metrics?.dlq_count ?? 0})</span>
           </button>
 
           <button
             onClick={loadData}
-            className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 rounded-lg bg-[#192737] border border-[#1E2D3D] text-[#94A6B8] hover:text-[#F0F5F8] transition-colors"
             title="Refresh Gateway Telemetry"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#00D6C9]' : ''}`} />
           </button>
 
           <button
@@ -140,7 +140,7 @@ export const IntegrationsView: React.FC = () => {
               setEndpointToEdit(null);
               setIsConfigModalOpen(true);
             }}
-            className="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-semibold shadow-md flex items-center space-x-1.5 transition-colors"
+            className="px-4 py-1.5 bg-[#00D6C9] hover:bg-[#00D6C9]/90 text-[#080D14] rounded-lg text-xs font-semibold font-mono shadow-soc-sm flex items-center space-x-1.5 transition-colors"
           >
             <Plus className="w-4 h-4" />
             <span>Register Webhook Target</span>
@@ -150,59 +150,59 @@ export const IntegrationsView: React.FC = () => {
 
       {/* KPI Ribbon */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <div className="p-3.5 bg-slate-900/90 border border-slate-800 rounded-lg">
-          <div className="text-[11px] font-medium text-slate-400">Registered Endpoints</div>
-          <div className="text-lg font-bold text-white mt-1">
-            {metrics?.active_endpoints ?? 0} <span className="text-xs text-slate-500 font-normal">/ {metrics?.total_endpoints ?? 0}</span>
+        <div className="p-3.5 bg-[#111C29] border border-[#1E2D3D] rounded-xl shadow-soc-sm">
+          <div className="text-[11px] font-mono text-[#94A6B8]">Registered Endpoints</div>
+          <div className="text-lg font-bold font-mono text-[#F0F5F8] mt-1">
+            {metrics?.active_endpoints ?? 0} <span className="text-xs text-[#94A6B8]/60 font-normal">/ {metrics?.total_endpoints ?? 0}</span>
           </div>
-          <div className="text-[10px] text-slate-500 mt-0.5">Active / Total targets</div>
+          <div className="text-[10px] text-[#94A6B8]/60 font-mono mt-0.5">Active / Total targets</div>
         </div>
 
-        <div className="p-3.5 bg-slate-900/90 border border-slate-800 rounded-lg">
-          <div className="text-[11px] font-medium text-slate-400">Total Dispatched</div>
-          <div className="text-lg font-bold text-sky-400 mt-1">
+        <div className="p-3.5 bg-[#111C29] border border-[#1E2D3D] rounded-xl shadow-soc-sm">
+          <div className="text-[11px] font-mono text-[#94A6B8]">Total Dispatched</div>
+          <div className="text-lg font-bold font-mono text-[#00D6C9] mt-1">
             {metrics?.total_dispatched ?? 0}
           </div>
-          <div className="text-[10px] text-slate-500 mt-0.5">Outbound event signals</div>
+          <div className="text-[10px] text-[#94A6B8]/60 font-mono mt-0.5">Outbound event signals</div>
         </div>
 
-        <div className="p-3.5 bg-slate-900/90 border border-slate-800 rounded-lg">
-          <div className="text-[11px] font-medium text-slate-400">Delivered Successfully</div>
-          <div className="text-lg font-bold text-emerald-400 mt-1">
+        <div className="p-3.5 bg-[#111C29] border border-[#1E2D3D] rounded-xl shadow-soc-sm">
+          <div className="text-[11px] font-mono text-[#94A6B8]">Delivered Successfully</div>
+          <div className="text-lg font-bold font-mono text-[#48C99B] mt-1">
             {metrics?.total_delivered ?? 0}
           </div>
-          <div className="text-[10px] text-slate-500 mt-0.5">HTTP 2xx acknowledgments</div>
+          <div className="text-[10px] text-[#94A6B8]/60 font-mono mt-0.5">HTTP 2xx acknowledgments</div>
         </div>
 
-        <div className="p-3.5 bg-slate-900/90 border border-slate-800 rounded-lg">
-          <div className="text-[11px] font-medium text-slate-400">Average Roundtrip Latency</div>
-          <div className="text-lg font-bold text-purple-400 mt-1">
-            {metrics?.average_latency_ms ?? 0} <span className="text-xs text-slate-500 font-normal">ms</span>
+        <div className="p-3.5 bg-[#111C29] border border-[#1E2D3D] rounded-xl shadow-soc-sm">
+          <div className="text-[11px] font-mono text-[#94A6B8]">Average Roundtrip Latency</div>
+          <div className="text-lg font-bold font-mono text-[#F0F5F8] mt-1">
+            {metrics?.average_latency_ms ?? 0} <span className="text-xs text-[#94A6B8]/60 font-normal">ms</span>
           </div>
-          <div className="text-[10px] text-slate-500 mt-0.5">Direct IP connection</div>
+          <div className="text-[10px] text-[#94A6B8]/60 font-mono mt-0.5">Direct IP connection</div>
         </div>
 
-        <div className="p-3.5 bg-slate-900/90 border border-slate-800 rounded-lg">
-          <div className="text-[11px] font-medium text-slate-400">Tripped Circuits</div>
-          <div className={`text-lg font-bold mt-1 ${metrics?.circuits_open ? 'text-rose-400' : 'text-slate-300'}`}>
+        <div className="p-3.5 bg-[#111C29] border border-[#1E2D3D] rounded-xl shadow-soc-sm">
+          <div className="text-[11px] font-mono text-[#94A6B8]">Tripped Circuits</div>
+          <div className={`text-lg font-bold font-mono mt-1 ${metrics?.circuits_open ? 'text-[#EF6268]' : 'text-[#F0F5F8]'}`}>
             {metrics?.circuits_open ?? 0}
           </div>
-          <div className="text-[10px] text-slate-500 mt-0.5">Shedding failed receivers</div>
+          <div className="text-[10px] text-[#94A6B8]/60 font-mono mt-0.5">Shedding failed receivers</div>
         </div>
       </div>
 
       {/* Webhook Endpoints Table */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-          <div className="font-semibold text-sm text-white">Configured Webhook Targets</div>
-          <div className="text-xs text-slate-400">
+      <div className="bg-[#111C29] border border-[#1E2D3D] rounded-xl overflow-hidden shadow-soc-sm">
+        <div className="p-4 border-b border-[#1E2D3D] flex items-center justify-between bg-[#080D14]/80">
+          <div className="font-semibold text-sm font-mono text-[#F0F5F8]">Configured Webhook Targets</div>
+          <div className="text-xs text-[#94A6B8] font-mono">
             {endpoints.length} target{endpoints.length === 1 ? '' : 's'} registered
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/70 text-slate-400 border-b border-slate-800">
+            <thead className="bg-[#080D14]/60 text-[#94A6B8] font-mono border-b border-[#1E2D3D] text-[11px]">
               <tr>
                 <th className="py-3 px-4 font-semibold">Target & URL</th>
                 <th className="py-3 px-4 font-semibold">Serializer</th>
@@ -212,44 +212,44 @@ export const IntegrationsView: React.FC = () => {
                 <th className="py-3 px-4 font-semibold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono text-slate-300">
+            <tbody className="divide-y divide-[#1E2D3D]/60 font-mono text-[#F0F5F8]">
               {endpoints.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-500 font-sans">
+                  <td colSpan={6} className="py-12 text-center text-[#94A6B8] font-sans">
                     No webhook targets registered yet. Click &ldquo;Register Webhook Target&rdquo; to connect external SIEM/SOAR platforms.
                   </td>
                 </tr>
               ) : (
                 endpoints.map((ep) => (
-                  <tr key={ep.id} className="hover:bg-slate-800/40 transition-colors">
+                  <tr key={ep.id} className="hover:bg-[#192737]/50 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center space-x-2">
-                        <span className="font-bold font-sans text-white text-xs">{ep.name}</span>
+                        <span className="font-bold text-[#F0F5F8] text-xs">{ep.name}</span>
                         <button
                           type="button"
                           onClick={() => handleToggleEnabled(ep)}
-                          className={`text-[10px] px-1.5 py-0.5 rounded font-sans cursor-pointer transition-colors ${
+                          className={`text-[10px] px-1.5 py-0.5 rounded font-mono cursor-pointer transition-colors ${
                             ep.enabled
-                              ? 'bg-emerald-950/70 text-emerald-400 border border-emerald-800/60 hover:bg-emerald-900/80'
-                              : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700'
+                              ? 'bg-[#48C99B]/15 text-[#48C99B] border border-[#48C99B]/40 hover:bg-[#48C99B]/25'
+                              : 'bg-[#192737] text-[#94A6B8] border border-[#1E2D3D] hover:bg-[#192737]/80'
                           }`}
                           title={`Click to ${ep.enabled ? 'disable' : 'enable'} endpoint`}
                         >
                           {ep.enabled ? 'Active' : 'Disabled'}
                         </button>
                       </div>
-                      <div className="text-[11px] text-sky-400/90 truncate max-w-xs mt-0.5" title={ep.target_url}>
+                      <div className="text-[11px] text-[#00D6C9] truncate max-w-xs mt-0.5" title={ep.target_url}>
                         {ep.target_url}
                       </div>
                       {ep.description && (
-                        <div className="text-[10px] text-slate-500 font-sans truncate max-w-xs mt-0.5">
+                        <div className="text-[10px] text-[#94A6B8] truncate max-w-xs mt-0.5">
                           {ep.description}
                         </div>
                       )}
                     </td>
 
-                    <td className="py-3.5 px-4 font-sans">
-                      <span className="inline-block px-2 py-0.5 rounded text-[11px] font-semibold uppercase bg-purple-950/70 text-purple-300 border border-purple-800/60">
+                    <td className="py-3.5 px-4">
+                      <span className="inline-block px-2 py-0.5 rounded text-[11px] font-semibold uppercase bg-[#00D6C9]/15 text-[#00D6C9] border border-[#00D6C9]/35">
                         {ep.format}
                       </span>
                     </td>
@@ -259,7 +259,7 @@ export const IntegrationsView: React.FC = () => {
                         {ep.events.map((ev) => (
                           <span
                             key={ev}
-                            className="bg-slate-950 text-slate-400 border border-slate-800 px-1.5 py-0.5 rounded text-[10px]"
+                            className="bg-[#080D14] text-[#94A6B8] border border-[#1E2D3D] px-1.5 py-0.5 rounded text-[10px]"
                           >
                             {ev}
                           </span>
@@ -270,7 +270,7 @@ export const IntegrationsView: React.FC = () => {
                     <td className="py-3.5 px-4">
                       {getCircuitBadge(ep.circuit_state)}
                       {ep.consecutive_failures > 0 && (
-                        <div className="text-[10px] text-rose-400 mt-1">
+                        <div className="text-[10px] text-[#EF6268] mt-1 font-mono">
                           {ep.consecutive_failures} failure{ep.consecutive_failures === 1 ? '' : 's'}
                         </div>
                       )}
@@ -278,24 +278,24 @@ export const IntegrationsView: React.FC = () => {
 
                     <td className="py-3.5 px-4 text-[11px]">
                       <div>
-                        <span className="text-emerald-400">{ep.total_sent} sent</span> &bull;{' '}
-                        <span className="text-rose-400">{ep.total_failed} failed</span>
+                        <span className="text-[#48C99B]">{ep.total_sent} sent</span> &bull;{' '}
+                        <span className="text-[#EF6268]">{ep.total_failed} failed</span>
                       </div>
                       {ep.last_delivery_at && (
-                        <div className="text-[10px] text-slate-500 mt-0.5">
+                        <div className="text-[10px] text-[#94A6B8] mt-0.5">
                           Last: {new Date(ep.last_delivery_at).toLocaleTimeString()} ({ep.last_status_code || '-'})
                         </div>
                       )}
                     </td>
 
                     <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end space-x-1.5 font-sans">
+                      <div className="flex items-center justify-end space-x-1.5 font-mono">
                         <button
                           onClick={() => {
                             setEndpointToTest(ep);
                             setIsTestModalOpen(true);
                           }}
-                          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-sky-400 rounded text-[11px] font-medium border border-slate-700 flex items-center space-x-1"
+                          className="px-2.5 py-1 bg-[#192737] hover:bg-[#00D6C9] hover:text-[#080D14] text-[#00D6C9] rounded-md text-[11px] font-medium border border-[#1E2D3D] flex items-center space-x-1 transition-colors"
                           title="Dispatch Test Ping"
                         >
                           <Send className="w-3 h-3" />
@@ -307,7 +307,7 @@ export const IntegrationsView: React.FC = () => {
                             setEndpointToEdit(ep);
                             setIsConfigModalOpen(true);
                           }}
-                          className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+                          className="p-1 rounded-md bg-[#192737] hover:bg-[#192737]/80 text-[#F0F5F8] border border-[#1E2D3D]"
                           title="Edit Target"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -315,7 +315,7 @@ export const IntegrationsView: React.FC = () => {
 
                         <button
                           onClick={() => handleDelete(ep.id, ep.name)}
-                          className="p-1 rounded bg-slate-800 hover:bg-rose-950/70 text-slate-400 hover:text-rose-300 border border-slate-700"
+                          className="p-1 rounded-md bg-[#192737] hover:bg-[#EF6268]/20 text-[#EF6268] border border-[#1E2D3D]"
                           title="Delete Target"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -331,20 +331,20 @@ export const IntegrationsView: React.FC = () => {
       </div>
 
       {/* Enterprise Security Architecture Callout */}
-      <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-400">
+      <div className="p-4 rounded-xl bg-[#111C29] border border-[#1E2D3D] grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-[#94A6B8] shadow-soc-sm">
         <div className="space-y-1">
-          <div className="font-semibold text-slate-200 flex items-center space-x-1.5">
-            <Lock className="w-4 h-4 text-sky-400" />
+          <div className="font-semibold text-[#F0F5F8] flex items-center space-x-1.5">
+            <Lock className="w-4 h-4 text-[#00D6C9]" />
             <span>HMAC-SHA256 Payload Signing</span>
           </div>
           <p className="text-[11px] leading-relaxed">
-            All outbound payloads include <code className="text-slate-300 bg-slate-950 px-1 py-0.5 rounded">X-HoneyShield-Signature</code> header binding a UTC timestamp with raw bytes. Replays beyond &plusmn;300 seconds are rejected.
+            All outbound payloads include <code className="text-[#00D6C9] bg-[#080D14] px-1 py-0.5 rounded border border-[#1E2D3D]">X-HoneyShield-Signature</code> header binding a UTC timestamp with raw bytes. Replays beyond &plusmn;300 seconds are rejected.
           </p>
         </div>
 
         <div className="space-y-1">
-          <div className="font-semibold text-slate-200 flex items-center space-x-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <div className="font-semibold text-[#F0F5F8] flex items-center space-x-1.5">
+            <ShieldCheck className="w-4 h-4 text-[#48C99B]" />
             <span>Anti-DNS Rebinding & SSRF Immunity</span>
           </div>
           <p className="text-[11px] leading-relaxed">

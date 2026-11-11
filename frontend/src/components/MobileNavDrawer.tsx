@@ -58,25 +58,25 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     {
       id: 'honeypots' as SidebarNavId,
       label: 'Honeypots',
-      desc: 'Active deception grid',
+      desc: 'Active deception grid sensors',
       icon: Target,
     },
     {
       id: 'intel' as SidebarNavId,
       label: 'Threat Intelligence',
-      desc: 'STIX/TAXII indicator fusion',
+      desc: 'STIX 2.1 & IOC adversary profiling',
       icon: Globe,
     },
     {
       id: 'forensics' as SidebarNavId,
-      label: 'Investigations',
-      desc: 'Forensics & IP search',
+      label: 'Forensic Investigations',
+      desc: 'Attacker entity deep dive',
       icon: Search,
     },
     {
       id: 'universe' as SidebarNavId,
-      label: 'Digital Universe',
-      desc: 'Interactive 4-agent defense',
+      label: 'Digital Agent Universe',
+      desc: 'Spatial SOC & real-time telemetry',
       icon: Sparkles,
       highlight: true,
     },
@@ -85,32 +85,32 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
   const secondaryItems = [
     {
       id: 'network' as SidebarNavId,
-      label: 'Incident Command',
-      desc: 'Live war room & containment',
+      label: 'Network Command',
+      desc: 'Incident response orchestrator',
       icon: Radio,
     },
     {
       id: 'detection' as SidebarNavId,
-      label: 'Detection Rules',
-      desc: 'Rule catalog & replay',
+      label: 'Attack Detection',
+      desc: 'Detection rules & replay studio',
       icon: Crosshair,
     },
     {
       id: 'ai' as SidebarNavId,
-      label: 'Campaigns & AI',
-      desc: 'Campaign tracking & hunting',
+      label: 'AI Analysis',
+      desc: 'Campaign clusters & threat hunting',
       icon: BrainCircuit,
     },
     {
       id: 'systems' as SidebarNavId,
-      label: 'Integrations',
-      desc: 'SIEM & SOAR connectors',
+      label: 'Defensive Integrations',
+      desc: 'SIEM-SOAR webhook gateways',
       icon: Server,
     },
     {
       id: 'config' as SidebarNavId,
-      label: 'Settings & Audit',
-      desc: 'Configuration & audit logs',
+      label: 'Configuration & Audit',
+      desc: 'Platform governance & audit trail',
       icon: Sliders,
     },
   ];
@@ -121,26 +121,26 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
   };
 
   return (
-    <div className="lg:hidden fixed inset-0 z-50 flex select-none">
-      {/* Backdrop overlay */}
+    <div className="fixed inset-0 z-50 lg:hidden flex">
+      {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
       {/* Drawer Container */}
-      <div className="relative w-4/5 max-w-xs bg-[#0B1020] border-r border-slate-800 shadow-2xl flex flex-col justify-between h-full z-10 overflow-hidden">
+      <div className="relative w-80 max-w-[85vw] bg-[#111C29] border-r border-[#1E2D3D] shadow-soc-lg flex flex-col h-full z-10 animate-in slide-in-from-left duration-200">
         {/* Drawer Header */}
-        <div className="p-4 border-b border-slate-800 bg-[#0E1526] flex items-center justify-between">
+        <div className="p-4 border-b border-[#1E2D3D] flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
-            <div className="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+            <div className="p-1.5 rounded-lg bg-[#00D6C9]/10 border border-[#00D6C9]/25 text-[#00D6C9]">
               <Shield className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-sm font-bold font-sans text-white tracking-wider">
+              <span className="font-bold text-sm tracking-wider text-[#F0F5F8] block">
                 MOBILE SOC CONSOLE
-              </div>
-              <span className="text-[10px] font-mono text-slate-400 block -mt-0.5">
+              </span>
+              <span className="text-[10px] text-[#94A6B8] font-mono block -mt-0.5">
                 System Modules (11)
               </span>
             </div>
@@ -148,18 +148,18 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
-            title="Close Drawer"
+            className="p-1.5 rounded-lg text-[#94A6B8] hover:text-[#F0F5F8] hover:bg-[#192737] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#00D6C9]"
+            title="Close Menu"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Modules List */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-3">
+        {/* Scrollable Navigation List */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-4">
           {/* Operations Group */}
           <div>
-            <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 px-2 py-1">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-[#94A6B8] px-2 py-1">
               Operations
             </div>
             <div className="space-y-1 mt-1">
@@ -173,34 +173,30 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                     onClick={() => handleItemClick(item.id)}
                     className={`w-full flex items-center justify-between p-2.5 rounded-lg text-left transition-colors text-xs ${
                       isActive
-                        ? 'bg-slate-800 text-white font-semibold'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                        ? 'bg-[#192737] text-[#F0F5F8] font-semibold border-l-2 border-[#00D6C9]'
+                        : 'text-[#94A6B8] hover:text-[#F0F5F8] hover:bg-[#192737]/60'
                     }`}
                   >
                     <div className="flex items-center space-x-2.5 min-w-0">
                       <Icon
                         className={`w-4 h-4 shrink-0 ${
-                          isActive
-                            ? 'text-cyan-400'
-                            : item.highlight
-                            ? 'text-cyan-400'
-                            : 'text-slate-400'
+                          isActive ? 'text-[#00D6C9]' : 'text-[#94A6B8]'
                         }`}
                       />
                       <div className="min-w-0">
                         <span className="font-medium truncate block">{item.label}</span>
-                        <span className="text-[10px] text-slate-400 truncate block">
+                        <span className="text-[10px] text-[#94A6B8] truncate block">
                           {item.desc}
                         </span>
                       </div>
                     </div>
 
                     {item.badge !== undefined ? (
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-red-500/20 text-red-300 border border-red-500/40 font-bold shrink-0">
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-[#EF6268]/20 text-[#EF6268] border border-[#EF6268]/40 font-bold shrink-0">
                         {item.badge}
                       </span>
                     ) : (
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                      <ChevronRight className="w-3.5 h-3.5 text-[#5A6E82] shrink-0" />
                     )}
                   </button>
                 );
@@ -209,8 +205,8 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
           </div>
 
           {/* Defense & Config Group */}
-          <div className="pt-2 border-t border-slate-800/60">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 px-2 py-1">
+          <div className="pt-2 border-t border-[#1E2D3D]/60">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-[#94A6B8] px-2 py-1">
               Defense & Config
             </div>
             <div className="space-y-1 mt-1">
@@ -224,24 +220,24 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                     onClick={() => handleItemClick(item.id)}
                     className={`w-full flex items-center justify-between p-2.5 rounded-lg text-left transition-colors text-xs ${
                       isActive
-                        ? 'bg-slate-800 text-white font-semibold'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                        ? 'bg-[#192737] text-[#F0F5F8] font-semibold border-l-2 border-[#00D6C9]'
+                        : 'text-[#94A6B8] hover:text-[#F0F5F8] hover:bg-[#192737]/60'
                     }`}
                   >
                     <div className="flex items-center space-x-2.5 min-w-0">
                       <Icon
                         className={`w-4 h-4 shrink-0 ${
-                          isActive ? 'text-cyan-400' : 'text-slate-400'
+                          isActive ? 'text-[#00D6C9]' : 'text-[#94A6B8]'
                         }`}
                       />
                       <div className="min-w-0">
                         <span className="font-medium truncate block">{item.label}</span>
-                        <span className="text-[10px] text-slate-400 truncate block">
+                        <span className="text-[10px] text-[#94A6B8] truncate block">
                           {item.desc}
                         </span>
                       </div>
                     </div>
-                    <ChevronRight className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                    <ChevronRight className="w-3.5 h-3.5 text-[#5A6E82] shrink-0" />
                   </button>
                 );
               })}
@@ -250,18 +246,18 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
         </div>
 
         {/* Drawer Footer: Operator info */}
-        <div className="p-3 border-t border-slate-800 bg-[#0E1526]">
+        <div className="p-3 border-t border-[#1E2D3D] bg-[#080D14]">
           {operator ? (
             <div className="flex items-center justify-between text-xs">
               <div className="flex items-center space-x-2 min-w-0">
-                <div className="w-6 h-6 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 flex items-center justify-center font-bold text-[10px]">
+                <div className="w-6 h-6 rounded-full bg-[#00D6C9]/15 text-[#00D6C9] border border-[#00D6C9]/30 flex items-center justify-center font-bold text-[10px]">
                   {operator.username.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0">
-                  <span className="text-white font-medium block truncate">
+                  <span className="text-[#F0F5F8] font-medium block truncate">
                     {operator.username}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-mono capitalize block truncate">
+                  <span className="text-[10px] text-[#94A6B8] font-mono capitalize block truncate">
                     {operator.role.replace('_', ' ')}
                   </span>
                 </div>
@@ -272,7 +268,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                   logout();
                   onClose();
                 }}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors"
+                className="p-1.5 rounded-lg text-[#94A6B8] hover:text-[#EF6268] hover:bg-[#192737] transition-colors"
                 title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />
@@ -284,7 +280,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                 if (onOpenLogin) onOpenLogin();
                 onClose();
               }}
-              className="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-semibold flex items-center justify-center space-x-2 transition-colors"
+              className="w-full py-2 bg-[#00D6C9] hover:bg-[#00BFB3] text-[#080D14] rounded-lg text-xs font-semibold flex items-center justify-center space-x-2 transition-colors"
             >
               <User className="w-4 h-4" />
               <span>Sign In to SOC</span>

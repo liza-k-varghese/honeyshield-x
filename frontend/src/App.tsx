@@ -294,7 +294,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#060913] cyber-grid-bg flex flex-col text-slate-100">
+    <div className="min-h-screen bg-[#080D14] flex flex-col text-[#F0F5F8]">
       <CurtainTransition isActive={isCurtainActive} />
       {/* Top Navigation */}
       <Header
@@ -371,16 +371,16 @@ function DashboardContent() {
           ) : activeView === 'alerts' ? (
             /* Dedicated Alerts Feed */
             <div className="space-y-6">
-              <div className="p-4 rounded-lg bg-slate-950/80 border border-cyan-500/20 flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-[#111C29] border border-[#1E2D3D] flex items-center justify-between shadow-soc-sm">
                 <div>
-                  <h2 className="text-sm font-bold text-white uppercase font-mono tracking-wider">
+                  <h2 className="text-sm font-bold text-[#F0F5F8] uppercase font-mono tracking-wider">
                     Full Alerts Console
                   </h2>
-                  <p className="text-xs text-slate-400 font-mono">
+                  <p className="text-xs text-[#94A6B8] font-mono">
                     Multi-Vector Correlated Detections & Incident Prioritization
                   </p>
                 </div>
-                <span className="text-xs font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
+                <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-[#00D6C9]/15 text-[#00D6C9] border border-[#00D6C9]/35 font-semibold">
                   {alerts.length} Total Alerts
                 </span>
               </div>
@@ -435,13 +435,13 @@ function DashboardContent() {
           ) : activeView === 'campaigns' || activeView === 'hunts' ? (
             /* AI Analysis Workspace: Campaigns & Threat Hunting */
             <div className="space-y-6">
-              <div className="flex items-center space-x-2 border-b border-cyan-500/20 pb-3 text-xs font-mono font-medium">
+              <div className="flex items-center space-x-2 border-b border-[#1E2D3D] pb-3 text-xs font-mono font-medium">
                 <button
                   onClick={() => setAiSubTab('campaigns')}
-                  className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors ${
+                  className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-2 transition-colors border ${
                     aiSubTab === 'campaigns'
-                      ? 'bg-purple-600 text-white font-semibold shadow-nexus-purple'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                      ? 'bg-[#00D6C9]/15 text-[#00D6C9] border-[#00D6C9]/40 font-semibold'
+                      : 'border-transparent text-[#94A6B8] hover:text-[#F0F5F8] hover:bg-[#192737]'
                   }`}
                 >
                   <BrainCircuit className="w-4 h-4" />
@@ -449,10 +449,10 @@ function DashboardContent() {
                 </button>
                 <button
                   onClick={() => setAiSubTab('hunting')}
-                  className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors ${
+                  className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-2 transition-colors border ${
                     aiSubTab === 'hunting'
-                      ? 'bg-purple-600 text-white font-semibold shadow-nexus-purple'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                      ? 'bg-[#00D6C9]/15 text-[#00D6C9] border-[#00D6C9]/40 font-semibold'
+                      : 'border-transparent text-[#94A6B8] hover:text-[#F0F5F8] hover:bg-[#192737]'
                   }`}
                 >
                   <Target className="w-4 h-4" />
@@ -469,28 +469,30 @@ function DashboardContent() {
           ) : activeView === 'investigation' ? (
             <div className="space-y-6">
               {/* IP Search / Query Ribbon */}
-              <div className="p-4 rounded-lg bg-slate-950/90 border border-cyan-500/20 space-y-3">
+              <div className="p-4 rounded-xl bg-[#111C29] border border-[#1E2D3D] space-y-3 shadow-soc-sm">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                  <div className="flex items-center space-x-2">
-                    <Network className="w-5 h-5 text-cyan-400" />
-                    <h3 className="text-sm font-semibold text-white font-mono">Attacker Entity Deep-Dive Search</h3>
+                  <div className="flex items-center space-x-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-[#00D6C9]/10 border border-[#00D6C9]/25 flex items-center justify-center">
+                      <Network className="w-4 h-4 text-[#00D6C9]" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-[#F0F5F8] font-mono tracking-tight">Attacker Entity Deep-Dive Search</h3>
                   </div>
 
                   {/* Search Form */}
                   <form onSubmit={handleSearchSubmit} className="flex items-center space-x-2">
                     <div className="relative">
-                      <Search className="w-4 h-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                      <Search className="w-4 h-4 text-[#94A6B8] absolute left-2.5 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
                         placeholder="Enter IPv4 or IPv6..."
-                        className="bg-slate-950 border border-slate-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono w-64"
+                        className="bg-[#080D14] border border-[#1E2D3D] rounded-lg pl-8 pr-3 py-1.5 text-xs text-[#F0F5F8] placeholder-[#94A6B8] focus:outline-none focus:border-[#00D6C9] focus:ring-1 focus:ring-[#00D6C9] font-mono w-64"
                       />
                     </div>
                     <button
                       type="submit"
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-600 hover:bg-cyan-500 text-white transition-colors flex items-center space-x-1"
+                      className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#00D6C9] hover:bg-[#00D6C9]/90 text-[#080D14] transition-colors flex items-center space-x-1.5 shadow-soc-sm"
                     >
                       <span>Investigate</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -500,8 +502,8 @@ function DashboardContent() {
 
                 {/* Quick Suggestions / Recent Attacker IPs */}
                 {suggestedIps.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/80 text-xs font-mono">
-                    <span className="text-slate-500">Recent Attackers:</span>
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#1E2D3D] text-xs font-mono">
+                    <span className="text-[#94A6B8]">Recent Attackers:</span>
                     {suggestedIps.slice(0, 5).map((ip) => (
                       <button
                         key={ip}
@@ -511,8 +513,8 @@ function DashboardContent() {
                         }}
                         className={`px-2 py-0.5 rounded border transition-colors ${
                           investigationIp === ip
-                            ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50'
-                            : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'
+                            ? 'bg-[#00D6C9]/15 text-[#00D6C9] border-[#00D6C9]/40'
+                            : 'bg-[#192737] text-[#94A6B8] border-[#1E2D3D] hover:border-[#00D6C9]/40 hover:text-[#F0F5F8]'
                         }`}
                       >
                         {ip}
@@ -530,10 +532,10 @@ function DashboardContent() {
                   onReplayIp={handleDeepLinkReplayIp}
                 />
               ) : (
-                <div className="py-20 text-center space-y-3 bg-slate-900/30 border border-slate-800 rounded-lg">
-                  <Network className="w-10 h-10 text-slate-600 mx-auto" />
-                  <h4 className="text-sm font-semibold text-slate-300">No Attacker Entity Selected</h4>
-                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                <div className="py-20 text-center space-y-3 bg-[#111C29] border border-[#1E2D3D] rounded-xl">
+                  <Network className="w-10 h-10 text-[#94A6B8]/50 mx-auto" />
+                  <h4 className="text-sm font-semibold text-[#F0F5F8]">No Attacker Entity Selected</h4>
+                  <p className="text-xs text-[#94A6B8] max-w-md mx-auto">
                     Enter an IP address above or click &ldquo;Investigate Attacker Entity&rdquo; from any active alert in the SOC overview to inspect threat intelligence, MITRE tactics, and progression graphs.
                   </p>
                 </div>
@@ -543,13 +545,13 @@ function DashboardContent() {
             /* Module 3.3 Detection & Replay Workspace */
             <div className="space-y-6">
               {/* Sub-navigation tabs */}
-              <div className="flex items-center space-x-2 border-b border-cyan-500/20 pb-3 text-xs font-mono font-medium">
+              <div className="flex items-center space-x-2 border-b border-[#1E2D3D] pb-3 text-xs font-mono font-medium overflow-x-auto">
                 <button
                   onClick={() => setRulesSubTab('catalog')}
-                  className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors ${
+                  className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-2 transition-colors border whitespace-nowrap ${
                     rulesSubTab === 'catalog'
-                      ? 'bg-cyan-600 text-white font-semibold shadow-nexus-cyan'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                      ? 'bg-[#00D6C9]/15 text-[#00D6C9] border-[#00D6C9]/40 font-semibold'
+                      : 'border-transparent text-[#94A6B8] hover:text-[#F0F5F8] hover:bg-[#192737]'
                   }`}
                 >
                   <Shield className="w-4 h-4" />
@@ -558,10 +560,10 @@ function DashboardContent() {
 
                 <button
                   onClick={() => setRulesSubTab('replay')}
-                  className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors ${
+                  className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-2 transition-colors border whitespace-nowrap ${
                     rulesSubTab === 'replay'
-                      ? 'bg-cyan-600 text-white font-semibold shadow-nexus-cyan'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                      ? 'bg-[#00D6C9]/15 text-[#00D6C9] border-[#00D6C9]/40 font-semibold'
+                      : 'border-transparent text-[#94A6B8] hover:text-[#F0F5F8] hover:bg-[#192737]'
                   }`}
                 >
                   <History className="w-4 h-4" />
@@ -570,10 +572,10 @@ function DashboardContent() {
 
                 <button
                   onClick={() => setRulesSubTab('simulation')}
-                  className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors ${
+                  className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-2 transition-colors border whitespace-nowrap ${
                     rulesSubTab === 'simulation'
-                      ? 'bg-cyan-600 text-white font-semibold shadow-nexus-cyan'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                      ? 'bg-[#00D6C9]/15 text-[#00D6C9] border-[#00D6C9]/40 font-semibold'
+                      : 'border-transparent text-[#94A6B8] hover:text-[#F0F5F8] hover:bg-[#192737]'
                   }`}
                 >
                   <Sliders className="w-4 h-4" />
@@ -582,10 +584,10 @@ function DashboardContent() {
 
                 <button
                   onClick={() => setRulesSubTab('audit')}
-                  className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors ${
+                  className={`px-3.5 py-1.5 rounded-lg flex items-center space-x-2 transition-colors border whitespace-nowrap ${
                     rulesSubTab === 'audit'
-                      ? 'bg-cyan-600 text-white font-semibold shadow-nexus-cyan'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                      ? 'bg-[#00D6C9]/15 text-[#00D6C9] border-[#00D6C9]/40 font-semibold'
+                      : 'border-transparent text-[#94A6B8] hover:text-[#F0F5F8] hover:bg-[#192737]'
                   }`}
                 >
                   <FileText className="w-4 h-4" />

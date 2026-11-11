@@ -129,31 +129,31 @@ export const GlobalThreatMapPanel: React.FC<GlobalThreatMapPanelProps> = ({
   };
 
   return (
-    <div className="nexus-panel corner-notch-tl corner-notch-br rounded-lg p-5 flex flex-col justify-between relative overflow-hidden">
+    <div className="bg-[#111C29] border border-[#1E2D3D] rounded-xl p-5 flex flex-col justify-between relative overflow-hidden shadow-soc-sm">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-cyan-500/15">
+      <div className="flex items-center justify-between pb-3 border-b border-[#1E2D3D]">
         <div className="flex items-center space-x-2.5">
-          <div className="p-1.5 rounded bg-cyan-950/60 border border-cyan-500/30 text-cyan-400 shadow-nexus-cyan">
+          <div className="p-1.5 rounded-lg bg-[#00D6C9]/10 border border-[#00D6C9]/25 text-[#00D6C9]">
             <Globe className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-100 font-mono flex items-center space-x-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#F0F5F8] font-mono flex items-center space-x-2">
               <span>Global Threat Network</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00D6C9] animate-ping" />
             </h3>
-            <p className="text-[10px] text-slate-400 font-mono">Real-Time Ingress Origins & Active Attack Vectors</p>
+            <p className="text-[10px] text-[#94A6B8] font-mono">Real-Time Ingress Origins & Active Attack Vectors</p>
           </div>
         </div>
         <div className="flex items-center space-x-2 text-[10px] font-mono">
-          <span className="px-2 py-0.5 rounded bg-cyan-950/50 text-cyan-300 border border-cyan-800/40 flex items-center space-x-1">
-            <Radio className="w-3 h-3 text-cyan-400 animate-pulse" />
+          <span className="px-2 py-0.5 rounded bg-[#00D6C9]/15 text-[#00D6C9] border border-[#00D6C9]/35 flex items-center space-x-1 font-semibold">
+            <Radio className="w-3 h-3 text-[#00D6C9] animate-pulse" />
             <span>{threatNodes.length} ORIGIN VECTORS</span>
           </span>
         </div>
       </div>
 
       {/* Interactive Cyber World Map Visualizer */}
-      <div className="relative my-3 w-full bg-[#050814]/90 rounded border border-cyan-500/20 overflow-hidden select-none">
+      <div className="relative my-3 w-full bg-[#080D14] rounded-lg border border-[#1E2D3D] overflow-hidden select-none">
         <svg
           viewBox="0 0 600 280"
           className="w-full h-56 sm:h-64 object-cover"
@@ -161,7 +161,7 @@ export const GlobalThreatMapPanel: React.FC<GlobalThreatMapPanelProps> = ({
           <defs>
             {/* Cyber Grid Pattern */}
             <pattern id="mapGrid" width="30" height="30" patternUnits="userSpaceOnUse">
-              <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(0, 240, 255, 0.05)" strokeWidth="0.5" />
+              <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(0, 214, 201, 0.05)" strokeWidth="0.5" />
             </pattern>
             {/* Central Glow Filter */}
             <filter id="hubGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -286,37 +286,37 @@ export const GlobalThreatMapPanel: React.FC<GlobalThreatMapPanelProps> = ({
 
         {/* Selected Attacker Overlay Card */}
         {selectedNode && (
-          <div className="absolute bottom-2 left-2 right-2 sm:right-auto sm:max-w-xs p-3 rounded bg-slate-950/95 border border-cyan-500/40 shadow-nexus-cyan backdrop-blur text-xs font-mono">
-            <div className="flex items-center justify-between pb-1.5 border-b border-slate-800">
+          <div className="absolute bottom-2 left-2 right-2 sm:right-auto sm:max-w-xs p-3 rounded-lg bg-[#111C29]/95 border border-[#00D6C9]/40 shadow-soc-sm backdrop-blur text-xs font-mono">
+            <div className="flex items-center justify-between pb-1.5 border-b border-[#1E2D3D]">
               <div className="flex items-center space-x-1.5">
-                <MapPin className="w-3.5 h-3.5 text-rose-400" />
-                <span className="font-bold text-white">{selectedNode.ip}</span>
+                <MapPin className="w-3.5 h-3.5 text-[#EF6268]" />
+                <span className="font-bold text-[#F0F5F8]">{selectedNode.ip}</span>
               </div>
               <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${
-                selectedNode.severity === 'critical' ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-amber-950 text-amber-300 border border-amber-800'
+                selectedNode.severity === 'critical' ? 'bg-[#EF6268]/15 text-[#EF6268] border border-[#EF6268]/40' : 'bg-[#E5B65A]/15 text-[#E5B65A] border border-[#E5B65A]/40'
               }`}>
                 {selectedNode.severity}
               </span>
             </div>
-            <div className="py-2 text-[11px] text-slate-300 space-y-1">
+            <div className="py-2 text-[11px] text-[#94A6B8] space-y-1">
               <div className="flex justify-between">
-                <span className="text-slate-500">Origin Location:</span>
-                <span>{selectedNode.city}, {selectedNode.country}</span>
+                <span className="text-[#94A6B8]/70">Origin Location:</span>
+                <span className="text-[#F0F5F8]">{selectedNode.city}, {selectedNode.country}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Vector Type:</span>
-                <span className="text-cyan-300">{selectedNode.type}</span>
+                <span className="text-[#94A6B8]/70">Vector Type:</span>
+                <span className="text-[#00D6C9]">{selectedNode.type}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Observed Probes:</span>
-                <span className="font-bold text-white">{selectedNode.count} events</span>
+                <span className="text-[#94A6B8]/70">Observed Probes:</span>
+                <span className="font-bold text-[#F0F5F8]">{selectedNode.count} events</span>
               </div>
             </div>
-            <div className="flex items-center space-x-2 pt-1 border-t border-slate-800/80">
+            <div className="flex items-center space-x-2 pt-1 border-t border-[#1E2D3D]">
               {onInvestigateIp && (
                 <button
                   onClick={() => onInvestigateIp(selectedNode.ip)}
-                  className="w-full py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-[10px] flex items-center justify-center space-x-1 transition-colors"
+                  className="w-full py-1 rounded bg-[#00D6C9] hover:bg-[#00D6C9]/90 text-[#080D14] font-semibold text-[10px] flex items-center justify-center space-x-1 transition-colors"
                 >
                   <span>Investigate Entity</span>
                   <ExternalLink className="w-3 h-3" />
@@ -324,7 +324,7 @@ export const GlobalThreatMapPanel: React.FC<GlobalThreatMapPanelProps> = ({
               )}
               <button
                 onClick={() => setSelectedNode(null)}
-                className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px]"
+                className="px-2 py-1 rounded bg-[#192737] hover:bg-[#192737]/80 text-[#94A6B8] hover:text-[#F0F5F8] text-[10px] border border-[#1E2D3D]"
               >
                 Close
               </button>
@@ -335,18 +335,18 @@ export const GlobalThreatMapPanel: React.FC<GlobalThreatMapPanelProps> = ({
 
       {/* Bottom Telemetry Ticker */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px] font-mono">
-        <div className="p-2 rounded bg-slate-950/70 border border-slate-800 flex items-center space-x-2">
-          <Shield className="w-3.5 h-3.5 text-cyan-400" />
+        <div className="p-2 rounded-lg bg-[#080D14] border border-[#1E2D3D] flex items-center space-x-2">
+          <Shield className="w-3.5 h-3.5 text-[#00D6C9]" />
           <div>
-            <div className="text-[9px] text-slate-500 uppercase">Defensive Hub</div>
-            <div className="text-slate-200 font-semibold">100% Intercept</div>
+            <div className="text-[9px] text-[#94A6B8] uppercase">Defensive Hub</div>
+            <div className="text-[#F0F5F8] font-semibold">100% Intercept</div>
           </div>
         </div>
-        <div className="p-2 rounded bg-slate-950/70 border border-slate-800 flex items-center space-x-2">
-          <Activity className="w-3.5 h-3.5 text-purple-400" />
+        <div className="p-2 rounded-lg bg-[#080D14] border border-[#1E2D3D] flex items-center space-x-2">
+          <Activity className="w-3.5 h-3.5 text-[#00D6C9]" />
           <div>
-            <div className="text-[9px] text-slate-500 uppercase">Ingress Vectors</div>
-            <div className="text-purple-300 font-semibold">{threatNodes.length} Active</div>
+            <div className="text-[9px] text-[#94A6B8] uppercase">Ingress Vectors</div>
+            <div className="text-[#00D6C9] font-semibold">{threatNodes.length} Active</div>
           </div>
         </div>
         <div className="p-2 rounded bg-slate-950/70 border border-slate-800 flex items-center space-x-2">
