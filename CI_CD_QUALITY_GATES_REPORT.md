@@ -25,7 +25,7 @@ GitHub Actions runners have deprecated the Node.js 20 runtime for JavaScript act
 | Action Identifier | Previous Version | Upgraded Version | Runtime | Upstream Compatibility Verification |
 |-------------------|:----------------:|:----------------:|:-------:|-------------------------------------|
 | `actions/checkout` | `@v4` | **`@v5`** | Node 24 | Preserves `fetch-depth: 50` and checkout semantics |
-| `actions/setup-node` | `@v4` | **`@v5`** | Node 24 | Preserves `node-version: '20'`, caching for npm & pnpm |
+| `actions/setup-node` | `@v4` | **`@v5`** | Node 24 | Configured `node-version: '24'`, caching for npm & pnpm |
 | `actions/setup-python`| `@v5` | **`@v6`** | Node 24 | Preserves `python-version: '3.13'` |
 | `actions/upload-artifact`| `@v4` | **`@v6`** | Node 24 | Preserves `name`, `path`, and `retention-days` inputs |
 | `pnpm/action-setup` | `@v4` | **`@v5`** | Node 24 | Preserves `version: 9` |
@@ -36,13 +36,12 @@ GitHub Actions runners have deprecated the Node.js 20 runtime for JavaScript act
 - **Runner Image:** Explicitly pinned to `ubuntu-24.04` across all jobs in `ci.yml` and `android-build.yml` to prevent runner drift during upcoming platform migrations (Ubuntu 26.04).
 - **Least Privilege:** Enforced top-level `permissions: contents: read` across all workflows.
 
-### 2.3 Application Node.js 20 End-of-Life (EOL) Assessment & Recommendation
-- **Current State:** The application builds and tests currently target Node.js `20` (`node-version: '20'`).
-- **EOL Timeline & Risk:** Node.js 20 officially reached End-of-Life (EOL) in April 2026. While operational builds and lockfiles remain stable, Node 20 will no longer receive upstream security patches, critical bug fixes, or OpenSSL updates.
-- **Recommendation:**
-  1. Schedule a validation milestone to test building and running the frontend and CHRONOS under **Node.js 24 LTS**.
-  2. Test Vite, Vitest, React 19, and Tailwind CSS under Node 24 in a dedicated branch (`system1-node24-upgrade`).
-  3. Upon passing regression tests, update `package.json` engines and CI configurations to Node 24.
+### 2.3 Application Node.js 24 LTS Migration (Completed)
+- **Migration Scope:** Both `frontend` and `chronos` application build, typecheck, test, and container packaging pipelines have been migrated from Node.js 20 to Node.js 24 LTS (`v24.22.2`).
+- **Engine Enforcements:** Added `engines: { "node": "^20.19.0 || ^22.0.0 || ^24.0.0" }` in both `frontend/package.json` and `chronos/package.json`.
+- **Docker Builder Upgrade:** Updated `chronos/Dockerfile` Stage 1 to `docker.io/library/node:24-alpine AS builder`.
+- **Workflow Updates:** Configured `node-version: '24'` in `ci.yml` (`frontend-qa`, `chronos-qa`) and `android-build.yml` (`build-android-apk`).
+- **Verification & Parity:** All 221 frontend unit tests, static typechecks, production builds, and CHRONOS OWASP security audits pass with 100% parity under Node.js 24.
 
 ---
 
@@ -142,7 +141,7 @@ alembic upgrade head
 - **Result:**
   - TypeScript: 0 errors.
   - Vite WebGL Bundle: 1611 modules transformed; production assets emitted in 2.75s.
-  - Cryptographic Hash: `843b91209209a70427b54c8787b8eb1de367d34c098d8b1c04e599ec8eb167ee` verified `OK`.
+  - Cryptographic Hash: `f55b86d9b2ec3bff14433201a130f92c10f003e0d57b0806953ceb6ac8338b22` verified `OK`.
   - Security Audit: 6/6 domains passed (Zero secrets, XSS input safety, client-side network isolation, Nginx hardening, source maps disabled, live headers verified).
 
 ---

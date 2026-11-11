@@ -36,10 +36,10 @@ jobs:
         with:
           packages: 'platforms;android-34 build-tools;34.0.0 cmdline-tools;latest'
 
-      - name: Set up Node.js
+      - name: Set up Node.js 24
         uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Verify Mobile Type Checking
         run: |
