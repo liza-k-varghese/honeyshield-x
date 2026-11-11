@@ -221,9 +221,26 @@ def run_e2e_verification() -> dict[str, Any]:
                 dash_stats.get("events_processed_24h", 0))
 
     # Obtain operator session token for RBAC-protected stream inspection
+    is_staging = "8001" in API_BASE_URL or "staging" in API_BASE_URL.lower()
+    if is_staging:
+        op_user = os.getenv("HONEYSHIELD_STAGING_OPERATOR_USER", "staging_operator")
+        op_pass = os.getenv("HONEYSHIELD_STAGING_OPERATOR_PASS")
+        key_path = os.path.join(REPO_ROOT, "docker", ".staging_operator.key")
+        if not op_pass and os.path.exists(key_path):
+            try:
+                with open(key_path, "r") as f:
+                    op_pass = f.read().strip()
+            except OSError:
+                pass
+        if not op_pass:
+            op_pass = os.getenv("HONEYSHIELD_OPERATOR_PASS", "")
+    else:
+        op_user = os.getenv("HONEYSHIELD_OPERATOR_USER", "admin_chief")
+        op_pass = os.getenv("HONEYSHIELD_OPERATOR_PASS", "AdminPass123!")
+
     code_login, login_resp = http_post(
         f"{API_BASE_URL}/api/v1/auth/login",
-        {"username": "admin_chief", "password": "AdminPass123!"},
+        {"username": op_user, "password": op_pass},
         {"Content-Type": "application/json"},
     )
     operator_token = login_resp.get("token") or login_resp.get("access_token")

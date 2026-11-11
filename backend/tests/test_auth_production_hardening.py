@@ -2,6 +2,7 @@
 
 import os
 import json
+import secrets
 import pytest
 from app.auth.registry import OperatorRegistry, default_operator_registry
 from app.auth.service import AuthService
@@ -52,12 +53,13 @@ def test_production_mode_accepts_configured_operators_json():
     old_json = os.environ.get("HONEYSHIELD_OPERATORS_JSON")
     try:
         os.environ["APP_ENV"] = "production"
+        synthetic_prod_pass = f"SynthProdTestPass-{secrets.token_urlsafe(16)}!Aa1"
         os.environ["HONEYSHIELD_OPERATORS_JSON"] = json.dumps([
             {
                 "username": "prod_secops",
                 "role": "security_administrator",
                 "email": "secops@corp.internal",
-                "password": "StrongProductionSecret2026!",
+                "password": synthetic_prod_pass,
             }
         ])
 
@@ -85,12 +87,13 @@ def test_production_mode_rejects_authentication_with_development_credentials():
     old_json = os.environ.get("HONEYSHIELD_OPERATORS_JSON")
     try:
         os.environ["APP_ENV"] = "production"
+        synthetic_prod_pass = f"SynthProdTestPass-{secrets.token_urlsafe(16)}!Aa1"
         os.environ["HONEYSHIELD_OPERATORS_JSON"] = json.dumps([
             {
                 "username": "prod_secops",
                 "role": "security_administrator",
                 "email": "secops@corp.internal",
-                "password": "StrongProductionSecret2026!",
+                "password": synthetic_prod_pass,
             }
         ])
 

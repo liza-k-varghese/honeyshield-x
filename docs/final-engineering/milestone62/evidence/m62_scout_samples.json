@@ -4,44 +4,44 @@
   "trajectory": [
     {
       "elapsed_s": 0.0,
-      "progress": 0.555,
-      "x": 334.54,
-      "y": 205.79,
+      "progress": 0.608,
+      "x": 351.33,
+      "y": 214.05,
       "attached": true
     },
     {
-      "elapsed_s": 0.534,
-      "progress": 0.731,
-      "x": 390.61,
-      "y": 233.7,
+      "elapsed_s": 0.564,
+      "progress": 0.768,
+      "x": 402.74,
+      "y": 239.86,
       "attached": true
     },
     {
-      "elapsed_s": 0.888,
-      "progress": 0.795,
-      "x": 411.46,
-      "y": 244.31,
+      "elapsed_s": 0.917,
+      "progress": 0.843,
+      "x": 427.25,
+      "y": 252.43,
       "attached": true
     },
     {
-      "elapsed_s": 1.241,
-      "progress": 0.891,
-      "x": 443.19,
-      "y": 260.68,
+      "elapsed_s": 1.27,
+      "progress": 0.907,
+      "x": 448.53,
+      "y": 263.46,
       "attached": true
     },
     {
-      "elapsed_s": 1.614,
-      "progress": 0.971,
-      "x": 470.06,
-      "y": 274.75,
+      "elapsed_s": 1.623,
+      "progress": 0.976,
+      "x": 471.86,
+      "y": 275.7,
       "attached": false
     },
     {
-      "elapsed_s": 14.257,
-      "progress": 0.0,
-      "x": 170,
-      "y": 130,
+      "elapsed_s": 14.205,
+      "progress": 0.037,
+      "x": 180.5,
+      "y": 134.52,
       "attached": false
     }
   ]

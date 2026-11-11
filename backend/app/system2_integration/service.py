@@ -23,6 +23,11 @@ import time
 from typing import Any
 import uuid
 
+try:
+    import redis
+except ImportError:
+    redis = None  # type: ignore
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -89,6 +94,26 @@ class System2IntegrationService:
         self._lock = threading.Lock()
         # Bounded LRU-style cache for deduplicating event IDs: event_id -> (timestamp, response_dict)
         self._dedup_cache: OrderedDict[str, tuple[float, dict[str, Any]]] = OrderedDict()
+        self._redis_client: Any = None
+        self._init_redis()
+
+    def _init_redis(self) -> None:
+        """Initialize connection to Redis for cross-worker distributed deduplication."""
+        if redis is None:
+            return
+        try:
+            host = os.getenv("REDIS_HOST", "127.0.0.1")
+            port = int(os.getenv("REDIS_PORT", "6379"))
+            client = redis.Redis(
+                host=host,
+                port=port,
+                decode_responses=True,
+                socket_timeout=1.0,
+            )
+            client.ping()
+            self._redis_client = client
+        except Exception:
+            self._redis_client = None
 
     def verify_sensor_credentials(self, auth_header: str | None, client_ip: str) -> None:
         """Verify the System 2 dedicated sensor authentication key."""
@@ -120,13 +145,24 @@ class System2IntegrationService:
         db: Session,
     ) -> System2TelemetryIngestResponse:
         """Ingest, validate, normalize, and process a System 2 sensor event."""
-        # 1. Deduplication Gate
+        # 1. Deduplication Gate (Distributed Redis with thread-safe in-memory fallback)
         now_ts = time.time()
+        if self._redis_client is not None:
+            try:
+                cached_json = self._redis_client.get(f"hsx:system2:dedup:{event.event_id}")
+                if cached_json:
+                    logger.info("Deduplicating System 2 event via Redis: %s", event.event_id)
+                    cached_resp = json.loads(cached_json)
+                    cached_resp["status"] = "deduplicated"
+                    return System2TelemetryIngestResponse(**cached_resp)
+            except Exception as e:
+                logger.debug("Redis dedup check error: %s", e)
+
         with self._lock:
             if event.event_id in self._dedup_cache:
                 cached_time, cached_resp = self._dedup_cache[event.event_id]
                 if (now_ts - cached_time) < DEDUPLICATION_WINDOW_SECONDS:
-                    logger.info("Deduplicating System 2 event: %s", event.event_id)
+                    logger.info("Deduplicating System 2 event via local cache: %s", event.event_id)
                     cached_resp["status"] = "deduplicated"
                     return System2TelemetryIngestResponse(**cached_resp)
                 else:
@@ -294,6 +330,20 @@ class System2IntegrationService:
             "provenance": effective_provenance,
             "ingested_at": datetime.now(timezone.utc),
         }
+
+        # 8. Cache response for distributed deduplication (Redis + local fallback)
+        if self._redis_client is not None:
+            try:
+                redis_dict = dict(response_dict)
+                if isinstance(redis_dict.get("ingested_at"), datetime):
+                    redis_dict["ingested_at"] = redis_dict["ingested_at"].isoformat()
+                self._redis_client.set(
+                    f"hsx:system2:dedup:{event.event_id}",
+                    json.dumps(redis_dict),
+                    ex=int(DEDUPLICATION_WINDOW_SECONDS),
+                )
+            except Exception as e:
+                logger.debug("Redis dedup save error: %s", e)
 
         with self._lock:
             # Maintain bounded LRU
