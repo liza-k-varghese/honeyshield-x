@@ -170,7 +170,12 @@ export const TimepieceScene: React.FC<TimepieceSceneProps> = ({
             max="1"
             step="0.01"
             value={watchConfig.explodedRatio}
-            onChange={(e) => onConfigChange({ explodedRatio: parseFloat(e.target.value) })}
+            onChange={(e) => {
+              const raw = parseFloat(e.target.value);
+              const clamped = Number.isFinite(raw) ? Math.max(0, Math.min(1, raw)) : 0;
+              onConfigChange({ explodedRatio: clamped });
+            }}
+            aria-label="Adjust Exploded View Ratio"
             className="w-24 sm:w-28 accent-[#C8AA73] cursor-pointer"
           />
           <span className="text-xs font-mono text-[#AEB8BC] min-w-[32px] text-right">

@@ -161,7 +161,11 @@ export const ModernPrecisionSection: React.FC = () => {
                 max="12000"
                 step="100"
                 value={altitudeMeters}
-                onChange={(e) => setAltitudeMeters(parseFloat(e.target.value))}
+                onChange={(e) => {
+                  const raw = parseFloat(e.target.value);
+                  setAltitudeMeters(Number.isFinite(raw) ? Math.max(0, Math.min(12000, raw)) : 10000);
+                }}
+                aria-label="Adjust Altitude Above Sea Level"
                 className="w-full accent-[#C8AA73] cursor-pointer"
               />
               <span className="text-[10px] font-mono text-[#AEB8BC] block">
@@ -181,7 +185,11 @@ export const ModernPrecisionSection: React.FC = () => {
                 max="2500"
                 step="25"
                 value={velocityKmh}
-                onChange={(e) => setVelocityKmh(parseFloat(e.target.value))}
+                onChange={(e) => {
+                  const raw = parseFloat(e.target.value);
+                  setVelocityKmh(Number.isFinite(raw) ? Math.max(0, Math.min(2500, raw)) : 900);
+                }}
+                aria-label="Adjust Cruising Velocity"
                 className="w-full accent-[#C8AA73] cursor-pointer"
               />
               <span className="text-[10px] font-mono text-[#AEB8BC] block">

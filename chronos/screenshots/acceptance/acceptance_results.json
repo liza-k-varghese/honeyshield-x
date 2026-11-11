@@ -13,111 +13,111 @@
     "alpha_enabled": true
   },
   "core_web_vitals": {
-    "ttfb_ms": 0,
-    "dom_interactive_ms": 67,
-    "dom_complete_ms": 39351,
+    "ttfb_ms": 17,
+    "dom_interactive_ms": 100,
+    "dom_complete_ms": 750,
     "first_paint_ms": null,
-    "first_contentful_paint_ms": 1350,
-    "total_transferred_bytes": 430529,
-    "total_transferred_kb": 420.44
+    "first_contentful_paint_ms": 250,
+    "total_transferred_bytes": 235485,
+    "total_transferred_kb": 229.97
   },
   "transferred_assets": [
     {
-      "name": "index-DyT2sRi8.js",
+      "name": "css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+      "type": "link",
+      "size_bytes": 0,
+      "duration_ms": 33
+    },
+    {
+      "name": "vendor-icons-Cra8mrVs.js",
+      "type": "link",
+      "size_bytes": 3171,
+      "duration_ms": 50
+    },
+    {
+      "name": "index-BO88qnm5.js",
       "type": "script",
-      "size_bytes": 24981,
-      "duration_ms": 33
+      "size_bytes": 26231,
+      "duration_ms": 50
     },
     {
-      "name": "index-C5zaLgHk.css",
+      "name": "index-uDi_XX9P.css",
       "type": "link",
-      "size_bytes": 6672,
-      "duration_ms": 33
-    },
-    {
-      "name": "vendor-icons-CQiBwLeZ.js",
-      "type": "link",
-      "size_bytes": 3080,
-      "duration_ms": 33
+      "size_bytes": 6687,
+      "duration_ms": 50
     },
     {
       "name": "vendor-react-CEfoZQ0_.js",
       "type": "link",
       "size_bytes": 69396,
-      "duration_ms": 33
+      "duration_ms": 67
     },
     {
-      "name": "vendor-three-DUFScJbZ.js",
+      "name": "vendor-three-MBenChda.js",
       "type": "link",
-      "size_bytes": 128305,
-      "duration_ms": 50
-    },
-    {
-      "name": "css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
-      "type": "link",
-      "size_bytes": 300,
-      "duration_ms": 1083
+      "size_bytes": 129117,
+      "duration_ms": 83
     },
     {
       "name": "favicon.svg",
       "type": "other",
-      "size_bytes": 984,
-      "duration_ms": 1767
+      "size_bytes": 684,
+      "duration_ms": 200
     },
     {
       "name": "LDIoaomQNQcsA88c7O9yZ4KMCoOg4Ko20yw.woff2",
       "type": "other",
-      "size_bytes": 27648,
-      "duration_ms": 1983
+      "size_bytes": 27348,
+      "duration_ms": 0
+    },
+    {
+      "name": "8vIJ7ww63mVu7gt79mT7.woff2",
+      "type": "other",
+      "size_bytes": 25904,
+      "duration_ms": 0
     },
     {
       "name": "tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
       "type": "other",
-      "size_bytes": 31732,
-      "duration_ms": 2183
-    },
-    {
-      "name": "8vIJ7ww63mVu7gt79mT7.woff2",
-      "type": "other",
-      "size_bytes": 26204,
-      "duration_ms": 2367
-    },
-    {
-      "name": "8vIJ7ww63mVu7gt79mT7.woff2",
-      "type": "other",
-      "size_bytes": 26204,
-      "duration_ms": 2650
+      "size_bytes": 31432,
+      "duration_ms": 0
     },
     {
       "name": "tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
       "type": "other",
-      "size_bytes": 31732,
-      "duration_ms": 2917
+      "size_bytes": 31432,
+      "duration_ms": 0
     },
     {
       "name": "8vIJ7ww63mVu7gt79mT7.woff2",
       "type": "other",
-      "size_bytes": 26204,
-      "duration_ms": 3033
+      "size_bytes": 25904,
+      "duration_ms": 0
     },
     {
       "name": "8vIJ7ww63mVu7gt79mT7.woff2",
       "type": "other",
-      "size_bytes": 26204,
-      "duration_ms": 38201
+      "size_bytes": 25904,
+      "duration_ms": 0
+    },
+    {
+      "name": "8vIJ7ww63mVu7gt79mT7.woff2",
+      "type": "other",
+      "size_bytes": 25904,
+      "duration_ms": 0
     }
   ],
   "gpu_frame_analysis": {
     "sample_count": 180,
-    "effective_fps": 44,
-    "mean_frame_time_ms": 22.5,
+    "effective_fps": 55,
+    "mean_frame_time_ms": 18.15,
     "min_frame_time_ms": 16.67,
     "max_frame_time_ms": 50,
     "median_frame_time_ms": 16.67,
     "p95_frame_time_ms": 33.33,
-    "jitter_std_dev_ms": 8.51,
-    "dropped_frames_gt_33ms": 60,
-    "rendering_stability_percent": 67
+    "jitter_std_dev_ms": 5.06,
+    "dropped_frames_gt_33ms": 15,
+    "rendering_stability_percent": 92
   },
   "threejs_scene_metrics": {},
   "scientific_validation": {

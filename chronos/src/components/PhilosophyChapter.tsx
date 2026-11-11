@@ -60,7 +60,10 @@ export const PhilosophyChapter: React.FC = () => {
                 min="0"
                 max="100"
                 value={woundPercent}
-                onChange={(e) => setWoundPercent(parseInt(e.target.value, 10))}
+                onChange={(e) => {
+                  const raw = parseInt(e.target.value, 10);
+                  setWoundPercent(Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 100);
+                }}
                 className="w-full accent-[#C8AA73] cursor-pointer"
                 aria-label="Adjust Mainspring Tension"
               />
