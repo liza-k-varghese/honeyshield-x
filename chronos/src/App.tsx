@@ -7,6 +7,7 @@ import { MechanicalSection } from './components/MechanicalSection';
 import { ModernPrecisionSection } from './components/ModernPrecisionSection';
 import { PhilosophyChapter } from './components/PhilosophyChapter';
 import { SpecificationsModal } from './components/SpecificationsModal';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { WatchConfig } from './three/WatchModel';
 import { ChevronRight, ChevronLeft, ArrowRight } from 'lucide-react';
 
@@ -75,34 +76,36 @@ export const App: React.FC = () => {
 
       {/* Main Exhibition Stage */}
       <main id="main-content" tabIndex={-1} className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-12 outline-none">
-        {activeTab === 'origins' && (
-          <OriginsHero
-            watchConfig={watchConfig}
-            onConfigChange={handleConfigChange}
-            onOpenSpecs={() => setIsSpecsOpen(true)}
-            onSelectChapter={navigateToChapter}
-          />
-        )}
+        <ErrorBoundary fallbackTitle="Exhibition Stage Interrupted">
+          {activeTab === 'origins' && (
+            <OriginsHero
+              watchConfig={watchConfig}
+              onConfigChange={handleConfigChange}
+              onOpenSpecs={() => setIsSpecsOpen(true)}
+              onSelectChapter={navigateToChapter}
+            />
+          )}
 
-        {activeTab === 'ancient' && (
-          <AncientSection />
-        )}
+          {activeTab === 'ancient' && (
+            <AncientSection />
+          )}
 
-        {activeTab === 'mechanical' && (
-          <MechanicalSection
-            watchConfig={watchConfig}
-            onConfigChange={handleConfigChange}
-            onOpenSpecs={() => setIsSpecsOpen(true)}
-          />
-        )}
+          {activeTab === 'mechanical' && (
+            <MechanicalSection
+              watchConfig={watchConfig}
+              onConfigChange={handleConfigChange}
+              onOpenSpecs={() => setIsSpecsOpen(true)}
+            />
+          )}
 
-        {activeTab === 'modern' && (
-          <ModernPrecisionSection />
-        )}
+          {activeTab === 'modern' && (
+            <ModernPrecisionSection />
+          )}
 
-        {activeTab === 'philosophy' && (
-          <PhilosophyChapter />
-        )}
+          {activeTab === 'philosophy' && (
+            <PhilosophyChapter />
+          )}
+        </ErrorBoundary>
 
         {/* Narrative Chapter Breadcrumb & Progression Navigation */}
         <nav aria-label="Chapter Progression Navigation" className="pt-8 border-t border-[rgba(200,170,115,0.2)] flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs">

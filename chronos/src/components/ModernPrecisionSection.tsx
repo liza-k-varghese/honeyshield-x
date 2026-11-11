@@ -121,6 +121,34 @@ export const ModernPrecisionSection: React.FC = () => {
         {/* Sliders and Equation Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div className="space-y-5">
+            {/* Quick Scenario Presets */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-mono text-[#AEB8BC] uppercase block w-full sm:w-auto">
+                Scenario Presets:
+              </span>
+              {[
+                { label: 'Sea Level At Rest', alt: 0, vel: 0 },
+                { label: 'High-Speed Rail', alt: 80, vel: 320 },
+                { label: 'Commercial Jet', alt: 11000, vel: 900 },
+                { label: 'Mt. Everest Summit', alt: 8848, vel: 0 },
+              ].map((p) => (
+                <button
+                  key={p.label}
+                  onClick={() => {
+                    setAltitudeMeters(p.alt);
+                    setVelocityKmh(p.vel);
+                  }}
+                  className={`px-2.5 py-1 text-[11px] font-mono rounded transition-colors ${
+                    altitudeMeters === p.alt && velocityKmh === p.vel
+                      ? 'bg-[#C8AA73] text-[#0D1117] font-bold'
+                      : 'bg-[#0D1117] text-[#AEB8BC] hover:text-[#F0E9DD] border border-[rgba(200,170,115,0.2)]'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+
             {/* Altitude Slider */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs font-mono">

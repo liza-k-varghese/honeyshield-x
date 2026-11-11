@@ -1,0 +1,95 @@
+{
+  "status": "PASS",
+  "environment": "Parrot OS Linux / Intel Iris Xe Graphics (Alder Lake-UP3 GT2)",
+  "target": "http://127.0.0.1:5175/",
+  "webgl": {
+    "context": "WebGL 2.0",
+    "renderer": "Mozilla",
+    "vendor": "Mozilla",
+    "maxTextureSize": 2048,
+    "dpr_capped": 1.5
+  },
+  "cwv": {
+    "ttfb_ms": 0,
+    "dom_interactive_ms": 67,
+    "dom_complete_ms": 583,
+    "first_paint_ms": null,
+    "first_contentful_paint_ms": 167,
+    "total_transferred_kb": 228.7,
+    "asset_count": 14
+  },
+  "gpu_benchmarks": {
+    "chapter_00_origins": {
+      "chapter": "00_origins_hero",
+      "samples": 180,
+      "effective_fps": 56,
+      "mean_frame_time_ms": 17.87,
+      "min_frame_time_ms": 16.67,
+      "max_frame_time_ms": 33.33,
+      "median_frame_time_ms": 16.67,
+      "p95_frame_time_ms": 33.33,
+      "jitter_std_dev_ms": 4.31,
+      "dropped_gt_33ms": 13,
+      "stability_percent": 93
+    },
+    "chapter_01_ancient": {
+      "chapter": "01_ancient_timeline",
+      "samples": 180,
+      "effective_fps": 58,
+      "mean_frame_time_ms": 17.13,
+      "min_frame_time_ms": 16.67,
+      "max_frame_time_ms": 33.33,
+      "median_frame_time_ms": 16.67,
+      "p95_frame_time_ms": 16.67,
+      "jitter_std_dev_ms": 2.74,
+      "dropped_gt_33ms": 5,
+      "stability_percent": 97
+    },
+    "chapter_02_mechanical": {
+      "chapter": "02_mechanical_calibre_ch01",
+      "samples": 180,
+      "effective_fps": 40,
+      "mean_frame_time_ms": 24.72,
+      "min_frame_time_ms": 16.67,
+      "max_frame_time_ms": 50,
+      "median_frame_time_ms": 16.67,
+      "p95_frame_time_ms": 33.33,
+      "jitter_std_dev_ms": 8.87,
+      "dropped_gt_33ms": 84,
+      "stability_percent": 53
+    }
+  },
+  "scientific": {
+    "hafele_keating_grav_gain_us": 0.094,
+    "hafele_keating_vel_loss_us": 0.03,
+    "hafele_keating_net_us": 0.064,
+    "gps_theoretical_net_us": 183.2,
+    "frequency_28800vph_equals_4hz": true,
+    "second_law_entropy": "\u0394S_universe \u2265 0"
+  },
+  "accessibility_interactions": {
+    "has_skip_link": true,
+    "has_semantic_header": true,
+    "has_semantic_main": true,
+    "has_semantic_nav": true,
+    "has_semantic_footer": true,
+    "modal_opened": true,
+    "modal_title": "Calibre CH-01 Flying Tourbillon",
+    "has_close_button": false,
+    "keyboard_navigation_active": true
+  },
+  "screenshots": [
+    "phase5_dossier_modal.png",
+    "phase5_1920_desktop_fhd.png",
+    "phase5_1440_desktop_std.png",
+    "phase5_1024_tablet_landscape.png",
+    "phase5_768_tablet_portrait.png",
+    "phase5_390_mobile_portrait.png",
+    "phase5_360_small_mobile.png",
+    "phase5_chapter_00_origins.png",
+    "phase5_chapter_01_ancient.png",
+    "phase5_chapter_02_mechanical.png",
+    "phase5_chapter_03_modern.png",
+    "phase5_chapter_04_philosophy.png"
+  ]
+}

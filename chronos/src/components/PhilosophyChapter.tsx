@@ -1,7 +1,12 @@
-import React from 'react';
-import { Orbit, Compass, Hourglass, Zap, Shield, Sparkles, Clock, BookOpen } from 'lucide-react';
+import React, { useState } from 'react';
+import { Orbit, Compass, Hourglass, Zap, Shield, Sparkles, Clock, BookOpen, RefreshCw } from 'lucide-react';
 
 export const PhilosophyChapter: React.FC = () => {
+  const [woundPercent, setWoundPercent] = useState(82);
+
+  const energyJoules = (woundPercent * 0.045).toFixed(2);
+  const hoursRemaining = ((woundPercent / 100) * 72).toFixed(1);
+
   return (
     <div className="space-y-12 animate-fadeIn max-w-5xl mx-auto">
       {/* Chapter Header */}
@@ -36,12 +41,47 @@ export const PhilosophyChapter: React.FC = () => {
             moves according to the same equations whether run forward or backward. Only thermodynamics introduces an
             irreversible direction:
           </p>
-          <div className="bg-[#1C2730] p-4 rounded border border-[rgba(200,170,115,0.25)] font-mono text-xs space-y-1 blueprint-frame">
-            <span className="text-[#C8AA73] block text-[10px] uppercase">Second Law of Thermodynamics</span>
-            <div className="text-lg text-[#F0E9DD] font-bold">ΔS_universe ≥ 0</div>
-            <p className="text-[11px] text-[#AEB8BC] mt-1">
-              Entropy never decreases in an isolated system. The arrow of time is the inevitable dispersal of energy.
-            </p>
+          <div className="bg-[#1C2730] p-4 sm:p-5 rounded border border-[rgba(200,170,115,0.25)] font-mono text-xs space-y-3 blueprint-frame">
+            <div className="flex items-center justify-between border-b border-[rgba(200,170,115,0.2)] pb-2">
+              <span className="text-[#C8AA73] text-[10px] uppercase font-bold">
+                Second Law of Thermodynamics
+              </span>
+              <div className="text-base text-[#F0E9DD] font-bold">ΔS_universe ≥ 0</div>
+            </div>
+
+            {/* Interactive Local Entropy Defiance Bar */}
+            <div className="space-y-1.5 pt-1">
+              <div className="flex justify-between text-[11px]">
+                <span className="text-[#AEB8BC]">Local Ordered State (Coiled Mainspring):</span>
+                <span className="text-[#C8AA73] font-bold">{woundPercent}% Tension</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={woundPercent}
+                onChange={(e) => setWoundPercent(parseInt(e.target.value, 10))}
+                className="w-full accent-[#C8AA73] cursor-pointer"
+                aria-label="Adjust Mainspring Tension"
+              />
+              <div className="flex justify-between text-[10px] text-[#AEB8BC]">
+                <span>Stored Energy: <strong className="text-[#F0E9DD]">{energyJoules} J</strong></span>
+                <span>Isochronous Autonomy: <strong className="text-[#C8AA73]">{hoursRemaining} Hours</strong></span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-[10px] text-[#AEB8BC]">
+                {woundPercent > 10 ? 'Channels entropy into disciplined 4.0 Hz ticks.' : 'Mainspring depleted; system in thermal equilibrium.'}
+              </span>
+              <button
+                onClick={() => setWoundPercent((prev) => Math.min(100, prev + 25))}
+                className="px-2 py-1 text-[10px] bg-[rgba(200,170,115,0.15)] text-[#C8AA73] border border-[rgba(200,170,115,0.3)] rounded hover:bg-[#C8AA73] hover:text-[#0D1117] transition-colors flex items-center gap-1"
+              >
+                <RefreshCw className="w-3 h-3" />
+                <span>Wind (+25%)</span>
+              </button>
+            </div>
           </div>
           <p className="text-xs sm:text-sm text-[#AEB8BC] leading-relaxed">
             A mechanical clock is a remarkable local defiance of disorder: using energy stored in a coiled mainspring,

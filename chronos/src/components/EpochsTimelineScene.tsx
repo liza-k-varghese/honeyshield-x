@@ -4,10 +4,19 @@ import { HOROLOGICAL_EPOCHS, EpochItem } from '../three/TimelineSpirals';
 import { SceneContainer } from './common/SceneContainer';
 import { ChevronRight, ChevronLeft, Orbit } from 'lucide-react';
 
-export const EpochsTimelineScene: React.FC = () => {
+interface EpochsTimelineSceneProps {
+  activeIdx?: number;
+  onSelectIdx?: (idx: number) => void;
+}
+
+export const EpochsTimelineScene: React.FC<EpochsTimelineSceneProps> = ({
+  activeIdx: controlledIdx,
+  onSelectIdx,
+}) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<EpochsEngine | null>(null);
-  const [activeIdx, setActiveIdx] = useState(2); // Default to Harrison H4 (1761)
+  const [internalIdx, setInternalIdx] = useState(0); // Default to Ancient 1500 BCE
+  const activeIdx = controlledIdx !== undefined ? controlledIdx : internalIdx;
   const selectedEpoch = HOROLOGICAL_EPOCHS[activeIdx];
 
   // Initialize EpochsEngine
@@ -16,7 +25,7 @@ export const EpochsTimelineScene: React.FC = () => {
 
     const engine = new EpochsEngine();
     engine.mount(mountRef.current);
-    engine.focusEpoch(HOROLOGICAL_EPOCHS[2]);
+    engine.focusEpoch(HOROLOGICAL_EPOCHS[activeIdx]);
     engineRef.current = engine;
 
     return () => {
@@ -25,13 +34,23 @@ export const EpochsTimelineScene: React.FC = () => {
     };
   }, []);
 
+  // Sync external index changes
+  useEffect(() => {
+    if (engineRef.current) {
+      engineRef.current.focusEpoch(HOROLOGICAL_EPOCHS[activeIdx]);
+    }
+  }, [activeIdx]);
+
   const handleSelectEpoch = useCallback((idx: number) => {
-    setActiveIdx(idx);
+    setInternalIdx(idx);
+    if (onSelectIdx) {
+      onSelectIdx(idx);
+    }
     const epoch = HOROLOGICAL_EPOCHS[idx];
     if (engineRef.current) {
       engineRef.current.focusEpoch(epoch);
     }
-  }, []);
+  }, [onSelectIdx]);
 
   const handleNext = () => {
     const nextIdx = (activeIdx + 1) % HOROLOGICAL_EPOCHS.length;

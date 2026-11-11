@@ -24,6 +24,9 @@ export const SpecificationsModal: React.FC<SpecificationsModalProps> = ({ isOpen
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dossier-modal-title"
     >
       <div
         className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0D1117] border border-[rgba(200,170,115,0.4)] rounded-lg shadow-2xl p-6 sm:p-8 space-y-6 blueprint-frame"
@@ -37,7 +40,7 @@ export const SpecificationsModal: React.FC<SpecificationsModalProps> = ({ isOpen
               <span className="text-[10px] font-mono tracking-widest text-[#C8AA73] uppercase block">
                 Haute Horlogerie Technical Dossier
               </span>
-              <h3 className="font-cinzel text-lg sm:text-xl font-bold text-[#F0E9DD] tracking-wide">
+              <h3 id="dossier-modal-title" className="font-cinzel text-lg sm:text-xl font-bold text-[#F0E9DD] tracking-wide">
                 Calibre CH-01 Flying Tourbillon
               </h3>
             </div>

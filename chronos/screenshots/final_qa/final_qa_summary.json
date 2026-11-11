@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "url": "http://127.0.0.1:5175/",
+  "performance_metrics": {
+    "domInteractive": 67,
+    "domComplete": 2333,
+    "loadEventEnd": 2333,
+    "transferSize": 1441
+  },
+  "interaction_latency_ms": {
+    "tab_switching": {
+      "ancient": 0,
+      "mechanical": 0,
+      "modern": 0,
+      "philosophy": 0,
+      "origins": 0
+    },
+    "dossier_modal": {
+      "open_ms": 0,
+      "close_ms": 0
+    }
+  },
+  "webgl_metrics": {
+    "measured_fps": 24
+  },
+  "screenshots": {
+    "00_origins": "/home/liza/HoneyShield-X/chronos/screenshots/final_qa/final_00_origins.png",
+    "01_ancient": "/home/liza/HoneyShield-X/chronos/screenshots/final_qa/final_01_ancient.png",
+    "02_mechanical": "/home/liza/HoneyShield-X/chronos/screenshots/final_qa/final_02_mechanical.png",
+    "03_modern": "/home/liza/HoneyShield-X/chronos/screenshots/final_qa/final_03_modern.png",
+    "04_philosophy": "/home/liza/HoneyShield-X/chronos/screenshots/final_qa/final_04_philosophy.png",
+    "dossier_modal": "/home/liza/HoneyShield-X/chronos/screenshots/final_qa/final_dossier_modal.png",
+    "1920_desktop": "/home/liza/HoneyShield-X/chronos/screenshots/final_qa/final_1920_desktop.png",
+    "1024_tablet_landscape": "/home/liza/HoneyShield-X/chronos/screenshots/final_qa/final_1024_tablet_landscape.png",
+    "768_tablet_portrait": "/home/liza/HoneyShield-X/chronos/screenshots/final_qa/final_768_tablet_portrait.png",
+    "390_mobile_portrait": "/home/liza/HoneyShield-X/chronos/screenshots/final_qa/final_390_mobile_portrait.png",
+    "360_small_mobile": "/home/liza/HoneyShield-X/chronos/screenshots/final_qa/final_360_small_mobile.png"
+  }
+}

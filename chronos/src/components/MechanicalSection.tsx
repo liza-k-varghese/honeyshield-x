@@ -72,37 +72,57 @@ export const MechanicalSection: React.FC<MechanicalSectionProps> = ({
 
         {/* 4 Architectural Tier Decomposition Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-          <div className="bg-[#1C2730] p-4 rounded border border-[rgba(200,170,115,0.2)] blueprint-frame">
-            <span className="text-[10px] font-mono text-[#C8AA73] uppercase block">Tier 1 • Frontage</span>
-            <h4 className="font-cinzel text-sm font-bold text-[#F0E9DD] mt-1">Stepped Bezel & Glass</h4>
-            <p className="text-xs text-[#AEB8BC] mt-1.5 leading-relaxed">
-              Antique gold fluted bezel securing a 1.2mm domed anti-reflective sapphire crystal preventing chromatic distortion.
-            </p>
-          </div>
-
-          <div className="bg-[#1C2730] p-4 rounded border border-[rgba(200,170,115,0.2)] blueprint-frame">
-            <span className="text-[10px] font-mono text-[#C8AA73] uppercase block">Tier 2 • Display</span>
-            <h4 className="font-cinzel text-sm font-bold text-[#F0E9DD] mt-1">Dial & Dauphine Hands</h4>
-            <p className="text-xs text-[#AEB8BC] mt-1.5 leading-relaxed">
-              Skeletonized chapter ring with warm ivory luminescent inserts, polished bevels, and faceted gold hour/minute hands.
-            </p>
-          </div>
-
-          <div className="bg-[#1C2730] p-4 rounded border border-[rgba(200,170,115,0.2)] blueprint-frame">
-            <span className="text-[10px] font-mono text-[#C8AA73] uppercase block">Tier 3 • Kinetic Core</span>
-            <h4 className="font-cinzel text-sm font-bold text-[#F0E9DD] mt-1">Gear Train & Tourbillon</h4>
-            <p className="text-xs text-[#AEB8BC] mt-1.5 leading-relaxed">
-              Center wheel, third wheel, fourth wheel, and 60-second flying tourbillon carriage rotating on 34 synthetic ruby bearings.
-            </p>
-          </div>
-
-          <div className="bg-[#1C2730] p-4 rounded border border-[rgba(200,170,115,0.2)] blueprint-frame">
-            <span className="text-[10px] font-mono text-[#C8AA73] uppercase block">Tier 4 • Potential Energy</span>
-            <h4 className="font-cinzel text-sm font-bold text-[#F0E9DD] mt-1">Twin Barrels & 22K Rotor</h4>
-            <p className="text-xs text-[#AEB8BC] mt-1.5 leading-relaxed">
-              Dual high-torque mainspring barrels delivering 72 hours of linear power, wound by an engraved guilloché oscillating mass.
-            </p>
-          </div>
+          {[
+            {
+              tier: 'Tier 1 • Frontage',
+              title: 'Stepped Bezel & Glass',
+              desc: 'Antique gold fluted bezel securing a 1.2mm domed anti-reflective sapphire crystal preventing chromatic distortion.',
+              ratio: 0.25,
+            },
+            {
+              tier: 'Tier 2 • Display',
+              title: 'Dial & Dauphine Hands',
+              desc: 'Skeletonized chapter ring with warm ivory luminescent inserts, polished bevels, and faceted gold hour/minute hands.',
+              ratio: 0.5,
+            },
+            {
+              tier: 'Tier 3 • Kinetic Core',
+              title: 'Gear Train & Tourbillon',
+              desc: 'Center wheel, third wheel, fourth wheel, and 60-second flying tourbillon carriage rotating on 34 synthetic ruby bearings.',
+              ratio: 0.75,
+            },
+            {
+              tier: 'Tier 4 • Potential Energy',
+              title: 'Twin Barrels & 22K Rotor',
+              desc: 'Dual high-torque mainspring barrels delivering 72 hours of linear power, wound by an engraved guilloché oscillating mass.',
+              ratio: 1.0,
+            },
+          ].map((item) => (
+            <button
+              key={item.tier}
+              onClick={() => onConfigChange({ explodedRatio: item.ratio })}
+              className="bg-[#1C2730] p-4 rounded border text-left transition-all blueprint-frame hover:border-[#C8AA73] hover:bg-[#24323D] group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA73]"
+              style={{
+                borderColor:
+                  Math.abs(watchConfig.explodedRatio - item.ratio) < 0.15
+                    ? '#C8AA73'
+                    : 'rgba(200,170,115,0.2)',
+              }}
+            >
+              <span className="text-[10px] font-mono text-[#C8AA73] uppercase block group-hover:text-[#E6D2B0]">
+                {item.tier}
+              </span>
+              <h4 className="font-cinzel text-sm font-bold text-[#F0E9DD] mt-1 group-hover:text-[#C8AA73] transition-colors">
+                {item.title}
+              </h4>
+              <p className="text-xs text-[#AEB8BC] mt-1.5 leading-relaxed font-sans">
+                {item.desc}
+              </p>
+              <span className="text-[10px] font-mono text-[#C8AA73]/70 mt-2 block">
+                Click to separate to {Math.round(item.ratio * 100)}% →
+              </span>
+            </button>
+          ))}
         </div>
       </section>
 

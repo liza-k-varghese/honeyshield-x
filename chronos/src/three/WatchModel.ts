@@ -284,15 +284,19 @@ export class WatchModel {
     const spoke1 = new THREE.Mesh(spoke1Geom, ChronosMaterials.antiqueGold('polished'));
     this.balanceWheel.add(spoke1);
 
-    // Gold Weight Screws around balance rim
+    // Gold Weight Screws around balance rim (Instanced)
+    const screwGeom = new THREE.CylinderGeometry(0.03, 0.03, 0.06, 8);
+    const screwsInstanced = new THREE.InstancedMesh(screwGeom, ChronosMaterials.warmIvory(true), 12);
+    const dummyScrew = new THREE.Object3D();
     for (let i = 0; i < 12; i++) {
-      const screwGeom = new THREE.CylinderGeometry(0.03, 0.03, 0.06, 8);
-      const screw = new THREE.Mesh(screwGeom, ChronosMaterials.warmIvory(true));
       const ang = (i / 12) * Math.PI * 2;
-      screw.position.set(Math.cos(ang) * 0.62, Math.sin(ang) * 0.62, 0);
-      screw.rotation.z = ang;
-      this.balanceWheel.add(screw);
+      dummyScrew.position.set(Math.cos(ang) * 0.62, Math.sin(ang) * 0.62, 0);
+      dummyScrew.rotation.set(0, 0, ang);
+      dummyScrew.updateMatrix();
+      screwsInstanced.setMatrixAt(i, dummyScrew.matrix);
     }
+    screwsInstanced.instanceMatrix.needsUpdate = true;
+    this.balanceWheel.add(screwsInstanced);
 
     // Hairspring Spiral Representation
     const springCurves: THREE.Vector3[] = [];
@@ -403,42 +407,50 @@ export class WatchModel {
     innerRail.position.z = 0.09;
     this.layerDial.add(innerRail);
 
-    // 12 Applied Faceted Hour Markers in Antique Gold + Warm Ivory Infill
+    // 12 Applied Faceted Hour Markers (Shared Geometries)
+    const quarterMarkerGeom = new THREE.BoxGeometry(0.12, 0.38, 0.06);
+    const quarterLumeGeom = new THREE.BoxGeometry(0.06, 0.266, 0.07);
+    const stdMarkerGeom = new THREE.BoxGeometry(0.07, 0.28, 0.06);
+    const stdLumeGeom = new THREE.BoxGeometry(0.035, 0.196, 0.07);
+
     for (let i = 0; i < 12; i++) {
       const angle = (i / 12) * Math.PI * 2;
       // Skip 6 o'clock to keep tourbillon aperture clear
       if (i === 6) continue;
 
       const isQuarter = i % 3 === 0;
-      const markerWidth = isQuarter ? 0.12 : 0.07;
-      const markerLength = isQuarter ? 0.38 : 0.28;
+      const markerGeom = isQuarter ? quarterMarkerGeom : stdMarkerGeom;
+      const lumeGeom = isQuarter ? quarterLumeGeom : stdLumeGeom;
 
-      const markerGeom = new THREE.BoxGeometry(markerWidth, markerLength, 0.06);
       const marker = new THREE.Mesh(markerGeom, ChronosMaterials.antiqueGold('polished'));
-
       const r = 1.92;
       marker.position.set(Math.sin(angle) * r, Math.cos(angle) * r, 0.11);
       marker.rotation.z = -angle;
       this.layerDial.add(marker);
 
       // Warm Ivory luminous insert
-      const lumeGeom = new THREE.BoxGeometry(markerWidth * 0.5, markerLength * 0.7, 0.07);
       const lume = new THREE.Mesh(lumeGeom, ChronosMaterials.warmIvory(true));
       lume.position.set(Math.sin(angle) * r, Math.cos(angle) * r, 0.12);
       lume.rotation.z = -angle;
       this.layerDial.add(lume);
     }
 
-    // Minute Hash Marks (60 marks)
+    // Minute Hash Marks (48 marks Instanced)
+    const hashGeom = new THREE.BoxGeometry(0.02, 0.1, 0.02);
+    const hashesInstanced = new THREE.InstancedMesh(hashGeom, ChronosMaterials.warmIvory(false), 48);
+    const dummyHash = new THREE.Object3D();
+    let hashIdx = 0;
+
     for (let m = 0; m < 60; m++) {
       if (m % 5 === 0) continue; // Skip hour positions
       const angle = (m / 60) * Math.PI * 2;
-      const hashGeom = new THREE.BoxGeometry(0.02, 0.1, 0.02);
-      const hash = new THREE.Mesh(hashGeom, ChronosMaterials.warmIvory(false));
-      hash.position.set(Math.sin(angle) * 2.1, Math.cos(angle) * 2.1, 0.09);
-      hash.rotation.z = -angle;
-      this.layerDial.add(hash);
+      dummyHash.position.set(Math.sin(angle) * 2.1, Math.cos(angle) * 2.1, 0.09);
+      dummyHash.rotation.set(0, 0, -angle);
+      dummyHash.updateMatrix();
+      hashesInstanced.setMatrixAt(hashIdx++, dummyHash.matrix);
     }
+    hashesInstanced.instanceMatrix.needsUpdate = true;
+    this.layerDial.add(hashesInstanced);
 
     // Top Sub-dial at 12 o'clock (Chronograph 30-min counter)
     const subDialTopGeom = new THREE.RingGeometry(0.3, 0.65, 32);
@@ -526,15 +538,19 @@ export class WatchModel {
     const innerBezel = new THREE.Mesh(innerBezelGeom, ChronosMaterials.antiqueGold('brushed'));
     bezelGroup.add(innerBezel);
 
-    // 60 Fluted notches around bezel
+    // 60 Fluted notches around bezel (Instanced)
+    const flutingGeom = new THREE.BoxGeometry(0.03, 0.12, 0.04);
+    const flutingInstanced = new THREE.InstancedMesh(flutingGeom, ChronosMaterials.antiqueGold('polished'), 60);
+    const dummyFlute = new THREE.Object3D();
     for (let f = 0; f < 60; f++) {
-      const flutingGeom = new THREE.BoxGeometry(0.03, 0.12, 0.04);
-      const fluting = new THREE.Mesh(flutingGeom, ChronosMaterials.antiqueGold('polished'));
       const ang = (f / 60) * Math.PI * 2;
-      fluting.position.set(Math.cos(ang) * 2.25, Math.sin(ang) * 2.25, 0.05);
-      fluting.rotation.z = ang;
-      bezelGroup.add(fluting);
+      dummyFlute.position.set(Math.cos(ang) * 2.25, Math.sin(ang) * 2.25, 0.05);
+      dummyFlute.rotation.set(0, 0, ang);
+      dummyFlute.updateMatrix();
+      flutingInstanced.setMatrixAt(f, dummyFlute.matrix);
     }
+    flutingInstanced.instanceMatrix.needsUpdate = true;
+    bezelGroup.add(flutingInstanced);
 
     this.layerBezel.add(bezelGroup);
     this.caseMeshes.push(outerBezel);
@@ -550,25 +566,95 @@ export class WatchModel {
 
   // --- 9. Straps and Deployment Clasp ---
   private buildStraps(): void {
-    // Top Strap Segment
-    const topStrapGeom = new THREE.BoxGeometry(2.1, 3.2, 0.35);
-    const topStrap = new THREE.Mesh(topStrapGeom, ChronosMaterials.obsidianBlack('matte'));
-    topStrap.position.set(0, 3.6, -0.15);
-    this.layerCase.add(topStrap);
-    this.strapMeshes.push(topStrap);
+    const strapMat = ChronosMaterials.obsidianBlack('matte');
+    const stitchMat = ChronosMaterials.warmIvory(false);
 
-    // Bottom Strap Segment
-    const botStrapGeom = new THREE.BoxGeometry(2.1, 3.2, 0.35);
-    const botStrap = new THREE.Mesh(botStrapGeom, ChronosMaterials.obsidianBlack('matte'));
-    botStrap.position.set(0, -3.6, -0.15);
-    this.layerCase.add(botStrap);
-    this.strapMeshes.push(botStrap);
+    // --- Top Strap (Curving downward around wrist) ---
+    // Segment 1 (Lug Transition)
+    const topSeg1Geom = new THREE.BoxGeometry(2.08, 1.4, 0.3);
+    const topSeg1 = new THREE.Mesh(topSeg1Geom, strapMat);
+    topSeg1.position.set(0, 2.7, -0.22);
+    topSeg1.rotation.x = -0.15;
+    this.layerCase.add(topSeg1);
+    this.strapMeshes.push(topSeg1);
+
+    // Segment 2 (Mid-curve)
+    const topSeg2Geom = new THREE.BoxGeometry(2.04, 1.6, 0.28);
+    const topSeg2 = new THREE.Mesh(topSeg2Geom, strapMat);
+    topSeg2.position.set(0, 4.0, -0.6);
+    topSeg2.rotation.x = -0.42;
+    this.layerCase.add(topSeg2);
+    this.strapMeshes.push(topSeg2);
+
+    // Segment 3 (Curved tail)
+    const topSeg3Geom = new THREE.BoxGeometry(2.0, 1.4, 0.26);
+    const topSeg3 = new THREE.Mesh(topSeg3Geom, strapMat);
+    topSeg3.position.set(0, 5.05, -1.35);
+    topSeg3.rotation.x = -0.75;
+    this.layerCase.add(topSeg3);
+    this.strapMeshes.push(topSeg3);
+
+    // Top Strap Stitches (Left & Right margins)
+    [-0.92, 0.92].forEach((xPos) => {
+      const stitchLineGeom = new THREE.BoxGeometry(0.04, 1.35, 0.04);
+      const stitch = new THREE.Mesh(stitchLineGeom, stitchMat);
+      stitch.position.set(xPos, 2.7, -0.06);
+      stitch.rotation.x = -0.15;
+      this.layerCase.add(stitch);
+    });
+
+    // --- Bottom Strap (Curving downward to Clasp) ---
+    // Segment 1 (Lug Transition)
+    const botSeg1Geom = new THREE.BoxGeometry(2.08, 1.4, 0.3);
+    const botSeg1 = new THREE.Mesh(botSeg1Geom, strapMat);
+    botSeg1.position.set(0, -2.7, -0.22);
+    botSeg1.rotation.x = 0.15;
+    this.layerCase.add(botSeg1);
+    this.strapMeshes.push(botSeg1);
+
+    // Segment 2 (Mid-curve)
+    const botSeg2Geom = new THREE.BoxGeometry(2.04, 1.6, 0.28);
+    const botSeg2 = new THREE.Mesh(botSeg2Geom, strapMat);
+    botSeg2.position.set(0, -4.0, -0.6);
+    botSeg2.rotation.x = 0.42;
+    this.layerCase.add(botSeg2);
+    this.strapMeshes.push(botSeg2);
+
+    // Segment 3 (Clasp Mount)
+    const botSeg3Geom = new THREE.BoxGeometry(2.0, 1.3, 0.26);
+    const botSeg3 = new THREE.Mesh(botSeg3Geom, strapMat);
+    botSeg3.position.set(0, -5.0, -1.3);
+    botSeg3.rotation.x = 0.72;
+    this.layerCase.add(botSeg3);
+    this.strapMeshes.push(botSeg3);
+
+    // Bottom Strap Stitches
+    [-0.92, 0.92].forEach((xPos) => {
+      const stitchLineGeom = new THREE.BoxGeometry(0.04, 1.35, 0.04);
+      const stitch = new THREE.Mesh(stitchLineGeom, stitchMat);
+      stitch.position.set(xPos, -2.7, -0.06);
+      stitch.rotation.x = 0.15;
+      this.layerCase.add(stitch);
+    });
 
     // Antique Gold Deployment Clasp
-    const claspGeom = new THREE.BoxGeometry(2.15, 0.6, 0.45);
-    const clasp = new THREE.Mesh(claspGeom, ChronosMaterials.antiqueGold('polished'));
-    clasp.position.set(0, -4.8, -0.15);
-    this.layerCase.add(clasp);
+    const claspGroup = new THREE.Group();
+    claspGroup.position.set(0, -5.4, -1.55);
+    claspGroup.rotation.x = 0.75;
+
+    const claspBodyGeom = new THREE.BoxGeometry(2.15, 0.65, 0.4);
+    const claspBody = new THREE.Mesh(claspBodyGeom, ChronosMaterials.antiqueGold('polished'));
+    claspGroup.add(claspBody);
+
+    // Clasp Release Pushers
+    [-1.15, 1.15].forEach((px) => {
+      const pusherGeom = new THREE.BoxGeometry(0.18, 0.35, 0.25);
+      const pusher = new THREE.Mesh(pusherGeom, ChronosMaterials.antiqueGold('brushed'));
+      pusher.position.set(px, 0, 0);
+      claspGroup.add(pusher);
+    });
+
+    this.layerCase.add(claspGroup);
   }
 
   // --- Helper: Spoked Gear Wheel Generator ---
@@ -592,30 +678,34 @@ export class WatchModel {
     const rim = new THREE.Mesh(rimGeom, material);
     gearGroup.add(rim);
 
-    // 4 spokes
+    // 4 spokes (Shared geometry)
+    const spokeGeom = new THREE.BoxGeometry(thickness * 0.8, radius * 0.85, thickness);
     for (let s = 0; s < 4; s++) {
-      const spokeGeom = new THREE.BoxGeometry(thickness * 0.8, radius * 0.85, thickness);
       const spoke = new THREE.Mesh(spokeGeom, material);
       spoke.rotation.z = (s * Math.PI) / 2;
       gearGroup.add(spoke);
     }
 
-    // Gear Teeth
+    // Gear Teeth (Instanced — Single draw call for all teeth on this gear)
     const toothLength = radius * 0.18;
     const toothWidth = (Math.PI * 2 * radius) / (teethCount * 2.2);
+    const toothGeom = new THREE.BoxGeometry(toothWidth, toothLength, thickness);
+    const teethInstanced = new THREE.InstancedMesh(toothGeom, material, teethCount);
+    const dummyTooth = new THREE.Object3D();
 
     for (let i = 0; i < teethCount; i++) {
       const angle = (i / teethCount) * Math.PI * 2;
-      const toothGeom = new THREE.BoxGeometry(toothWidth, toothLength, thickness);
-      const tooth = new THREE.Mesh(toothGeom, material);
-      tooth.position.set(
+      dummyTooth.position.set(
         Math.cos(angle) * (radius * 0.85 + toothLength * 0.45),
         Math.sin(angle) * (radius * 0.85 + toothLength * 0.45),
         0
       );
-      tooth.rotation.z = angle + (angledTeeth ? 0.35 : 0);
-      gearGroup.add(tooth);
+      dummyTooth.rotation.set(0, 0, angle + (angledTeeth ? 0.35 : 0));
+      dummyTooth.updateMatrix();
+      teethInstanced.setMatrixAt(i, dummyTooth.matrix);
     }
+    teethInstanced.instanceMatrix.needsUpdate = true;
+    gearGroup.add(teethInstanced);
 
     // Merge into single container mesh
     const dummyMesh = new THREE.Mesh();
