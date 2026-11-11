@@ -124,11 +124,12 @@ def test_staging_container():
     # 5. Container Restart and Recovery
     print("\n[TEST 5] Testing Container Restart & Recovery...")
     try:
-        import time
+        import time, os
+        c_name = os.getenv("CONTAINER_NAME", "chronos_staging_https")
         # Graceful stop and start to permit socket teardown under rootless pasta networking
-        subprocess.run(["podman", "stop", "-t", "2", "chronos_staging_https"], capture_output=True, text=True)
+        subprocess.run(["podman", "stop", "-t", "2", c_name], capture_output=True, text=True)
         time.sleep(1.0)
-        res = subprocess.run(["podman", "start", "chronos_staging_https"], capture_output=True, text=True)
+        res = subprocess.run(["podman", "start", c_name], capture_output=True, text=True)
         assert res.returncode == 0, f"podman start failed: {res.stderr}"
         time.sleep(2.0)
         req = urllib.request.Request(f"{HTTPS_URL}/", method="GET")

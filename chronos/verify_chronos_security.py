@@ -203,8 +203,10 @@ def check_production_debug_and_build() -> dict:
         "evidence": "Source maps disabled (sourcemap: false), zero .map files in dist/, production build cleanly minified"
     }
 
-def check_live_http_headers(url: str = "http://127.0.0.1:5175/") -> dict:
-    """Inspect HTTP response headers from local preview server."""
+def check_live_http_headers(url: str = None) -> dict:
+    """Inspect HTTP response headers from local preview or production container."""
+    if url is None:
+        url = os.getenv("CHRONOS_URL", "http://127.0.0.1:5175/")
     findings = []
     headers_found = {}
     try:
