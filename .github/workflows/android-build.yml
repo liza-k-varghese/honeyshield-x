@@ -2,12 +2,12 @@ name: HoneyShield X Android Build & Package Validation
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, 'fix/android-build-ci' ]
     paths:
       - 'mobile/**'
       - '.github/workflows/android-build.yml'
   pull_request:
-    branches: [ main ]
+    branches: [ main, 'fix/android-build-ci' ]
     paths:
       - 'mobile/**'
   workflow_dispatch:
@@ -40,21 +40,30 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: 'mobile/package-lock.json'
+
+      - name: Install Mobile Dependencies
+        working-directory: mobile
+        run: |
+          npm ci
 
       - name: Verify Mobile Type Checking
+        working-directory: mobile
         run: |
-          cd mobile
-          npx tsc --noEmit
+          npm run typecheck
 
       - name: Bundle React Native JavaScript Asset
+        working-directory: mobile
         run: |
-          cd mobile
+          mkdir -p android/app/src/main/assets
           npx esbuild index.js \
             --bundle \
             --minify \
             --platform=neutral \
             --packages=external \
             --outfile=android/app/src/main/assets/index.android.bundle
+          cp app.json android/app/src/main/assets/app.json
 
       - name: Grant Execute Permission to Gradle Wrapper
         run: |
@@ -69,6 +78,10 @@ jobs:
         working-directory: mobile/android
         run: |
           APK_PATH=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "ERROR: No assembled debug APK found in app/build/outputs/apk/debug"
+            exit 1
+          fi
           echo "Assembled APK: $APK_PATH"
           $ANDROID_HOME/build-tools/34.0.0/aapt dump badging "$APK_PATH" | grep -E "package:|launchable-activity:|sdkVersion:"
           $ANDROID_HOME/build-tools/34.0.0/apksigner verify --verbose "$APK_PATH"

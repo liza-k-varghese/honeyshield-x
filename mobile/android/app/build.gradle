@@ -41,7 +41,7 @@ android {
 
     sourceSets {
         main {
-            assets.srcDirs = ['../../build_output/apk_root/assets', 'src/main/assets']
+            assets.srcDirs = ['src/main/assets']
         }
     }
 }

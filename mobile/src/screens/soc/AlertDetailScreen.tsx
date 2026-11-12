@@ -37,6 +37,8 @@ export const AlertDetailScreen: React.FC<AlertDetailScreenProps> = ({ route, nav
   const [alert, setAlert] = useState<AlertItem>(
     initialAlert || {
       id: alertId,
+      alert_type: 'SSH_BRUTE_FORCE',
+      message: 'Automated SSH Credential Stuffing',
       title: 'Automated SSH Credential Stuffing',
       description: 'High frequency authentication failures detected from single source IP across multiple privileged accounts.',
       severity: 'CRITICAL',
