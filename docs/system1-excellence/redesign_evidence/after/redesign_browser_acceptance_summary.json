@@ -1,0 +1,114 @@
+{
+  "timestamp": "2026-11-11T16:25:01Z",
+  "target_url": "http://127.0.0.1:5173",
+  "views_captured": [
+    {
+      "view": "overview",
+      "viewport": "1920x1080",
+      "filename": "02_staging_security_overview.png",
+      "description": "Security Overview Flagship Command Center",
+      "dom_nodes": 520,
+      "status": "PASS"
+    },
+    {
+      "view": "universe",
+      "viewport": "1920x1080",
+      "filename": "03_staging_digital_universe.png",
+      "description": "Spatial Agent Universe 2.0",
+      "dom_nodes": 924,
+      "status": "PASS"
+    },
+    {
+      "view": "alerts",
+      "viewport": "1920x1080",
+      "filename": "04_staging_alerts_triage.png",
+      "description": "Full Alerts Console & Incident Prioritization",
+      "dom_nodes": 410,
+      "status": "PASS"
+    },
+    {
+      "view": "cases",
+      "viewport": "1920x1080",
+      "filename": "05_staging_case_management.png",
+      "description": "Incident Case Management & NIST Playbooks",
+      "dom_nodes": 380,
+      "status": "PASS"
+    },
+    {
+      "view": "deception",
+      "viewport": "1920x1080",
+      "filename": "06_staging_deception_grid.png",
+      "description": "Active Deception Grid & Canary Orchestration",
+      "dom_nodes": 382,
+      "status": "PASS"
+    },
+    {
+      "view": "intel",
+      "viewport": "1920x1080",
+      "filename": "07_staging_threat_intelligence.png",
+      "description": "Threat Intelligence & IOC Fusion Core",
+      "dom_nodes": 413,
+      "status": "PASS"
+    },
+    {
+      "view": "command",
+      "viewport": "1920x1080",
+      "filename": "08_staging_live_command.png",
+      "description": "Live Incident Command Center & Telemetry Stream",
+      "dom_nodes": 375,
+      "status": "PASS"
+    },
+    {
+      "view": "campaigns",
+      "viewport": "1920x1080",
+      "filename": "09_staging_threat_hunting.png",
+      "description": "Attack Campaign Intelligence & Threat Hunting",
+      "dom_nodes": 426,
+      "status": "PASS"
+    },
+    {
+      "view": "rules",
+      "viewport": "1920x1080",
+      "filename": "10_staging_detection_rules.png",
+      "description": "Declarative Detection Rules Catalog & Sandbox",
+      "dom_nodes": 559,
+      "status": "PASS"
+    },
+    {
+      "view": "integrations",
+      "viewport": "1920x1080",
+      "filename": "11_staging_system2_integrations.png",
+      "description": "SIEM-SOAR Gateway & Outbound Webhooks",
+      "dom_nodes": 417,
+      "status": "PASS"
+    },
+    {
+      "view": "overview",
+      "viewport": "1440x900",
+      "filename": "15_staging_laptop_overview.png",
+      "description": "Overview on Laptop 1440x900",
+      "status": "PASS"
+    },
+    {
+      "view": "overview",
+      "viewport": "768x1024",
+      "filename": "14_staging_tablet_overview.png",
+      "description": "Overview on Tablet 768x1024",
+      "status": "PASS"
+    },
+    {
+      "view": "overview",
+      "viewport": "390x844",
+      "filename": "12_staging_mobile_overview.png",
+      "description": "Overview on Mobile 390x844",
+      "status": "PASS"
+    },
+    {
+      "view": "universe",
+      "viewport": "390x844",
+      "filename": "13_staging_mobile_universe.png",
+      "description": "Universe on Mobile 390x844",
+      "status": "PASS"
+    }
+  ]
+}

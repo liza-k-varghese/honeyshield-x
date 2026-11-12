@@ -93,7 +93,7 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
   );
   const totalAttacksCount = stats?.total_attacks ?? attacks.length;
 
-  // Infrastructure Services Health Summary (disentangled from functional security systems)
+  // Infrastructure Services Health Summary
   const infraHealthSummary = useMemo(() => {
     const health = stats?.system_health;
     if (!health) {
@@ -101,16 +101,16 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
         return {
           label: 'Infrastructure: Telemetry Unreachable',
           text: 'INFRASTRUCTURE OFFLINE',
-          color: 'text-rose-400',
-          dotColor: 'bg-rose-500',
+          color: 'text-[#EF6268]',
+          dotColor: 'bg-[#EF6268]',
           isHealthy: false,
         };
       }
       return {
         label: 'Infrastructure: 3/3 Services Online',
         text: '3/3 SYSTEMS OPERATIONAL',
-        color: 'text-emerald-400',
-        dotColor: 'bg-emerald-400',
+        color: 'text-[#48C99B]',
+        dotColor: 'bg-[#48C99B]',
         isHealthy: true,
       };
     }
@@ -129,16 +129,16 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
       return {
         label: 'Infrastructure: 3/3 Services Online',
         text: '3/3 SYSTEMS OPERATIONAL',
-        color: 'text-emerald-400',
-        dotColor: 'bg-emerald-400',
+        color: 'text-[#48C99B]',
+        dotColor: 'bg-[#48C99B]',
         isHealthy: true,
       };
     }
     return {
       label: `Infrastructure: ${healthyCount}/3 Nominal`,
       text: `${healthyCount}/3 SYSTEMS NOMINAL`,
-      color: healthyCount > 1 ? 'text-amber-400' : 'text-rose-400',
-      dotColor: healthyCount > 1 ? 'bg-amber-400' : 'bg-rose-400',
+      color: healthyCount > 1 ? 'text-[#E5B65A]' : 'text-[#EF6268]',
+      dotColor: healthyCount > 1 ? 'bg-[#E5B65A]' : 'bg-[#EF6268]',
       isHealthy: false,
     };
   }, [stats?.system_health, isStatsError]);
@@ -150,7 +150,7 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
         badgeText: 'Unavailable',
         subText: 'Sensor Health — Unavailable',
         detailText: 'Telemetry service unreachable',
-        color: 'text-amber-400',
+        color: 'text-[#E5B65A]',
         statusType: 'error' as const,
       };
     }
@@ -171,7 +171,7 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
           badgeText: '0 Traps',
           subText: '0 Traps - No Sensors Registered',
           detailText: 'No honeypots configured',
-          color: 'text-slate-400',
+          color: 'text-[#94A6B8]',
           statusType: 'empty' as const,
         };
       }
@@ -180,7 +180,7 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
           badgeText: `${healthySensors} Active`,
           subText: `Canary Active (${unconfigured} Unconfigured)`,
           detailText: 'Canary Honeytokens active • Daemons unconfigured',
-          color: 'text-amber-300',
+          color: 'text-[#E5B65A]',
           statusType: 'partial' as const,
         };
       }
@@ -189,7 +189,7 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
           badgeText: `${healthySensors} / ${configuredSensors}`,
           subText: 'Degraded Sensors',
           detailText: `${configuredSensors - healthySensors} sensor(s) require attention`,
-          color: 'text-rose-400',
+          color: 'text-[#EF6268]',
           statusType: 'degraded' as const,
         };
       }
@@ -197,7 +197,7 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
         badgeText: `${healthySensors} / ${configuredSensors}`,
         subText: 'All Sensors Healthy',
         detailText: 'Canary Honeytokens & listeners active',
-        color: 'text-emerald-400',
+        color: 'text-[#48C99B]',
         statusType: 'healthy' as const,
       };
     }
@@ -208,7 +208,7 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
         badgeText: `${stats.honeypot_types} / ${stats.honeypot_types}`,
         subText: 'active traps',
         detailText: 'Canary Honeytokens active',
-        color: 'text-emerald-400',
+        color: 'text-[#48C99B]',
         statusType: 'healthy' as const,
       };
     }
@@ -218,7 +218,7 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
         badgeText: 'Unavailable',
         subText: 'Sensor Health — Unavailable',
         detailText: 'Sensor telemetry offline',
-        color: 'text-slate-400',
+        color: 'text-[#94A6B8]',
         statusType: 'error' as const,
       };
     }
@@ -227,7 +227,7 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
       badgeText: '4 / 4',
       subText: 'active traps',
       detailText: 'Canary Honeytokens active',
-      color: 'text-emerald-400',
+      color: 'text-[#48C99B]',
       statusType: 'healthy' as const,
     };
   }, [stats, isStatsError, isStatsLoading]);
@@ -297,30 +297,30 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
   }, [attacks, activityFilter]);
 
   return (
-    <div className="space-y-6 text-slate-100 max-w-7xl mx-auto pb-8 font-sans">
+    <div className="space-y-6 text-[#F0F5F8] max-w-7xl mx-auto pb-8 font-sans">
       {/* ====================================================================
           SECTION 1: Clear Page Introduction & Verified Operational Status
           ==================================================================== */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-[#263449]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-[#1E2D3D]">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-cyan-400 font-semibold">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-[#00D6C9] font-semibold">
               HONEYSHIELD X
             </span>
-            <span className="text-slate-500 text-xs">•</span>
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-[#5A6E82] text-xs">•</span>
+            <span className="text-xs text-[#94A6B8] font-mono">
               Unified Security Operations
             </span>
           </div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold tracking-tight text-white font-sans">
+            <h1 className="text-2xl font-bold tracking-tight text-[#F0F5F8] font-sans">
               Security Overview
             </h1>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-500/30 text-cyan-300 font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#00D6C9]/10 border border-[#00D6C9]/30 text-[#00D6C9] font-mono font-semibold">
               SOC LIVE
             </span>
           </div>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-[#94A6B8] mt-1">
             Monitor threats, investigate activity, and manage your security environment.
           </p>
         </div>
@@ -328,32 +328,32 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
         {/* Global Operational Status Pill & Navigation Shortcuts */}
         <div className="flex items-center gap-2.5 flex-wrap">
           <div
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#111827] border border-[#263449] text-xs font-mono"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#111C29] border border-[#1E2D3D] text-xs font-mono shadow-soc-sm"
             title={infraHealthSummary.label}
           >
-            <span className={`w-2 h-2 rounded-full ${infraHealthSummary.dotColor} animate-pulse`} />
-            <span className="text-slate-300 font-medium">{infraHealthSummary.text}</span>
+            <span className={`w-2 h-2 rounded-full ${infraHealthSummary.dotColor}`} />
+            <span className="text-[#F0F5F8] font-medium">{infraHealthSummary.text}</span>
           </div>
 
           <button
             onClick={handleToggleOnboarding}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-mono transition-colors ${
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-mono transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#00D6C9] ${
               showOnboarding
-                ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300'
-                : 'bg-[#111827] hover:bg-[#172033] border-[#263449] text-slate-300 hover:text-white'
+                ? 'bg-[#00D6C9]/15 border-[#00D6C9]/40 text-[#00D6C9]'
+                : 'bg-[#111C29] hover:bg-[#192737] border-[#1E2D3D] text-[#94A6B8] hover:text-[#F0F5F8]'
             }`}
             title="Toggle First-Time Platform Guide"
             aria-label="Platform Guide"
           >
-            <Compass className="w-3.5 h-3.5 text-cyan-400" />
+            <Compass className="w-3.5 h-3.5 text-[#00D6C9]" />
             <span>Platform Guide</span>
           </button>
 
           <button
             onClick={() => onNavigateView('universe')}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:text-cyan-200 text-xs font-mono transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00D6C9]/10 hover:bg-[#00D6C9]/20 border border-[#00D6C9]/30 text-[#00D6C9] text-xs font-mono transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#00D6C9]"
           >
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <Sparkles className="w-3.5 h-3.5 text-[#00D6C9]" />
             <span>Digital Universe</span>
             <ArrowRight className="w-3 h-3 ml-0.5" />
           </button>
@@ -364,24 +364,24 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
           FIRST-TIME USER EXPERIENCE (FTUX): Lightweight, Dismissible Onboarding Guide
           ==================================================================== */}
       {showOnboarding && (
-        <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-[#111827] via-[#172033] to-[#111827] border border-cyan-500/30 shadow-lg relative transition-all">
+        <div className="p-4 sm:p-5 rounded-xl bg-[#111C29] border border-[#1E2D3D] shadow-soc-md relative transition-all">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-400">
+              <div className="p-1.5 rounded-lg bg-[#00D6C9]/15 text-[#00D6C9]">
                 <Compass className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-white tracking-tight">
+                <h3 className="text-sm font-bold text-[#F0F5F8] tracking-tight">
                   Welcome to HoneyShield X — Unified Security Operations
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-[#94A6B8]">
                   A modern platform combining automated detection, active deception, threat intelligence, and spatial agent coordination.
                 </p>
               </div>
             </div>
             <button
               onClick={handleDismissOnboarding}
-              className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-1 rounded text-[#94A6B8] hover:text-[#F0F5F8] hover:bg-[#192737] transition-colors"
               title="Close Guide"
               aria-label="Close Guide"
             >
@@ -391,85 +391,85 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
             {/* FTUX Box 1: Security Operations */}
-            <div className="p-3 rounded-lg bg-[#0B1020]/70 border border-[#263449] hover:border-slate-600 transition-colors">
+            <div className="p-3 rounded-lg bg-[#192737] border border-[#1E2D3D] hover:border-[#00D6C9]/40 transition-colors">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-mono uppercase font-bold text-blue-400">Detect</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                <span className="text-[10px] font-mono uppercase font-bold text-[#00D6C9]">Detect</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00D6C9]" />
               </div>
-              <p className="text-xs font-semibold text-white">Security Operations</p>
-              <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+              <p className="text-xs font-semibold text-[#F0F5F8]">Security Operations</p>
+              <p className="text-[11px] text-[#94A6B8] mt-1 leading-relaxed">
                 Detect and investigate suspicious activity across your network and endpoints.
               </p>
               <button
                 onClick={() => onNavigateView('alerts')}
-                className="mt-2 text-[11px] text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1"
+                className="mt-2 text-[11px] text-[#00D6C9] hover:text-[#00BFB3] font-medium inline-flex items-center gap-1"
               >
                 View Alerts →
               </button>
             </div>
 
             {/* FTUX Box 2: Deception & Honeypots */}
-            <div className="p-3 rounded-lg bg-[#0B1020]/70 border border-[#263449] hover:border-slate-600 transition-colors">
+            <div className="p-3 rounded-lg bg-[#192737] border border-[#1E2D3D] hover:border-[#48C99B]/40 transition-colors">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-mono uppercase font-bold text-emerald-400">Deceive</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="text-[10px] font-mono uppercase font-bold text-[#48C99B]">Deceive</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#48C99B]" />
               </div>
-              <p className="text-xs font-semibold text-white">Deception & Honeypots</p>
-              <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+              <p className="text-xs font-semibold text-[#F0F5F8]">Deception & Honeypots</p>
+              <p className="text-[11px] text-[#94A6B8] mt-1 leading-relaxed">
                 Observe attackers interacting with controlled traps and canary tokens.
               </p>
               <button
                 onClick={() => onNavigateView('deception')}
-                className="mt-2 text-[11px] text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1"
+                className="mt-2 text-[11px] text-[#00D6C9] hover:text-[#00BFB3] font-medium inline-flex items-center gap-1"
               >
                 Manage Traps →
               </button>
             </div>
 
             {/* FTUX Box 3: Threat Intelligence */}
-            <div className="p-3 rounded-lg bg-[#0B1020]/70 border border-[#263449] hover:border-slate-600 transition-colors">
+            <div className="p-3 rounded-lg bg-[#192737] border border-[#1E2D3D] hover:border-[#8B5CF6]/40 transition-colors">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-mono uppercase font-bold text-purple-400">Understand</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                <span className="text-[10px] font-mono uppercase font-bold text-[#A78BFA]">Understand</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#8B5CF6]" />
               </div>
-              <p className="text-xs font-semibold text-white">Threat Intelligence</p>
-              <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+              <p className="text-xs font-semibold text-[#F0F5F8]">Threat Intelligence</p>
+              <p className="text-[11px] text-[#94A6B8] mt-1 leading-relaxed">
                 Connect indicators and enrich security investigations with global STIX feeds.
               </p>
               <button
                 onClick={() => onNavigateView('intel')}
-                className="mt-2 text-[11px] text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1"
+                className="mt-2 text-[11px] text-[#00D6C9] hover:text-[#00BFB3] font-medium inline-flex items-center gap-1"
               >
                 Explore Intel →
               </button>
             </div>
 
             {/* FTUX Box 4: Digital Agent Universe */}
-            <div className="p-3 rounded-lg bg-[#0B1020]/70 border border-[#263449] hover:border-slate-600 transition-colors">
+            <div className="p-3 rounded-lg bg-[#192737] border border-[#1E2D3D] hover:border-[#00D6C9]/40 transition-colors">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-mono uppercase font-bold text-cyan-400">Coordinate</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                <span className="text-[10px] font-mono uppercase font-bold text-[#00D6C9]">Coordinate</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00D6C9]" />
               </div>
-              <p className="text-xs font-semibold text-white">Digital Universe</p>
-              <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+              <p className="text-xs font-semibold text-[#F0F5F8]">Digital Universe</p>
+              <p className="text-[11px] text-[#94A6B8] mt-1 leading-relaxed">
                 Visualize how events move through HoneyShield X using four robotic agents.
               </p>
               <button
                 onClick={() => onNavigateView('universe')}
-                className="mt-2 text-[11px] text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1"
+                className="mt-2 text-[11px] text-[#00D6C9] hover:text-[#00BFB3] font-medium inline-flex items-center gap-1"
               >
                 Open Universe →
               </button>
             </div>
           </div>
 
-          <div className="mt-3 pt-2.5 border-t border-[#263449]/80 flex items-center justify-between">
-            <span className="text-[10px] text-slate-400 font-mono">
+          <div className="mt-3 pt-2.5 border-t border-[#1E2D3D] flex items-center justify-between">
+            <span className="text-[10px] text-[#94A6B8] font-mono">
               Quick start guide • Reopen anytime via Platform Guide button
             </span>
             <button
               onClick={handleDismissOnboarding}
-              className="text-xs text-slate-300 hover:text-white font-medium"
+              className="text-xs text-[#94A6B8] hover:text-[#F0F5F8] font-medium"
             >
               Dismiss Guide
             </button>
@@ -482,16 +482,16 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
           ==================================================================== */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1: Critical Alerts */}
-        <div className="p-4 rounded-xl bg-[#111827] border border-[#263449] hover:border-slate-700 transition-colors">
+        <div className="p-4 rounded-xl bg-[#111C29] border border-[#1E2D3D] hover:border-[#EF6268]/40 transition-colors shadow-soc-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Critical Alerts</span>
+            <span className="text-xs font-medium text-[#94A6B8]">Critical Alerts</span>
             <div
               className={`p-1.5 rounded-lg ${
                 isAlertsError
-                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                  ? 'bg-[#E5B65A]/15 text-[#E5B65A] border border-[#E5B65A]/30'
                   : criticalOpenAlertsCount > 0
-                  ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                  : 'bg-slate-800 text-slate-400'
+                  ? 'bg-[#EF6268]/15 text-[#EF6268] border border-[#EF6268]/30'
+                  : 'bg-[#192737] text-[#94A6B8] border border-[#1E2D3D]'
               }`}
             >
               <ShieldAlert className="w-4 h-4" />
@@ -499,69 +499,69 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             {isAlertsError ? (
-              <span className="text-lg font-bold font-mono text-amber-400">Alerts Error</span>
+              <span className="text-lg font-bold font-mono text-[#E5B65A]">Alerts Error</span>
             ) : (
               <span
                 className={`text-3xl font-bold font-sans ${
                   isAlertsLoading
-                    ? 'animate-pulse opacity-60 text-slate-300'
+                    ? 'animate-pulse opacity-60 text-[#94A6B8]'
                     : criticalOpenAlertsCount > 0
-                    ? 'text-rose-400'
-                    : 'text-white'
+                    ? 'text-[#EF6268]'
+                    : 'text-[#F0F5F8]'
                 }`}
               >
                 {criticalOpenAlertsCount}
               </span>
             )}
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-xs text-[#94A6B8] font-mono">
               {isAlertsError ? 'telemetry unreachable' : 'requiring triage'}
             </span>
           </div>
-          <div className="mt-2 text-xs text-slate-500 flex items-center justify-between">
+          <div className="mt-2 text-xs text-[#94A6B8] flex items-center justify-between">
             <span>Total open alerts:</span>
-            <span className="font-semibold text-slate-300 font-mono">
+            <span className="font-semibold text-[#F0F5F8] font-mono">
               {isAlertsError ? 'N/A' : openAlerts.length}
             </span>
           </div>
         </div>
 
         {/* Metric 2: Active Threats */}
-        <div className="p-4 rounded-xl bg-[#111827] border border-[#263449] hover:border-slate-700 transition-colors">
+        <div className="p-4 rounded-xl bg-[#111C29] border border-[#1E2D3D] hover:border-[#E5B65A]/40 transition-colors shadow-soc-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Monitored Threats</span>
-            <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <span className="text-xs font-medium text-[#94A6B8]">Monitored Threats</span>
+            <div className="p-1.5 rounded-lg bg-[#E5B65A]/15 text-[#E5B65A] border border-[#E5B65A]/30">
               <Activity className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span
-              className={`text-3xl font-bold font-sans text-white ${
+              className={`text-3xl font-bold font-sans text-[#F0F5F8] ${
                 isStatsLoading ? 'animate-pulse opacity-60' : ''
               }`}
             >
               {totalAttacksCount}
             </span>
-            <span className="text-xs text-slate-400 font-mono">detected vectors</span>
+            <span className="text-xs text-[#94A6B8] font-mono">detected vectors</span>
           </div>
-          <div className="mt-2 text-xs text-slate-500 flex items-center justify-between">
+          <div className="mt-2 text-xs text-[#94A6B8] flex items-center justify-between">
             <span>Unique attacker IPs:</span>
-            <span className="font-semibold text-slate-300 font-mono">
+            <span className="font-semibold text-[#F0F5F8] font-mono">
               {stats?.unique_attacker_ips_24h ?? Math.min(totalAttacksCount, 12)}
             </span>
           </div>
         </div>
 
-        {/* Metric 3: Sensor Health (DATA INTEGRITY: Truthful state derivation) */}
-        <div className="p-4 rounded-xl bg-[#111827] border border-[#263449] hover:border-slate-700 transition-colors">
+        {/* Metric 3: Sensor Health */}
+        <div className="p-4 rounded-xl bg-[#111C29] border border-[#1E2D3D] hover:border-[#48C99B]/40 transition-colors shadow-soc-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Deception Sensors</span>
+            <span className="text-xs font-medium text-[#94A6B8]">Deception Sensors</span>
             <div
               className={`p-1.5 rounded-lg ${
                 sensorState.statusType === 'healthy'
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                  ? 'bg-[#48C99B]/15 text-[#48C99B] border border-[#48C99B]/30'
                   : sensorState.statusType === 'partial'
-                  ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
-                  : 'bg-slate-800 text-slate-400 border border-slate-700'
+                  ? 'bg-[#E5B65A]/15 text-[#E5B65A] border border-[#E5B65A]/30'
+                  : 'bg-[#192737] text-[#94A6B8] border border-[#1E2D3D]'
               }`}
             >
               <Target className="w-4 h-4" />
@@ -571,32 +571,32 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
             <span className={`text-3xl font-bold font-sans ${sensorState.color}`}>
               {sensorState.badgeText}
             </span>
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-xs text-[#94A6B8] font-mono">
               {sensorState.subText}
             </span>
           </div>
-          <div className="mt-2 text-xs text-slate-500 flex items-center justify-between">
+          <div className="mt-2 text-xs text-[#94A6B8] flex items-center justify-between">
             <span className="truncate pr-1">{sensorState.detailText}</span>
           </div>
         </div>
 
-        {/* Metric 4: Events Processed (DATA INTEGRITY: Honest 24h persistent vs session stream) */}
-        <div className="p-4 rounded-xl bg-[#111827] border border-[#263449] hover:border-slate-700 transition-colors">
+        {/* Metric 4: Events Processed */}
+        <div className="p-4 rounded-xl bg-[#111C29] border border-[#1E2D3D] hover:border-[#00D6C9]/40 transition-colors shadow-soc-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">{eventMetric.label}</span>
-            <div className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <span className="text-xs font-medium text-[#94A6B8]">{eventMetric.label}</span>
+            <div className="p-1.5 rounded-lg bg-[#00D6C9]/15 text-[#00D6C9] border border-[#00D6C9]/30">
               <Zap className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-sans text-cyan-400">
+            <span className="text-3xl font-bold font-sans text-[#00D6C9]">
               {eventMetric.count}
             </span>
-            <span className="text-xs text-slate-400 font-mono">{eventMetric.subText}</span>
+            <span className="text-xs text-[#94A6B8] font-mono">{eventMetric.subText}</span>
           </div>
-          <div className="mt-2 text-xs text-slate-500 flex items-center justify-between">
+          <div className="mt-2 text-xs text-[#94A6B8] flex items-center justify-between">
             <span>Stream connection:</span>
-            <span className="font-semibold text-emerald-400 font-mono uppercase text-[11px]">
+            <span className="font-semibold text-[#48C99B] font-mono uppercase text-[11px]">
               {streamConnectionState}
             </span>
           </div>
@@ -604,38 +604,38 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
       </div>
 
       {/* ====================================================================
-          SECTION 3: Priority Alerts & Recent Security Activity (Immediate Operational Focus)
+          SECTION 3: Priority Alerts & Recent Security Activity
           ==================================================================== */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Priority Alerts Table (2/3 width) */}
         <div className="lg:col-span-2 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-rose-400" />
+            <h2 className="text-sm font-semibold text-[#F0F5F8] uppercase tracking-wider font-mono flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-[#EF6268]" />
               <span>Priority Alerts</span>
             </h2>
             <button
               onClick={() => onNavigateView('alerts')}
-              className="text-xs text-cyan-400 hover:text-cyan-300 font-mono transition-colors"
+              className="text-xs text-[#00D6C9] hover:text-[#00BFB3] font-mono transition-colors"
             >
               View all ({alerts.length}) →
             </button>
           </div>
 
-          <div className="bg-[#111827] border border-[#263449] rounded-xl overflow-hidden shadow-sm">
+          <div className="bg-[#111C29] border border-[#1E2D3D] rounded-xl overflow-hidden shadow-soc-sm">
             {isAlertsError ? (
-              <div className="p-8 text-center space-y-3 border border-rose-500/20 bg-rose-950/10">
-                <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto" />
+              <div className="p-8 text-center space-y-3 border border-[#EF6268]/20 bg-[#EF6268]/5">
+                <AlertTriangle className="w-8 h-8 text-[#E5B65A] mx-auto" />
                 <div>
-                  <p className="text-sm font-semibold text-slate-200">Priority Alerts Telemetry Unreachable</p>
-                  <p className="text-xs text-slate-400 max-w-sm mx-auto font-mono mt-1">
+                  <p className="text-sm font-semibold text-[#F0F5F8]">Priority Alerts Telemetry Unreachable</p>
+                  <p className="text-xs text-[#94A6B8] max-w-sm mx-auto font-mono mt-1">
                     Failed to fetch priority alerts from the backend API. Verify network connection and backend service health.
                   </p>
                 </div>
                 {onRetryAlerts && (
                   <button
                     onClick={onRetryAlerts}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-850 hover:bg-slate-800 border border-slate-700 text-xs text-slate-200 font-mono transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#192737] hover:bg-[#1E2D3D] border border-[#1E2D3D] text-xs text-[#F0F5F8] font-mono transition-colors"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                     <span>Retry Connection</span>
@@ -644,34 +644,34 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
               </div>
             ) : isAlertsLoading ? (
               <div className="p-8 text-center space-y-2">
-                <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-xs text-slate-400 font-mono">Loading priority alerts telemetry...</p>
+                <div className="w-6 h-6 border-2 border-[#00D6C9] border-t-transparent rounded-full animate-spin mx-auto" />
+                <p className="text-xs text-[#94A6B8] font-mono">Loading priority alerts telemetry...</p>
               </div>
             ) : priorityAlerts.length === 0 ? (
               <div className="p-8 text-center space-y-2">
-                <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
-                <p className="text-sm font-semibold text-slate-200">All systems nominal</p>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                <CheckCircle2 className="w-8 h-8 text-[#48C99B] mx-auto" />
+                <p className="text-sm font-semibold text-[#F0F5F8]">All systems nominal</p>
+                <p className="text-xs text-[#94A6B8] max-w-sm mx-auto">
                   No open high-priority alerts requiring immediate operator triage. HoneyShield X is actively monitoring all sensors.
                 </p>
-                <p className="text-[11px] text-slate-500 font-mono">
+                <p className="text-[11px] text-[#5A6E82] font-mono">
                   No critical alerts in the selected period.
                 </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-[#0B1020]/90 text-slate-400 uppercase font-mono text-[11px] border-b border-[#263449]">
+                  <thead className="bg-[#080D14] text-[#94A6B8] uppercase font-mono text-[11px] border-b border-[#1E2D3D]">
                     <tr>
-                      <th className="py-2.5 px-3.5">Severity</th>
-                      <th className="py-2.5 px-3.5">Alert Title</th>
-                      <th className="py-2.5 px-3.5">Source IP</th>
-                      <th className="py-2.5 px-3.5">Time</th>
-                      <th className="py-2.5 px-3.5">Status</th>
-                      <th className="py-2.5 px-3.5 text-right">Action</th>
+                      <th className="py-2.5 px-3.5 font-medium">Severity</th>
+                      <th className="py-2.5 px-3.5 font-medium">Alert Title</th>
+                      <th className="py-2.5 px-3.5 font-medium">Source IP</th>
+                      <th className="py-2.5 px-3.5 font-medium">Time</th>
+                      <th className="py-2.5 px-3.5 font-medium">Status</th>
+                      <th className="py-2.5 px-3.5 text-right font-medium">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#263449]/70 font-sans">
+                  <tbody className="divide-y divide-[#1E2D3D]/60 font-sans">
                     {priorityAlerts.map((alert) => {
                       const ip = extractIp(alert.message);
                       const isCritical = alert.severity === 'critical';
@@ -680,35 +680,35 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
                       return (
                         <tr
                           key={alert.id}
-                          className="hover:bg-slate-800/30 transition-colors group cursor-pointer"
+                          className="hover:bg-[#192737]/60 transition-colors group cursor-pointer"
                           onClick={() => (onSelectAlert ? onSelectAlert(alert) : onInvestigateIp(ip))}
                         >
                           <td className="py-2.5 px-3.5">
                             <span
-                              className={`inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                              className={`inline-block px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase ${
                                 isCritical
-                                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                                  ? 'bg-[#EF6268]/15 text-[#EF6268] border border-[#EF6268]/30'
                                   : isHigh
-                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                                  : 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                                  ? 'bg-[#E5B65A]/15 text-[#E5B65A] border border-[#E5B65A]/30'
+                                  : 'bg-[#48C99B]/15 text-[#48C99B] border border-[#48C99B]/30'
                               }`}
                             >
                               {alert.severity}
                             </span>
                           </td>
-                          <td className="py-2.5 px-3.5 font-medium text-slate-200 max-w-xs truncate" title={alert.message}>
+                          <td className="py-2.5 px-3.5 font-medium text-[#F0F5F8] max-w-xs truncate" title={alert.message}>
                             {alert.message}
                           </td>
-                          <td className="py-2.5 px-3.5 font-mono text-cyan-300">
+                          <td className="py-2.5 px-3.5 font-mono text-[#00D6C9]">
                             {ip}
                           </td>
-                          <td className="py-2.5 px-3.5 text-slate-400 font-mono text-[11px]">
+                          <td className="py-2.5 px-3.5 text-[#94A6B8] font-mono text-[11px]">
                             {formatEventTime(alert.notified_at || undefined)}
                           </td>
                           <td className="py-2.5 px-3.5">
                             <span
                               className={`text-[11px] font-medium ${
-                                alert.status === 'open' ? 'text-amber-400' : 'text-slate-400'
+                                alert.status === 'open' ? 'text-[#E5B65A]' : 'text-[#94A6B8]'
                               }`}
                             >
                               {alert.status}
@@ -717,7 +717,7 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
                           <td className="py-2.5 px-3.5 text-right" onClick={(e) => e.stopPropagation()}>
                             <button
                               onClick={() => onInvestigateIp(ip)}
-                              className="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 hover:text-white border border-slate-700 hover:border-cyan-500 font-mono text-[11px] transition-colors"
+                              className="px-2.5 py-1 rounded bg-[#192737] hover:bg-[#00D6C9] text-[#00D6C9] hover:text-[#080D14] border border-[#1E2D3D] hover:border-[#00D6C9] font-mono text-[11px] font-medium transition-colors"
                             >
                               Investigate
                             </button>
@@ -735,27 +735,27 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
         {/* Right Column: Live Telemetry Activity Feed (1/3 width) */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-2">
-              <Activity className="w-4 h-4 text-cyan-400" />
+            <h2 className="text-sm font-semibold text-[#F0F5F8] uppercase tracking-wider font-mono flex items-center gap-2">
+              <Activity className="w-4 h-4 text-[#00D6C9]" />
               <span>Live Activity</span>
             </h2>
             <div className="flex items-center gap-1 text-[11px] font-mono">
               <button
                 onClick={() => setActivityFilter('all')}
-                className={`px-2 py-0.5 rounded ${
+                className={`px-2 py-0.5 rounded transition-colors ${
                   activityFilter === 'all'
-                    ? 'bg-slate-800 text-white font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-[#192737] text-[#F0F5F8] font-semibold border border-[#1E2D3D]'
+                    : 'text-[#94A6B8] hover:text-[#F0F5F8]'
                 }`}
               >
                 All
               </button>
               <button
                 onClick={() => setActivityFilter('critical')}
-                className={`px-2 py-0.5 rounded ${
+                className={`px-2 py-0.5 rounded transition-colors ${
                   activityFilter === 'critical'
-                    ? 'bg-slate-800 text-white font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-[#192737] text-[#F0F5F8] font-semibold border border-[#1E2D3D]'
+                    : 'text-[#94A6B8] hover:text-[#F0F5F8]'
                 }`}
               >
                 Critical
@@ -763,14 +763,14 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
             </div>
           </div>
 
-          <div className="bg-[#111827] border border-[#263449] rounded-xl p-3 space-y-2.5 shadow-sm max-h-[380px] overflow-y-auto">
+          <div className="bg-[#111C29] border border-[#1E2D3D] rounded-xl p-3 space-y-2.5 shadow-soc-sm max-h-[380px] overflow-y-auto">
             {filteredActivity.length === 0 ? (
               <div className="py-8 text-center space-y-1">
-                <Activity className="w-5 h-5 text-slate-500 mx-auto" />
-                <p className="text-xs text-slate-400 font-mono">
+                <Activity className="w-5 h-5 text-[#5A6E82] mx-auto" />
+                <p className="text-xs text-[#94A6B8] font-mono">
                   No security activity recorded yet.
                 </p>
-                <p className="text-[10px] text-slate-500">
+                <p className="text-[10px] text-[#5A6E82]">
                   Monitored telemetry will appear here in real-time.
                 </p>
               </div>
@@ -778,22 +778,22 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
               filteredActivity.map((item, idx) => (
                 <div
                   key={item.id ?? idx}
-                  className="p-2.5 rounded-lg bg-[#0B1020]/80 border border-[#263449]/80 hover:border-slate-700 transition-colors flex items-start justify-between gap-2"
+                  className="p-2.5 rounded-lg bg-[#080D14] border border-[#1E2D3D] hover:border-[#00D6C9]/40 transition-colors flex items-start justify-between gap-2"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0" />
-                      <span className="text-xs font-semibold text-slate-200 truncate block">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#00D6C9] shrink-0" />
+                      <span className="text-xs font-semibold text-[#F0F5F8] truncate block">
                         {item.attack_type}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono mt-1">
-                      <span className="text-cyan-300">{item.source_ip}</span>
+                    <div className="flex items-center gap-2 text-[11px] text-[#94A6B8] font-mono mt-1">
+                      <span className="text-[#00D6C9]">{item.source_ip}</span>
                       <span>•</span>
                       <span>Risk: {item.risk_score?.toFixed(1) ?? 'N/A'}</span>
                     </div>
                   </div>
-                  <span className="text-[10px] text-slate-500 font-mono shrink-0">
+                  <span className="text-[10px] text-[#5A6E82] font-mono shrink-0">
                     {formatEventTime(item.detected_at)}
                   </span>
                 </div>
@@ -809,43 +809,43 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
       <div>
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider font-mono">
+            <h2 className="text-sm font-semibold text-[#F0F5F8] uppercase tracking-wider font-mono">
               Security Systems Overview
             </h2>
-            <p className="text-xs text-slate-400">Three unified operational security pillars</p>
+            <p className="text-xs text-[#94A6B8]">Three unified operational security pillars</p>
           </div>
-          <span className="text-xs text-slate-500 font-mono hidden sm:inline-block">Core architecture & capabilities</span>
+          <span className="text-xs text-[#5A6E82] font-mono hidden sm:inline-block">Core architecture & capabilities</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* System 1: Detect — Security Operations */}
-          <div className="p-4 rounded-xl bg-[#111827] border border-[#263449] hover:border-slate-700 transition-all flex flex-col justify-between">
+          <div className="p-4 rounded-xl bg-[#111C29] border border-[#1E2D3D] hover:border-[#00D6C9]/40 transition-all shadow-soc-sm flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-950/70 text-blue-300 border border-blue-800/40 font-bold">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#00D6C9]/15 text-[#00D6C9] border border-[#00D6C9]/30 font-bold">
                     SYSTEM 1
                   </span>
-                  <span className="text-[10px] font-mono text-blue-400 font-bold">
+                  <span className="text-[10px] font-mono text-[#00D6C9] font-bold">
                     Detect
                   </span>
                 </div>
-                <span className="text-xs text-emerald-400 font-mono flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> ACTIVE
+                <span className="text-xs text-[#48C99B] font-mono flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#48C99B]" /> ACTIVE
                 </span>
               </div>
-              <h3 className="text-base font-semibold text-white">Security Operations</h3>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+              <h3 className="text-base font-semibold text-[#F0F5F8]">Security Operations</h3>
+              <p className="text-xs text-[#94A6B8] mt-1 leading-relaxed">
                 Detection, alerts and investigations. Autonomous threat triage and guided incident response workflows.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-[#263449]/70 flex items-center justify-between">
-              <span className="text-xs font-mono text-slate-400">
+            <div className="mt-4 pt-3 border-t border-[#1E2D3D] flex items-center justify-between">
+              <span className="text-xs font-mono text-[#94A6B8]">
                 {openAlerts.length} active alerts
               </span>
               <button
                 onClick={() => onNavigateView('alerts')}
-                className="text-xs text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1 transition-colors"
+                className="text-xs text-[#00D6C9] hover:text-[#00BFB3] font-medium inline-flex items-center gap-1 transition-colors"
               >
                 <span>View Alerts</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -854,33 +854,33 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
           </div>
 
           {/* System 2: Deceive — Deception & Honeypots */}
-          <div className="p-4 rounded-xl bg-[#111827] border border-[#263449] hover:border-slate-700 transition-all flex flex-col justify-between">
+          <div className="p-4 rounded-xl bg-[#111C29] border border-[#1E2D3D] hover:border-[#48C99B]/40 transition-all shadow-soc-sm flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/70 text-emerald-300 border border-emerald-800/40 font-bold">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#48C99B]/15 text-[#48C99B] border border-[#48C99B]/30 font-bold">
                     SYSTEM 2
                   </span>
-                  <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                  <span className="text-[10px] font-mono text-[#48C99B] font-bold">
                     Deceive
                   </span>
                 </div>
-                <span className="text-xs text-emerald-400 font-mono flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> ACTIVE
+                <span className="text-xs text-[#48C99B] font-mono flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#48C99B]" /> ACTIVE
                 </span>
               </div>
-              <h3 className="text-base font-semibold text-white">Deception & Honeypots</h3>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+              <h3 className="text-base font-semibold text-[#F0F5F8]">Deception & Honeypots</h3>
+              <p className="text-xs text-[#94A6B8] mt-1 leading-relaxed">
                 Traps, sensors and captured suspicious activity. Active decoys and canary tokens engage adversaries before production exposure.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-[#263449]/70 flex items-center justify-between">
-              <span className="text-xs font-mono text-slate-400">
+            <div className="mt-4 pt-3 border-t border-[#1E2D3D] flex items-center justify-between">
+              <span className="text-xs font-mono text-[#94A6B8]">
                 Canary Honeytokens
               </span>
               <button
                 onClick={() => onNavigateView('deception')}
-                className="text-xs text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1 transition-colors"
+                className="text-xs text-[#00D6C9] hover:text-[#00BFB3] font-medium inline-flex items-center gap-1 transition-colors"
               >
                 <span>Manage Honeypots</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -889,33 +889,33 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
           </div>
 
           {/* System 3: Understand — Threat Intelligence */}
-          <div className="p-4 rounded-xl bg-[#111827] border border-[#263449] hover:border-slate-700 transition-all flex flex-col justify-between">
+          <div className="p-4 rounded-xl bg-[#111C29] border border-[#1E2D3D] hover:border-[#8B5CF6]/40 transition-all shadow-soc-sm flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-950/70 text-purple-300 border border-purple-800/40 font-bold">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#8B5CF6]/15 text-[#A78BFA] border border-[#8B5CF6]/30 font-bold">
                     SYSTEM 3
                   </span>
-                  <span className="text-[10px] font-mono text-purple-400 font-bold">
+                  <span className="text-[10px] font-mono text-[#A78BFA] font-bold">
                     Understand
                   </span>
                 </div>
-                <span className="text-xs text-emerald-400 font-mono flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> STIX/TAXII
+                <span className="text-xs text-[#48C99B] font-mono flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#48C99B]" /> STIX/TAXII
                 </span>
               </div>
-              <h3 className="text-base font-semibold text-white">Threat Intelligence</h3>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+              <h3 className="text-base font-semibold text-[#F0F5F8]">Threat Intelligence</h3>
+              <p className="text-xs text-[#94A6B8] mt-1 leading-relaxed">
                 Indicators, enrichment and correlation. Multi-feed STIX 2.1 IOC fusion and adversary campaign attribution.
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-[#263449]/70 flex items-center justify-between">
-              <span className="text-xs font-mono text-slate-400">
+            <div className="mt-4 pt-3 border-t border-[#1E2D3D] flex items-center justify-between">
+              <span className="text-xs font-mono text-[#94A6B8]">
                 STIX 2.1 verified
               </span>
               <button
                 onClick={() => onNavigateView('intel')}
-                className="text-xs text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1 transition-colors"
+                className="text-xs text-[#00D6C9] hover:text-[#00BFB3] font-medium inline-flex items-center gap-1 transition-colors"
               >
                 <span>Explore Threat Intel</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -928,39 +928,39 @@ export const SecurityOverview: React.FC<SecurityOverviewProps> = ({
       {/* ====================================================================
           SECTION 5: Digital Agent Universe Entry Point (Restrained & Elegant)
           ==================================================================== */}
-      <div className="p-5 rounded-xl bg-gradient-to-r from-[#111827] via-[#172033] to-cyan-950/30 border border-cyan-500/20 hover:border-cyan-500/40 transition-all shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-5 rounded-xl bg-[#111C29] border border-[#1E2D3D] hover:border-[#00D6C9]/40 transition-all shadow-soc-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1.5 max-w-xl">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-cyan-400" />
-            <h3 className="text-base font-bold text-white font-sans">
+            <Sparkles className="w-4 h-4 text-[#00D6C9]" />
+            <h3 className="text-base font-bold text-[#F0F5F8] font-sans">
               Explore the Digital Universe
             </h3>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700/50">
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#00D6C9]/10 text-[#00D6C9] border border-[#00D6C9]/30">
               UNIVERSE 2.0
             </span>
           </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
+          <p className="text-xs text-[#94A6B8] leading-relaxed">
             Follow security events through HoneyShield X with four digital agents.
           </p>
-          <div className="flex items-center gap-3 pt-1 text-[11px] font-mono text-slate-400">
+          <div className="flex items-center gap-3 pt-1 text-[11px] font-mono text-[#94A6B8]">
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-blue-500" /> SCOUT
+              <span className="w-2 h-2 rounded-full bg-[#00D6C9]" /> SCOUT
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-cyan-400" /> NEXUS
+              <span className="w-2 h-2 rounded-full bg-[#00BFB3]" /> NEXUS
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-purple-500" /> ORACLE
+              <span className="w-2 h-2 rounded-full bg-[#8B5CF6]" /> ORACLE
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-rose-500" /> SENTINEL
+              <span className="w-2 h-2 rounded-full bg-[#EF6268]" /> SENTINEL
             </span>
           </div>
         </div>
 
         <button
           onClick={() => onNavigateView('universe')}
-          className="self-start md:self-center px-4 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs font-mono tracking-wider transition-colors shadow-[0_0_15px_rgba(6,182,212,0.25)] flex items-center gap-2 shrink-0"
+          className="self-start md:self-center px-4 py-2.5 rounded-lg bg-[#00D6C9] hover:bg-[#00BFB3] text-[#080D14] font-semibold text-xs font-mono tracking-wider transition-colors shadow-soc-sm flex items-center gap-2 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D6C9]"
         >
           <span>Open Universe</span>
           <ArrowRight className="w-4 h-4" />

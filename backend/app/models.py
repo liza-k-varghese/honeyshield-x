@@ -131,3 +131,23 @@ class DevicePairingChallenge(Base):
     device_metadata_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+
+class System2IngestedEvent(Base):
+    """Durable idempotency ledger for System 2 sensor events (Phase 3).
+
+    Guarantees permanent, database-enforced exactly-once ingestion identity
+    independent of Redis TTL expiration, process restarts, or cache flushes.
+    """
+    __tablename__ = "system2_ingested_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
+    sensor_id: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
+    event_id: Mapped[str] = mapped_column(String(128), unique=True, index=True, nullable=False)
+    source_ip: Mapped[str] = mapped_column(String(45), nullable=False)
+    attack_id: Mapped[int] = mapped_column(ForeignKey("attacks.id", ondelete="CASCADE"), nullable=False)
+    attack_event_id: Mapped[int] = mapped_column(ForeignKey("attack_events.id", ondelete="CASCADE"), nullable=False)
+    alert_id: Mapped[int | None] = mapped_column(ForeignKey("alerts.id", ondelete="SET NULL"), nullable=True)
+    correlation_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    response_json: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+

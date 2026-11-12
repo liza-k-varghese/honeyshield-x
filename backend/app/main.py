@@ -48,6 +48,7 @@ from app.routers import (
     pairing,
     emergency,
     system_observability,
+    system2_integration,
 )
 import app.events.service  # Initialize event bus bridge & listeners
 from app.observability.middleware import ObservabilityTracingMiddleware
@@ -116,6 +117,7 @@ app.include_router(events.router, prefix="/api/v1")
 app.include_router(pairing.router, prefix="/api/v1")
 app.include_router(emergency.router, prefix="/api/v1")
 app.include_router(system_observability.router, prefix="/api/v1")
+app.include_router(system2_integration.router, prefix="/api/v1")
 
 def get_postgres_config() -> tuple[str, int, str, str, str]:
     db_url_env = os.getenv("DATABASE_URL")

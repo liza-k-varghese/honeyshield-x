@@ -81,17 +81,17 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
         {/* Main Incident Command Center (3 cols) */}
         <div className="lg:col-span-3 space-y-4">
           {/* Controls Bar */}
-          <div className="bg-[#111726] border border-slate-800 rounded-lg p-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="bg-[#111C29] border border-[#1E2D3D] rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-soc-sm">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400 font-medium">Status:</span>
+              <span className="text-xs text-[#94A6B8] font-medium font-mono">Status:</span>
               {(['all', 'open', 'acknowledged', 'resolved'] as const).map((st) => (
                 <button
                   key={st}
                   onClick={() => setStatusFilter(st)}
-                  className={`px-3 py-1 rounded text-xs font-medium capitalize transition ${
+                  className={`px-3 py-1 rounded-lg text-xs font-medium capitalize font-mono transition-colors ${
                     statusFilter === st
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                      : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+                      ? 'bg-[#00D6C9]/15 text-[#00D6C9] border border-[#00D6C9]/40'
+                      : 'bg-[#192737] text-[#94A6B8] hover:text-[#F0F5F8] border border-[#1E2D3D]'
                   }`}
                 >
                   {st}
@@ -101,53 +101,53 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
 
             <div className="flex items-center gap-2">
               <div className="relative">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+                <Search className="w-3.5 h-3.5 text-[#94A6B8] absolute left-2.5 top-2.5" />
                 <input
                   type="text"
                   placeholder="Filter IP, ID, or Type..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-slate-900 border border-slate-800 rounded pl-8 pr-3 py-1 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 w-48"
+                  className="bg-[#080D14] border border-[#1E2D3D] rounded-lg pl-8 pr-3 py-1 text-xs text-[#F0F5F8] placeholder-[#94A6B8] focus:outline-none focus:border-[#00D6C9] font-mono w-48"
                 />
               </div>
 
               <button
                 onClick={() => refetch()}
-                className="p-1.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 transition"
+                className="p-1.5 rounded-lg bg-[#192737] hover:bg-[#192737]/80 text-[#94A6B8] hover:text-[#F0F5F8] border border-[#1E2D3D] transition-colors"
                 title="Refresh Incidents"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-cyan-400' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-[#00D6C9]' : ''}`} />
               </button>
             </div>
           </div>
 
           {/* Virtual Incidents Table */}
-          <div className="bg-[#111726] border border-slate-800 rounded-lg overflow-hidden">
-            <div className="p-3 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
+          <div className="bg-[#111C29] border border-[#1E2D3D] rounded-xl overflow-hidden shadow-soc-sm">
+            <div className="p-3 border-b border-[#1E2D3D] flex items-center justify-between bg-[#080D14]/80">
               <div className="flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-cyan-400" />
-                <h3 className="text-xs font-semibold text-slate-200">
+                <Terminal className="w-4 h-4 text-[#00D6C9]" />
+                <h3 className="text-xs font-semibold text-[#F0F5F8] font-mono">
                   Virtual Incident Stream ({filteredIncidents.length})
                 </h3>
               </div>
-              <span className="text-[11px] text-slate-500 font-mono">
+              <span className="text-[11px] text-[#94A6B8] font-mono">
                 Auto-synced via SSE telemetry
               </span>
             </div>
 
             {isLoading ? (
-              <div className="p-12 text-center text-xs text-slate-400">
-                <Activity className="w-5 h-5 animate-spin text-cyan-400 mx-auto mb-2" />
+              <div className="p-12 text-center text-xs text-[#94A6B8]">
+                <Activity className="w-5 h-5 animate-spin text-[#00D6C9] mx-auto mb-2" />
                 Loading Incident Stream...
               </div>
             ) : filteredIncidents.length === 0 ? (
-              <div className="p-12 text-center text-xs text-slate-500 font-mono">
+              <div className="p-12 text-center text-xs text-[#94A6B8] font-mono">
                 No incidents match the active filter.
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-900/60 text-slate-400 font-medium border-b border-slate-800">
+                  <thead className="bg-[#080D14]/60 text-[#94A6B8] font-mono font-medium border-b border-[#1E2D3D] text-[11px]">
                     <tr>
                       <th className="py-2.5 px-3">Incident ID</th>
                       <th className="py-2.5 px-3">Attacker IP</th>
@@ -158,14 +158,14 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
                       <th className="py-2.5 px-3 text-right">Governed Command</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60">
+                  <tbody className="divide-y divide-[#1E2D3D]/60">
                     {filteredIncidents.map((inc) => (
                       <tr
                         key={inc.incident_id}
-                        className="hover:bg-slate-800/30 transition cursor-pointer"
+                        className="hover:bg-[#192737]/50 transition-colors cursor-pointer"
                         onClick={() => handleOpenCommand(inc, 'ALERT_ACKNOWLEDGE')}
                       >
-                        <td className="py-2.5 px-3 font-mono font-medium text-cyan-400">
+                        <td className="py-2.5 px-3 font-mono font-medium text-[#00D6C9]">
                           <div className="flex items-center gap-1.5">
                             <span>{inc.incident_id}</span>
                             {onReplayAttack && inc.attack_id && (
@@ -174,7 +174,7 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
                                   e.stopPropagation();
                                   onReplayAttack(inc.attack_id!);
                                 }}
-                                className="text-slate-500 hover:text-amber-400 transition"
+                                className="text-[#94A6B8] hover:text-[#E5B65A] transition-colors"
                                 title={`Replay Attack #${inc.attack_id} in Rule Console`}
                               >
                                 <Play className="w-3 h-3" />
@@ -184,14 +184,14 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
                         </td>
                         <td className="py-2.5 px-3">
                           <div className="flex items-center gap-1.5">
-                            <span className="font-mono text-slate-200">{inc.source_ip}</span>
+                            <span className="font-mono text-[#F0F5F8]">{inc.source_ip}</span>
                             {onInvestigateIp && inc.source_ip !== 'unknown' && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   onInvestigateIp(inc.source_ip);
                                 }}
-                                className="text-slate-500 hover:text-cyan-400 transition"
+                                className="text-[#94A6B8] hover:text-[#00D6C9] transition-colors"
                                 title="Investigate IP Dossier"
                               >
                                 <ExternalLink className="w-3 h-3" />
@@ -199,23 +199,23 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
                             )}
                           </div>
                         </td>
-                        <td className="py-2.5 px-3 text-slate-300 font-medium truncate max-w-[180px]">
+                        <td className="py-2.5 px-3 text-[#F0F5F8] font-medium truncate max-w-[180px]">
                           {inc.attack_type}
                         </td>
                         <td className="py-2.5 px-3">
                           <div className="flex items-center gap-2">
                             <span
-                              className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-bold font-mono uppercase ${
                                 inc.severity === 'critical'
-                                  ? 'bg-rose-950 text-rose-300 border border-rose-800'
+                                  ? 'bg-[#EF6268]/15 text-[#EF6268] border border-[#EF6268]/40'
                                   : inc.severity === 'high'
-                                  ? 'bg-orange-950 text-orange-300 border border-orange-800'
-                                  : 'bg-slate-800 text-slate-300 border border-slate-700'
+                                  ? 'bg-[#E5B65A]/15 text-[#E5B65A] border border-[#E5B65A]/40'
+                                  : 'bg-[#192737] text-[#94A6B8] border border-[#1E2D3D]'
                               }`}
                             >
                               {inc.severity}
                             </span>
-                            <span className="font-mono text-[11px] text-slate-400">
+                            <span className="font-mono text-[11px] text-[#94A6B8]">
                               {inc.risk_score.toFixed(1)}
                             </span>
                           </div>
@@ -224,10 +224,10 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
                           <span
                             className={`px-2 py-0.5 rounded text-[10px] font-mono capitalize ${
                               inc.status === 'open'
-                                ? 'bg-amber-950/60 text-amber-300 border border-amber-800/60'
+                                ? 'bg-[#E5B65A]/15 text-[#E5B65A] border border-[#E5B65A]/40'
                                 : inc.status === 'acknowledged'
-                                ? 'bg-cyan-950/60 text-cyan-300 border border-cyan-800/60'
-                                : 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60'
+                                ? 'bg-[#00D6C9]/15 text-[#00D6C9] border border-[#00D6C9]/40'
+                                : 'bg-[#48C99B]/15 text-[#48C99B] border border-[#48C99B]/40'
                             }`}
                           >
                             {inc.status}
@@ -237,25 +237,25 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
                           <span
                             className={
                               inc.notification_status === 'delivered'
-                                ? 'text-emerald-400'
+                                ? 'text-[#48C99B]'
                                 : inc.notification_status === 'failed'
-                                ? 'text-rose-400'
-                                : 'text-slate-500'
+                                ? 'text-[#EF6268]'
+                                : 'text-[#94A6B8]'
                             }
                           >
                             {inc.notification_status}
                           </span>
                         </td>
                         <td className="py-2.5 px-3 text-right" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex items-center justify-end gap-1.5">
+                          <div className="flex items-center justify-end gap-1.5 font-mono">
                             {inc.status === 'open' && (
                               <button
                                 onClick={(e) => handleQuickAcknowledge(inc, e)}
                                 disabled={!hasPermission('command:ack')}
-                                className={`px-2 py-1 rounded text-[11px] font-medium border transition ${
+                                className={`px-2 py-1 rounded-md text-[11px] font-medium border transition-colors ${
                                   hasPermission('command:ack')
-                                    ? 'bg-slate-800 hover:bg-slate-700 text-cyan-300 border-slate-700'
-                                    : 'bg-slate-900 text-slate-600 border-slate-800 cursor-not-allowed'
+                                    ? 'bg-[#192737] hover:bg-[#00D6C9] hover:text-[#080D14] text-[#00D6C9] border-[#1E2D3D]'
+                                    : 'bg-[#111C29] text-[#94A6B8]/40 border-[#1E2D3D] cursor-not-allowed'
                                 }`}
                                 title={hasPermission('command:ack') ? 'Quick Acknowledge' : 'Requires Analyst or higher'}
                               >
@@ -264,14 +264,14 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
                             )}
                             <button
                               onClick={() => handleOpenCommand(inc, 'ALERT_RESOLVE')}
-                              className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-medium border border-slate-700 transition"
+                              className="px-2 py-1 rounded-md bg-[#192737] hover:bg-[#192737]/80 text-[#F0F5F8] text-[11px] font-medium border border-[#1E2D3D] transition-colors"
                               title="Resolve Incident"
                             >
                               Resolve
                             </button>
                             <button
                               onClick={() => handleOpenCommand(inc, 'NOTIFICATION_DISPATCH')}
-                              className="px-2 py-1 rounded bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-200 text-[11px] font-medium border border-cyan-500/40 transition"
+                              className="px-2 py-1 rounded-md bg-[#00D6C9]/15 hover:bg-[#00D6C9]/25 text-[#00D6C9] text-[11px] font-medium border border-[#00D6C9]/40 transition-colors"
                               title="Command Center Menu"
                             >
                               Commands...
@@ -289,19 +289,19 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
 
         {/* Live SSE Telemetry Sidebar (1 col) */}
         <div className="space-y-4">
-          <div className="bg-[#111726] border border-slate-800 rounded-lg p-3 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+          <div className="bg-[#111C29] border border-[#1E2D3D] rounded-xl p-3 space-y-3 shadow-soc-sm">
+            <div className="flex items-center justify-between border-b border-[#1E2D3D] pb-2">
               <div className="flex items-center gap-1.5">
-                <Activity className="w-3.5 h-3.5 text-cyan-400" />
-                <h4 className="text-xs font-semibold text-slate-200">Live SSE Feed</h4>
+                <Activity className="w-3.5 h-3.5 text-[#00D6C9]" />
+                <h4 className="text-xs font-semibold text-[#F0F5F8] font-mono">Live SSE Feed</h4>
               </div>
-              <span className="text-[10px] text-slate-500 font-mono">
+              <span className="text-[10px] text-[#94A6B8] font-mono">
                 {streamEvents.length} events
               </span>
             </div>
 
             {streamEvents.length === 0 ? (
-              <div className="p-6 text-center text-xs text-slate-500 font-mono">
+              <div className="p-6 text-center text-xs text-[#94A6B8] font-mono">
                 Listening for stream telemetry...
               </div>
             ) : (
@@ -309,15 +309,15 @@ export const LiveCommandCenterView: React.FC<LiveCommandCenterViewProps> = ({
                 {streamEvents.slice(0, 15).map((ev) => (
                   <div
                     key={ev.id}
-                    className="p-2 rounded bg-slate-900/80 border border-slate-800/80 space-y-1 text-[11px]"
+                    className="p-2 rounded-lg bg-[#080D14] border border-[#1E2D3D] space-y-1 text-[11px]"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-cyan-400 font-medium">{ev.type}</span>
-                      <span className="text-[9px] text-slate-500 font-mono">
+                      <span className="font-mono text-[#00D6C9] font-medium">{ev.type}</span>
+                      <span className="text-[9px] text-[#94A6B8] font-mono">
                         {new Date(ev.timestamp).toLocaleTimeString()}
                       </span>
                     </div>
-                    <div className="text-slate-400 font-mono truncate text-[10px]">
+                    <div className="text-[#94A6B8] font-mono truncate text-[10px]">
                       {JSON.stringify(ev.payload)}
                     </div>
                   </div>

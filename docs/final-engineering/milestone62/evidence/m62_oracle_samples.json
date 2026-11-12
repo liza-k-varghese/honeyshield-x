@@ -1,83 +1,76 @@
 {
   "agent": "oracle",
-  "sample_count": 11,
+  "sample_count": 10,
   "trajectory": [
     {
-      "elapsed_s": 6.078,
-      "progress": 0.0,
-      "x": 810,
-      "y": 430,
+      "elapsed_s": 6.024,
+      "progress": 0.027,
+      "x": 802.53,
+      "y": 426.79,
       "attached": false
     },
     {
-      "elapsed_s": 6.435,
-      "progress": 0.032,
-      "x": 801.03,
-      "y": 426.15,
+      "elapsed_s": 6.389,
+      "progress": 0.144,
+      "x": 769.47,
+      "y": 412.51,
+      "attached": true
+    },
+    {
+      "elapsed_s": 6.741,
+      "progress": 0.224,
+      "x": 746.78,
+      "y": 402.62,
+      "attached": true
+    },
+    {
+      "elapsed_s": 7.094,
+      "progress": 0.315,
+      "x": 720.9,
+      "y": 391.25,
+      "attached": true
+    },
+    {
+      "elapsed_s": 7.652,
+      "progress": 0.485,
+      "x": 671.75,
+      "y": 369.4,
+      "attached": true
+    },
+    {
+      "elapsed_s": 8.005,
+      "progress": 0.635,
+      "x": 628.26,
+      "y": 349.81,
+      "attached": true
+    },
+    {
+      "elapsed_s": 8.357,
+      "progress": 0.715,
+      "x": 604.78,
+      "y": 339.13,
+      "attached": true
+    },
+    {
+      "elapsed_s": 8.709,
+      "progress": 0.795,
+      "x": 581.17,
+      "y": 328.32,
+      "attached": true
+    },
+    {
+      "elapsed_s": 9.062,
+      "progress": 0.88,
+      "x": 555.85,
+      "y": 316.65,
+      "attached": true
+    },
+    {
+      "elapsed_s": 9.415,
+      "progress": 0.987,
+      "x": 523.99,
+      "y": 301.86,
       "attached": false
-    },
-    {
-      "elapsed_s": 6.789,
-      "progress": 0.16,
-      "x": 764.94,
-      "y": 410.54,
-      "attached": true
-    },
-    {
-      "elapsed_s": 7.165,
-      "progress": 0.203,
-      "x": 752.84,
-      "y": 405.27,
-      "attached": true
-    },
-    {
-      "elapsed_s": 7.519,
-      "progress": 0.283,
-      "x": 730.05,
-      "y": 395.28,
-      "attached": true
-    },
-    {
-      "elapsed_s": 8.05,
-      "progress": 0.437,
-      "x": 685.63,
-      "y": 375.61,
-      "attached": true
-    },
-    {
-      "elapsed_s": 8.404,
-      "progress": 0.544,
-      "x": 654.72,
-      "y": 361.76,
-      "attached": true
-    },
-    {
-      "elapsed_s": 8.761,
-      "progress": 0.656,
-      "x": 622.01,
-      "y": 346.97,
-      "attached": true
-    },
-    {
-      "elapsed_s": 9.135,
-      "progress": 0.784,
-      "x": 584.33,
-      "y": 329.77,
-      "attached": true
-    },
-    {
-      "elapsed_s": 9.489,
-      "progress": 0.864,
-      "x": 560.61,
-      "y": 318.85,
-      "attached": true
-    },
-    {
-      "elapsed_s": 9.843,
-      "progress": 0.933,
-      "x": 539.95,
-      "y": 309.29,
-      "attached": true
     }
   ]
 }

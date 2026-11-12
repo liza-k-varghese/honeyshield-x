@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "url": "http://127.0.0.1:5175/",
+  "title": "CHRONOS \u2014 The Architecture of Time",
+  "webgl_active": true,
+  "canvas_found": true,
+  "breakpoints_tested": [
+    "1440px",
+    "1024px",
+    "768px",
+    "390px"
+  ],
+  "screenshots": {
+    "1440_prologue": "/home/liza/HoneyShield-X/chronos/screenshots/phase2/1440_prologue.png",
+    "1440_dossier_modal": "/home/liza/HoneyShield-X/chronos/screenshots/phase2/1440_dossier_modal.png",
+    "1440_anatomy": "/home/liza/HoneyShield-X/chronos/screenshots/phase2/1440_anatomy.png",
+    "1440_epochs": "/home/liza/HoneyShield-X/chronos/screenshots/phase2/1440_epochs.png",
+    "1440_atelier": "/home/liza/HoneyShield-X/chronos/screenshots/phase2/1440_atelier.png",
+    "1440_philosophy": "/home/liza/HoneyShield-X/chronos/screenshots/phase2/1440_philosophy.png",
+    "1024_prologue": "/home/liza/HoneyShield-X/chronos/screenshots/phase2/1024_prologue.png",
+    "768_prologue": "/home/liza/HoneyShield-X/chronos/screenshots/phase2/768_prologue.png",
+    "390_mobile_prologue": "/home/liza/HoneyShield-X/chronos/screenshots/phase2/390_mobile_prologue.png",
+    "390_mobile_drawer": "/home/liza/HoneyShield-X/chronos/screenshots/phase2/390_mobile_drawer.png",
+    "390_mobile_philosophy": "/home/liza/HoneyShield-X/chronos/screenshots/phase2/390_mobile_philosophy.png"
+  }
+}

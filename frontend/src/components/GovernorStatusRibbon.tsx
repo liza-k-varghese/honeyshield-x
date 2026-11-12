@@ -19,9 +19,9 @@ export const GovernorStatusRibbon: React.FC<GovernorStatusRibbonProps> = ({
 
   if (isLoading || !governor) {
     return (
-      <div className="bg-[#111726] border border-slate-800 rounded-lg p-3 flex items-center justify-between text-xs text-slate-400">
+      <div className="bg-[#111C29] border border-[#1E2D3D] rounded-xl p-3 flex items-center justify-between text-xs text-[#94A6B8] shadow-soc-sm">
         <span className="flex items-center gap-2">
-          <Activity className="w-4 h-4 animate-spin text-cyan-400" />
+          <Activity className="w-4 h-4 animate-spin text-[#00D6C9]" />
           Loading Governor Telemetry...
         </span>
       </div>
@@ -45,71 +45,71 @@ export const GovernorStatusRibbon: React.FC<GovernorStatusRibbonProps> = ({
   };
 
   return (
-    <div className="bg-[#111726] border border-slate-800 rounded-lg p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+    <div className="bg-[#111C29] border border-[#1E2D3D] rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs shadow-soc-sm">
       {/* 1. Live Stream Status */}
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-900 border border-slate-800">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#080D14] border border-[#1E2D3D]">
           {streamStatus === 'connected' ? (
             <>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <Wifi className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="font-mono text-emerald-400 font-medium">STREAM ACTIVE (SSE)</span>
+              <span className="w-2 h-2 rounded-full bg-[#48C99B] animate-pulse" />
+              <Wifi className="w-3.5 h-3.5 text-[#48C99B]" />
+              <span className="font-mono text-[#48C99B] font-medium">STREAM ACTIVE (SSE)</span>
             </>
           ) : streamStatus === 'connecting' ? (
             <>
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-              <Activity className="w-3.5 h-3.5 text-amber-400" />
-              <span className="font-mono text-amber-400 font-medium">CONNECTING...</span>
+              <span className="w-2 h-2 rounded-full bg-[#E5B65A] animate-ping" />
+              <Activity className="w-3.5 h-3.5 text-[#E5B65A]" />
+              <span className="font-mono text-[#E5B65A] font-medium">CONNECTING...</span>
             </>
           ) : (
             <>
-              <span className="w-2 h-2 rounded-full bg-rose-400" />
-              <WifiOff className="w-3.5 h-3.5 text-rose-400" />
-              <span className="font-mono text-rose-400 font-medium">STREAM OFFLINE (POLLING)</span>
+              <span className="w-2 h-2 rounded-full bg-[#EF6268]" />
+              <WifiOff className="w-3.5 h-3.5 text-[#EF6268]" />
+              <span className="font-mono text-[#EF6268] font-medium">STREAM OFFLINE (POLLING)</span>
             </>
           )}
         </div>
       </div>
 
       {/* 2. Governor Rate Limiting & Cooldowns */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5 text-slate-300">
-          <Shield className="w-3.5 h-3.5 text-cyan-400" />
-          <span className="text-slate-400">Rate Limit:</span>
-          <span className="font-mono font-semibold text-slate-200">
+      <div className="flex items-center gap-3 font-mono">
+        <div className="flex items-center gap-1.5 text-[#F0F5F8]">
+          <Shield className="w-3.5 h-3.5 text-[#00D6C9]" />
+          <span className="text-[#94A6B8]">Rate Limit:</span>
+          <span className="font-mono font-semibold text-[#F0F5F8]">
             {governor.operator_actions_last_minute} / {governor.operator_rate_limit_max}
           </span>
-          <span className="text-slate-500">act/min</span>
+          <span className="text-[#94A6B8]/60">act/min</span>
         </div>
 
-        <div className="h-3.5 w-px bg-slate-800" />
+        <div className="h-3.5 w-px bg-[#1E2D3D]" />
 
-        <div className="flex items-center gap-1.5 text-slate-300">
-          <span className="text-slate-400">Entity Cooldowns:</span>
-          <span className="font-mono font-semibold text-slate-200">
+        <div className="flex items-center gap-1.5 text-[#F0F5F8]">
+          <span className="text-[#94A6B8]">Entity Cooldowns:</span>
+          <span className="font-mono font-semibold text-[#F0F5F8]">
             {governor.active_cooldowns_count}
           </span>
-          <span className="text-slate-500">active</span>
+          <span className="text-[#94A6B8]/60">active</span>
         </div>
       </div>
 
       {/* 3. Circuit Breaker Status */}
       <div className="flex items-center gap-2">
         <div
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded border font-mono ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono ${
             isBreakerOpen
-              ? 'bg-rose-950/60 border-rose-800/80 text-rose-300'
+              ? 'bg-[#EF6268]/15 border-[#EF6268]/40 text-[#EF6268]'
               : isBreakerHalfOpen
-              ? 'bg-amber-950/60 border-amber-800/80 text-amber-300'
-              : 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300'
+              ? 'bg-[#E5B65A]/15 border-[#E5B65A]/40 text-[#E5B65A]'
+              : 'bg-[#48C99B]/15 border-[#48C99B]/40 text-[#48C99B]'
           }`}
         >
           {isBreakerOpen ? (
-            <ShieldAlert className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+            <ShieldAlert className="w-3.5 h-3.5 text-[#EF6268] animate-pulse" />
           ) : isBreakerHalfOpen ? (
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+            <AlertTriangle className="w-3.5 h-3.5 text-[#E5B65A]" />
           ) : (
-            <Shield className="w-3.5 h-3.5 text-emerald-400" />
+            <Shield className="w-3.5 h-3.5 text-[#48C99B]" />
           )}
           <span>
             BREAKER: {cb.state}
@@ -122,10 +122,10 @@ export const GovernorStatusRibbon: React.FC<GovernorStatusRibbonProps> = ({
       <div className="flex items-center gap-2">
         <button
           onClick={() => setShowLockoutModal(true)}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-medium transition ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-mono font-medium transition-colors ${
             governor.lockout_engaged
-              ? 'bg-rose-600 hover:bg-rose-500 text-white'
-              : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
+              ? 'bg-[#EF6268] hover:bg-[#EF6268]/90 text-[#F0F5F8]'
+              : 'bg-[#192737] hover:bg-[#192737]/80 text-[#94A6B8] hover:text-[#F0F5F8] border border-[#1E2D3D]'
           }`}
           title="Emergency Lockout freezes all outbound notification dispatches"
         >
@@ -136,7 +136,7 @@ export const GovernorStatusRibbon: React.FC<GovernorStatusRibbonProps> = ({
             </>
           ) : (
             <>
-              <Unlock className="w-3.5 h-3.5 text-slate-400" />
+              <Unlock className="w-3.5 h-3.5 text-[#94A6B8]" />
               <span>ENGAGE LOCKOUT</span>
             </>
           )}

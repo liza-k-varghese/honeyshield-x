@@ -95,7 +95,9 @@ class TestMilestone17SDKRecoveryAndDefense(unittest.TestCase):
     # ----------------------------------------------------------------------
     def test_01_android_manifest_and_gradle_structure_validation(self):
         """Verifies standard Android Gradle structure, package ID, SDK limits, and components."""
-        manifest_path = "mobile/android/app/src/main/AndroidManifest.xml"
+        from pathlib import Path
+        repo_root = Path(__file__).resolve().parent.parent.parent
+        manifest_path = str(repo_root / "mobile/android/app/src/main/AndroidManifest.xml")
         self.assertTrue(os.path.exists(manifest_path), f"Missing {manifest_path}")
 
         with open(manifest_path, "r", encoding="utf-8") as f:
@@ -110,11 +112,11 @@ class TestMilestone17SDKRecoveryAndDefense(unittest.TestCase):
         self.assertIn('android:scheme="honeyshield"', manifest_content)
 
         # Verify Gradle root and app build files
-        self.assertTrue(os.path.exists("mobile/android/settings.gradle"))
-        self.assertTrue(os.path.exists("mobile/android/build.gradle"))
-        self.assertTrue(os.path.exists("mobile/android/app/build.gradle"))
-        self.assertTrue(os.path.exists("mobile/android/gradle.properties"))
-        self.assertTrue(os.path.exists("mobile/android/gradle/wrapper/gradle-wrapper.properties"))
+        self.assertTrue(os.path.exists(str(repo_root / "mobile/android/settings.gradle")))
+        self.assertTrue(os.path.exists(str(repo_root / "mobile/android/build.gradle")))
+        self.assertTrue(os.path.exists(str(repo_root / "mobile/android/app/build.gradle")))
+        self.assertTrue(os.path.exists(str(repo_root / "mobile/android/gradle.properties")))
+        self.assertTrue(os.path.exists(str(repo_root / "mobile/android/gradle/wrapper/gradle-wrapper.properties")))
 
     # ----------------------------------------------------------------------
     # 2. Android Security Enclave & Biometric Step-Up Simulation

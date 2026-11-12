@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 .env
 .env.*
+*.env
 !.env.example
 *.log
 .pytest_cache/
@@ -14,4 +15,6 @@ dist/
 *.pem
 *.key
 *.cert
+*.crt
+certs/
 .DS_Store

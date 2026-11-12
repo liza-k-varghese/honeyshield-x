@@ -52,18 +52,30 @@ check_port_conflicts() {
     local ports=("${STAGING_FE_PORT}" "${STAGING_BE_PORT}" "${STAGING_PG_PORT}" "${STAGING_RD_PORT}")
     local conflict=0
 
+    local c_cmd="docker"
+    if ! command -v docker >/dev/null 2>&1; then
+        c_cmd="podman"
+    fi
+
     for port in "${ports[@]}"; do
         if ss -tlpn "( sport = :${port} )" 2>/dev/null | grep -q ":${port} "; then
-            log_err "Staging port ${port} is already in use!"
-            conflict=1
+            # Verify if port is bound by existing honeyshield-staging container
+            local staging_owner
+            staging_owner=$(${c_cmd} ps --filter "name=honeyshield-staging" --format "{{.Names}} {{.Ports}}" 2>/dev/null | grep ":${port}->" || true)
+            if [[ -n "${staging_owner}" ]]; then
+                log_info "Staging port ${port} is currently bound by active staging container (${staging_owner%% *})."
+            else
+                log_err "Staging port ${port} is already in use by an external process or conflicting service!"
+                conflict=1
+            fi
         fi
     done
 
     if [[ ${conflict} -ne 0 ]]; then
-        log_err "Port conflict detected. Staging cannot start without port collisions."
+        log_err "Port conflict detected with non-staging processes. Staging cannot start without port collisions."
         exit 1
     fi
-    log_ok "All staging ports (${STAGING_FE_PORT}, ${STAGING_BE_PORT}, ${STAGING_PG_PORT}, ${STAGING_RD_PORT}) are free."
+    log_ok "All staging ports are available or correctly bound to existing staging containers."
 }
 
 check_isolation_boundaries() {
@@ -171,7 +183,7 @@ execute_staging() {
         local pg_status rd_status be_status
         pg_status=$(docker inspect --format='{{.State.Health.Status}}' honeyshield-staging-postgres 2>/dev/null || echo "starting")
         rd_status=$(docker inspect --format='{{.State.Health.Status}}' honeyshield-staging-redis 2>/dev/null || echo "starting")
-        be_status=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8001/api/v1/health || echo "000")
+        be_status=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8001/health || echo "000")
 
         if [[ "${pg_status}" == "healthy" ]] && [[ "${rd_status}" == "healthy" ]] && [[ "${be_status}" == "200" ]]; then
             log_ok "All staging containers are healthy and operational!"
@@ -191,7 +203,28 @@ execute_staging() {
     log_info "Running staging acceptance smoke tests..."
     local fe_code be_health
     fe_code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5174/ || echo "000")
-    be_health=$(curl -s http://127.0.0.1:8001/api/v1/health || echo "{}")
+    be_health=$(curl -fsS http://127.0.0.1:8001/health) || {
+        log_err "Staging backend health request failed."
+        exit 1
+    }
+
+    if [[ "${fe_code}" != "200" ]]; then
+        log_err "Staging frontend failed: HTTP ${fe_code}"
+        exit 1
+    fi
+
+    # Staging Authentication Security Gate: Dev credentials MUST be rejected
+    log_info "Verifying staging authentication isolation..."
+    local dev_auth_status
+    dev_auth_status=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:8001/api/v1/auth/login \
+        -H "Content-Type: application/json" \
+        -d '{"username":"admin_chief","password":"AdminPass123!"}' || echo "000")
+    if [[ "${dev_auth_status}" == "401" ]]; then
+        log_ok "Staging Authentication Lockdown: Development credentials rejected (HTTP 401)."
+    else
+        log_err "Staging Authentication Lockdown FAILED: Expected HTTP 401 for dev credentials, got HTTP ${dev_auth_status}!"
+        exit 1
+    fi
 
     log_ok "Staging Frontend Web: HTTP ${fe_code} (http://127.0.0.1:5174/)"
     log_ok "Staging Backend API: ${be_health} (http://127.0.0.1:8001/)"

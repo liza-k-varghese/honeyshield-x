@@ -57,12 +57,17 @@ services:
     container_name: honeyshield-staging-backend
     restart: unless-stopped
     environment:
+      APP_ENV: staging
+      HONEYSHIELD_ENV: staging
       ENVIRONMENT: staging
       DEBUG: "false"
       DATABASE_URL: postgresql+psycopg://honeyshield_staging_user:${STAGING_POSTGRES_PASSWORD:-staging_secure_pass_change_me}@postgres-staging:5432/honeyshield_staging
       REDIS_HOST: redis-staging
       REDIS_PORT: 6379
       SECRET_KEY: ${STAGING_SECRET_KEY:-staging_secret_key_placeholder_min_32}
+    env_file:
+      - path: staging.env
+        required: false
     ports:
       # Strictly bound to loopback interface on staging port 8001
       - "127.0.0.1:8001:8000"
@@ -74,7 +79,7 @@ services:
       redis-staging:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8000/api/v1/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8000/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3

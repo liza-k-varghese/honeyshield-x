@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "url": "http://127.0.0.1:5175/",
+  "title": "CHRONOS \u2014 The Architecture of Time",
+  "webgl_active": true,
+  "canvas_found": true,
+  "breakpoints_tested": [
+    "1920px",
+    "1440px",
+    "1024px",
+    "768px",
+    "390px",
+    "360px"
+  ],
+  "screenshots": {
+    "1920_origins": "/home/liza/HoneyShield-X/chronos/screenshots/master/1920_origins.png",
+    "1440_ch00_origins": "/home/liza/HoneyShield-X/chronos/screenshots/master/1440_ch00_origins.png",
+    "1440_ch01_ancient": "/home/liza/HoneyShield-X/chronos/screenshots/master/1440_ch01_ancient.png",
+    "1440_ch02_mechanical": "/home/liza/HoneyShield-X/chronos/screenshots/master/1440_ch02_mechanical.png",
+    "1440_ch03_modern": "/home/liza/HoneyShield-X/chronos/screenshots/master/1440_ch03_modern.png",
+    "1440_ch04_philosophy": "/home/liza/HoneyShield-X/chronos/screenshots/master/1440_ch04_philosophy.png",
+    "1440_dossier_modal": "/home/liza/HoneyShield-X/chronos/screenshots/master/1440_dossier_modal.png",
+    "1024_origins": "/home/liza/HoneyShield-X/chronos/screenshots/master/1024_origins.png",
+    "768_origins": "/home/liza/HoneyShield-X/chronos/screenshots/master/768_origins.png",
+    "390_mobile_origins": "/home/liza/HoneyShield-X/chronos/screenshots/master/390_mobile_origins.png",
+    "390_mobile_drawer": "/home/liza/HoneyShield-X/chronos/screenshots/master/390_mobile_drawer.png",
+    "360_small_mobile_origins": "/home/liza/HoneyShield-X/chronos/screenshots/master/360_small_mobile_origins.png"
+  }
+}

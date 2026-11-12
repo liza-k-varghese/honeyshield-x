@@ -10,31 +10,31 @@ export const SeverityBadge: React.FC<SeverityBadgeProps> = ({ severity }) => {
   switch (norm) {
     case 'critical':
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-950 text-red-400 border border-red-800">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold tracking-wider bg-[#EF6268]/15 text-[#EF6268] border border-[#EF6268]/35 shadow-sm">
           CRITICAL
         </span>
       );
     case 'high':
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-orange-950 text-orange-400 border border-orange-800">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold tracking-wider bg-[#E5B65A]/15 text-[#E5B65A] border border-[#E5B65A]/35 shadow-sm">
           HIGH
         </span>
       );
     case 'medium':
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-yellow-950 text-yellow-400 border border-yellow-800">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold tracking-wider bg-[#E5B65A]/10 text-[#E5B65A] border border-[#E5B65A]/25">
           MEDIUM
         </span>
       );
     case 'low':
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold tracking-wider bg-[#48C99B]/15 text-[#48C99B] border border-[#48C99B]/35 shadow-sm">
           LOW
         </span>
       );
     default:
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-medium tracking-wider bg-[#192737] text-[#94A6B8] border border-[#1E2D3D]">
           {severity ? severity.toUpperCase() : 'UNKNOWN'}
         </span>
       );
@@ -50,26 +50,28 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   switch (norm) {
     case 'open':
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-950 text-rose-300 border border-rose-800/60">
-          <span className="w-1.5 h-1.5 mr-1.5 rounded-full bg-rose-400 animate-pulse" />
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-[#EF6268]/15 text-[#EF6268] border border-[#EF6268]/30">
+          <span className="w-1.5 h-1.5 mr-1.5 rounded-full bg-[#EF6268] animate-pulse" />
           Open
         </span>
       );
     case 'acknowledged':
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-950 text-amber-300 border border-amber-800/60">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-[#E5B65A]/15 text-[#E5B65A] border border-[#E5B65A]/30">
+          <span className="w-1.5 h-1.5 mr-1.5 rounded-full bg-[#E5B65A]" />
           Acknowledged
         </span>
       );
     case 'resolved':
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-950 text-emerald-300 border border-emerald-800/60">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-[#48C99B]/15 text-[#48C99B] border border-[#48C99B]/30">
+          <span className="w-1.5 h-1.5 mr-1.5 rounded-full bg-[#48C99B]" />
           Resolved
         </span>
       );
     default:
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-800 text-slate-300">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-[#192737] text-[#94A6B8] border border-[#1E2D3D]">
           {status}
         </span>
       );
@@ -85,26 +87,26 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = ({ status }) 
   switch (norm) {
     case 'delivered':
       return (
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono bg-sky-950 text-sky-300 border border-sky-800">
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#48C99B]/15 text-[#48C99B] border border-[#48C99B]/30">
           Delivered
         </span>
       );
     case 'in_flight':
       return (
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono bg-indigo-950 text-indigo-300 border border-indigo-800">
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#00D6C9]/15 text-[#00D6C9] border border-[#00D6C9]/30">
           In Flight
         </span>
       );
     case 'failed':
       return (
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono bg-red-950 text-red-300 border border-red-800">
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#EF6268]/15 text-[#EF6268] border border-[#EF6268]/30">
           Failed
         </span>
       );
     case 'pending':
     default:
       return (
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-mono bg-slate-800 text-slate-400 border border-slate-700">
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#192737] text-[#94A6B8] border border-[#1E2D3D]">
           Pending
         </span>
       );

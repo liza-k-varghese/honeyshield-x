@@ -1,31 +1,51 @@
 name: HoneyShield X Continuous Integration & Quality Assurance
 
-on:
+'on':
   push:
-    branches: [ main ]
+    branches: [ main, 'system1-*' ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, 'system1-*' ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
+  secret-scanning:
+    name: Zero-Secrets & Credential Security Gate
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Source Revision
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 50
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Execute Automated Zero-Secrets Scanner
+        run: python scripts/audit_git_secrets.py
+
   frontend-qa:
     name: Frontend Quality Assurance
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: frontend
 
     steps:
       - name: Checkout Source Revision
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v5
         with:
           version: 9
 
@@ -43,7 +63,7 @@ jobs:
 
       - name: Upload Build Artifacts
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: frontend-dist
           path: frontend/dist
@@ -51,7 +71,7 @@ jobs:
 
   backend-qa:
     name: Backend Quality Assurance
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:17-alpine
@@ -79,10 +99,10 @@ jobs:
 
     steps:
       - name: Checkout Source Revision
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.13'
 
@@ -90,7 +110,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
-          pip install pytest pytest-subtests pytest-asyncio
+          pip install pytest pytest-subtests pytest-asyncio httpx
 
       - name: Apply Database Migrations (Alembic)
         env:
@@ -110,8 +130,139 @@ jobs:
 
       - name: Retain Test Logs on Failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: pytest-failure-logs
           path: backend/tests/
           retention-days: 7
+
+  system2-contract-qa:
+    name: System 2 Integration Contract & Schema Enforcement
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: honeyshield
+          POSTGRES_USER: honeyshield
+          POSTGRES_PASSWORD: change_this_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Source Revision
+        uses: actions/checkout@v5
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install pytest pytest-subtests pytest-asyncio httpx
+
+      - name: Apply Database Migrations (Alembic)
+        env:
+          DATABASE_URL: postgresql+psycopg://honeyshield:change_this_password@localhost:5432/honeyshield
+        run: |
+          cd backend
+          alembic upgrade head
+
+      - name: Verify System 2 API & Deduplication Contracts
+        env:
+          DATABASE_URL: postgresql+psycopg://honeyshield:change_this_password@localhost:5432/honeyshield
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          APP_ENV: test
+        run: |
+          PYTHONPATH=backend pytest backend/tests/test_system2_integration.py backend/tests/test_system2_distributed_deduplication.py -v --tb=short
+
+  chronos-qa:
+    name: CHRONOS WebGL Application & Staging Release Package QA
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: chronos
+
+    steps:
+      - name: Checkout Source Revision
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: 'chronos/package-lock.json'
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: TypeScript Static Typecheck (tsc -b)
+        run: npx tsc -b
+
+      - name: Build WebGL Production Distribution (vite build)
+        run: npm run build
+
+      - name: Verify Staging Package Cryptographic Checksum
+        run: sha256sum -c chronos-staging-package-v1.0.0.tar.gz.sha256
+
+      - name: Clean-Room Release Package Extraction & Manifest Verification
+        run: |
+          mkdir -p /tmp/chronos-ci-extracted
+          tar -xzf chronos-staging-package-v1.0.0.tar.gz -C /tmp/chronos-ci-extracted
+          test -f /tmp/chronos-ci-extracted/Dockerfile
+          test -f /tmp/chronos-ci-extracted/Dockerfile.standalone
+          test -f /tmp/chronos-ci-extracted/nginx.conf
+          test -f /tmp/chronos-ci-extracted/nginx.ssl.conf
+          test -f /tmp/chronos-ci-extracted/DEPLOYMENT_GUIDE.md
+          test -f /tmp/chronos-ci-extracted/dist/index.html
+          rm -rf /tmp/chronos-ci-extracted
+          echo "Staging archive manifest cleanly verified."
+
+      - name: Launch Ephemeral Preview Server & Execute Application Security Audit
+        run: |
+          npx vite preview --port 5178 --host 127.0.0.1 &
+          PREVIEW_PID=$!
+          sleep 2
+          CHRONOS_URL="http://127.0.0.1:5178/" python verify_chronos_security.py
+          kill $PREVIEW_PID || true
+
+      - name: Upload CHRONOS Distribution
+        if: success()
+        uses: actions/upload-artifact@v6
+        with:
+          name: chronos-dist
+          path: chronos/dist
+          retention-days: 7
+
+      - name: Upload Verified Release Tarball
+        if: success()
+        uses: actions/upload-artifact@v6
+        with:
+          name: chronos-staging-package-v1.0.0.tar.gz
+          path: chronos/chronos-staging-package-v1.0.0.tar.gz
+          retention-days: 14

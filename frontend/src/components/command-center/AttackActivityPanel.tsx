@@ -38,40 +38,40 @@ export const AttackActivityPanel: React.FC<AttackActivityPanelProps> = ({
   const getSeverityBadge = (severity: string) => {
     switch (severity.toLowerCase()) {
       case 'critical':
-        return 'bg-rose-950/70 text-rose-300 border-rose-800/60';
+        return 'bg-[#EF6268]/15 text-[#EF6268] border-[#EF6268]/40';
       case 'high':
-        return 'bg-amber-950/70 text-amber-300 border-amber-800/60';
+        return 'bg-[#E5B65A]/15 text-[#E5B65A] border-[#E5B65A]/40';
       case 'medium':
-        return 'bg-cyan-950/70 text-cyan-300 border-cyan-800/60';
+        return 'bg-[#00D6C9]/15 text-[#00D6C9] border-[#00D6C9]/40';
       default:
-        return 'bg-emerald-950/70 text-emerald-300 border-emerald-800/60';
+        return 'bg-[#48C99B]/15 text-[#48C99B] border-[#48C99B]/40';
     }
   };
 
   return (
-    <div className="nexus-panel corner-notch-tl corner-notch-br rounded-lg p-5 flex flex-col justify-between">
+    <div className="bg-[#111C29] border border-[#1E2D3D] rounded-xl p-5 flex flex-col justify-between shadow-soc-sm">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-cyan-500/15">
+      <div className="flex items-center justify-between pb-3 border-b border-[#1E2D3D]">
         <div className="flex items-center space-x-2.5">
-          <div className="p-1.5 rounded bg-cyan-950/60 border border-cyan-500/30 text-cyan-400 shadow-nexus-cyan">
+          <div className="p-1.5 rounded-lg bg-[#00D6C9]/10 border border-[#00D6C9]/25 text-[#00D6C9]">
             <Activity className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-100 font-mono flex items-center space-x-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#F0F5F8] font-mono flex items-center space-x-2">
               <span>Attack Activity</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00D6C9] animate-pulse" />
             </h3>
-            <p className="text-[10px] text-slate-400 font-mono">Time-Series Event Telemetry & Incident Ingress</p>
+            <p className="text-[10px] text-[#94A6B8] font-mono">Time-Series Event Telemetry & Incident Ingress</p>
           </div>
         </div>
-        <div className="flex items-center space-x-1.5 text-[10px] font-mono text-cyan-400">
-          <Radio className="w-3 h-3 text-cyan-400 animate-pulse" />
+        <div className="flex items-center space-x-1.5 text-[10px] font-mono text-[#00D6C9]">
+          <Radio className="w-3 h-3 text-[#00D6C9] animate-pulse" />
           <span>LIVE STREAM</span>
         </div>
       </div>
 
       {/* Neon Time-Series Chart */}
-      <div className="py-2 border-b border-cyan-500/10">
+      <div className="py-2 border-b border-[#1E2D3D]">
         <NeonChart
           data={chartData}
           height={115}
@@ -83,11 +83,11 @@ export const AttackActivityPanel: React.FC<AttackActivityPanelProps> = ({
       {/* Recent Attacks Stream Table */}
       <div className="mt-3">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-[10px] uppercase tracking-wider text-slate-400 font-mono flex items-center space-x-1">
-            <Clock className="w-3 h-3 text-cyan-400" />
+          <span className="text-[10px] uppercase tracking-wider text-[#94A6B8] font-mono flex items-center space-x-1">
+            <Clock className="w-3 h-3 text-[#00D6C9]" />
             <span>Recent Incident Timeline</span>
           </span>
-          <span className="text-[10px] font-mono text-slate-500">
+          <span className="text-[10px] font-mono text-[#94A6B8]/60">
             {attacks.length} Total Captured
           </span>
         </div>
@@ -97,26 +97,26 @@ export const AttackActivityPanel: React.FC<AttackActivityPanelProps> = ({
             recentAttacks.map((attack) => (
               <div
                 key={attack.id}
-                className="p-2 rounded bg-slate-950/70 border border-slate-800/80 hover:border-cyan-500/30 transition-colors flex items-center justify-between text-xs font-mono"
+                className="p-2 rounded-lg bg-[#080D14] border border-[#1E2D3D] hover:border-[#00D6C9]/40 transition-colors flex items-center justify-between text-xs font-mono"
               >
                 <div className="flex items-center space-x-2.5 min-w-0">
-                  <ShieldAlert className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                  <ShieldAlert className="w-3.5 h-3.5 text-[#00D6C9] shrink-0" />
                   <div className="min-w-0">
-                    <div className="text-slate-200 font-semibold truncate flex items-center space-x-2">
+                    <div className="text-[#F0F5F8] font-semibold truncate flex items-center space-x-2">
                       <span>{attack.attack_type}</span>
-                      <span className="text-[9px] text-slate-500 font-normal">
+                      <span className="text-[9px] text-[#94A6B8]/60 font-normal">
                         ({attack.protocol || 'TCP'})
                       </span>
                     </div>
-                    <div className="text-[10px] text-slate-400 truncate flex items-center space-x-2">
+                    <div className="text-[10px] text-[#94A6B8] truncate flex items-center space-x-2">
                       <span
-                        className="hover:text-cyan-300 cursor-pointer text-cyan-400 underline decoration-cyan-500/40"
+                        className="hover:text-[#00D6C9] cursor-pointer text-[#00D6C9] underline decoration-[#00D6C9]/40"
                         onClick={() => attack.source_ip && onInvestigateIp?.(attack.source_ip)}
                       >
                         {attack.source_ip || 'Internal Probe'}
                       </span>
                       <span>&bull;</span>
-                      <span className="text-slate-500">
+                      <span className="text-[#94A6B8]/60">
                         {new Date(attack.detected_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </span>
                     </div>
@@ -130,7 +130,7 @@ export const AttackActivityPanel: React.FC<AttackActivityPanelProps> = ({
                   {onSelectAttack && (
                     <button
                       onClick={() => onSelectAttack(attack.id)}
-                      className="p-1 rounded bg-slate-900 hover:bg-cyan-950 hover:text-cyan-400 text-slate-400 transition-colors"
+                      className="p-1 rounded bg-[#192737] hover:bg-[#00D6C9] hover:text-[#080D14] text-[#94A6B8] transition-colors"
                       title="Inspect Attack Detail"
                     >
                       <ArrowUpRight className="w-3.5 h-3.5" />
@@ -140,7 +140,7 @@ export const AttackActivityPanel: React.FC<AttackActivityPanelProps> = ({
               </div>
             ))
           ) : (
-            <div className="py-6 text-center text-xs font-mono text-slate-500">
+            <div className="py-6 text-center text-xs font-mono text-[#94A6B8]">
               No recent attacks logged in current cycle
             </div>
           )}

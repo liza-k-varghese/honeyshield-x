@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  chronos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chronos_web_prod
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true
+    read_only: false

@@ -1,0 +1,152 @@
+{
+  "acceptance_verdict": "ACCEPTED \u2014 PRODUCTION CLIENT READY",
+  "tested_environment": "Parrot OS / Intel Iris Xe Graphics (Alder Lake-UP3 GT2)",
+  "target_url": "http://127.0.0.1:8080/ (Production Build)",
+  "webgl_device_info": {
+    "context_type": "WebGL 2.0",
+    "max_texture_size": 2048,
+    "max_renderbuffer_size": 2048,
+    "vendor": "Mozilla",
+    "renderer": "Mozilla",
+    "shading_language": "WebGL GLSL ES 3.00",
+    "antialias_enabled": true,
+    "alpha_enabled": true
+  },
+  "core_web_vitals": {
+    "ttfb_ms": 0,
+    "dom_interactive_ms": 83,
+    "dom_complete_ms": 500,
+    "first_paint_ms": null,
+    "first_contentful_paint_ms": 117,
+    "total_transferred_bytes": 907,
+    "total_transferred_kb": 0.89
+  },
+  "transferred_assets": [
+    {
+      "name": "index-BO88qnm5.js",
+      "type": "script",
+      "size_bytes": 31551,
+      "duration_ms": 0
+    },
+    {
+      "name": "vendor-icons-Cra8mrVs.js",
+      "type": "link",
+      "size_bytes": 3093,
+      "duration_ms": 0
+    },
+    {
+      "name": "index-uDi_XX9P.css",
+      "type": "link",
+      "size_bytes": 7860,
+      "duration_ms": 0
+    },
+    {
+      "name": "vendor-react-CEfoZQ0_.js",
+      "type": "link",
+      "size_bytes": 81057,
+      "duration_ms": 0
+    },
+    {
+      "name": "css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+      "type": "link",
+      "size_bytes": 0,
+      "duration_ms": 0
+    },
+    {
+      "name": "vendor-three-MBenChda.js",
+      "type": "link",
+      "size_bytes": 155840,
+      "duration_ms": 0
+    },
+    {
+      "name": "favicon.svg",
+      "type": "other",
+      "size_bytes": 684,
+      "duration_ms": 67
+    },
+    {
+      "name": "LDIoaomQNQcsA88c7O9yZ4KMCoOg4Ko20yw.woff2",
+      "type": "other",
+      "size_bytes": 27348,
+      "duration_ms": 0
+    },
+    {
+      "name": "8vIJ7ww63mVu7gt79mT7.woff2",
+      "type": "other",
+      "size_bytes": 25904,
+      "duration_ms": 0
+    },
+    {
+      "name": "tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+      "type": "other",
+      "size_bytes": 31432,
+      "duration_ms": 0
+    },
+    {
+      "name": "tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+      "type": "other",
+      "size_bytes": 31432,
+      "duration_ms": 0
+    },
+    {
+      "name": "8vIJ7ww63mVu7gt79mT7.woff2",
+      "type": "other",
+      "size_bytes": 25904,
+      "duration_ms": 0
+    },
+    {
+      "name": "8vIJ7ww63mVu7gt79mT7.woff2",
+      "type": "other",
+      "size_bytes": 25904,
+      "duration_ms": 0
+    },
+    {
+      "name": "8vIJ7ww63mVu7gt79mT7.woff2",
+      "type": "other",
+      "size_bytes": 25904,
+      "duration_ms": 0
+    }
+  ],
+  "gpu_frame_analysis": {
+    "sample_count": 180,
+    "effective_fps": 60,
+    "mean_frame_time_ms": 16.76,
+    "min_frame_time_ms": 16.67,
+    "max_frame_time_ms": 33.33,
+    "median_frame_time_ms": 16.67,
+    "p95_frame_time_ms": 16.67,
+    "jitter_std_dev_ms": 1.24,
+    "dropped_frames_gt_33ms": 1,
+    "rendering_stability_percent": 99
+  },
+  "threejs_scene_metrics": {},
+  "scientific_validation": {
+    "aircraft_altitude_m": 10000,
+    "aircraft_speed_kmh": 900,
+    "calculated_net_drift_us_day": 0.0642,
+    "gps_theoretical_net_drift_us_day": 183.2,
+    "is_4hz_consistent_with_28800vph": true,
+    "second_law_entropy_arrow_formulation": "\u0394S_universe \u2265 0"
+  },
+  "interaction_and_a11y": {
+    "has_skip_link": true,
+    "has_banner_header": true,
+    "has_main_content": true,
+    "has_navigation": true,
+    "has_footer": true,
+    "keyboard_arrow_nav_works": true
+  },
+  "screenshots": {
+    "00_origins": "/home/liza/HoneyShield-X/chronos/screenshots/acceptance/acceptance_00_origins.png",
+    "01_ancient": "/home/liza/HoneyShield-X/chronos/screenshots/acceptance/acceptance_01_ancient.png",
+    "02_mechanical": "/home/liza/HoneyShield-X/chronos/screenshots/acceptance/acceptance_02_mechanical.png",
+    "03_modern": "/home/liza/HoneyShield-X/chronos/screenshots/acceptance/acceptance_03_modern.png",
+    "04_philosophy": "/home/liza/HoneyShield-X/chronos/screenshots/acceptance/acceptance_04_philosophy.png",
+    "dossier_modal": "/home/liza/HoneyShield-X/chronos/screenshots/acceptance/acceptance_dossier_modal.png",
+    "1920_full_hd": "/home/liza/HoneyShield-X/chronos/screenshots/acceptance/acceptance_1920_full_hd.png",
+    "1024_tablet_landscape": "/home/liza/HoneyShield-X/chronos/screenshots/acceptance/acceptance_1024_tablet_landscape.png",
+    "768_tablet_portrait": "/home/liza/HoneyShield-X/chronos/screenshots/acceptance/acceptance_768_tablet_portrait.png",
+    "390_mobile_portrait": "/home/liza/HoneyShield-X/chronos/screenshots/acceptance/acceptance_390_mobile_portrait.png",
+    "360_small_mobile": "/home/liza/HoneyShield-X/chronos/screenshots/acceptance/acceptance_360_small_mobile.png"
+  }
+}

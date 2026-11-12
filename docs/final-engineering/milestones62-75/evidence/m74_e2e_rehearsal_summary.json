@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-08T15:53:53.502404+00:00",
+  "timestamp": "2026-11-11T01:40:53.710864+00:00",
   "overall_status": "ALL_WORKFLOWS_PASSED",
   "workflows": {
     "workflow_a_auth": {
@@ -9,7 +9,7 @@
     },
     "workflow_b_overview": {
       "status": "PASSED",
-      "total_attacks": 73,
+      "total_attacks": 123,
       "health": {
         "api": "healthy",
         "postgresql": "connected",
@@ -23,7 +23,7 @@
     "workflow_c_deception": {
       "status": "PASSED",
       "http_status": 200,
-      "canary_count": 44
+      "canary_count": 86
     },
     "workflow_d_threat_intel": {
       "status": "PASSED",
@@ -32,7 +32,7 @@
     },
     "workflow_e_investigations": {
       "status": "PASSED",
-      "case_id": "CASE-2026-2726"
+      "case_id": "CASE-2026-4624"
     },
     "workflow_f_incident_command": {
       "status": "PASSED",
@@ -44,8 +44,8 @@
     },
     "workflow_h_live_event": {
       "status": "PASSED",
-      "attack_id": 9633,
-      "event_id": 41732
+      "attack_id": 10154,
+      "event_id": 43540
     },
     "workflow_i_failure_handling": {
       "status": "PASSED",
