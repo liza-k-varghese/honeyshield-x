@@ -5,18 +5,22 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Shield, Radio, LogOut } from 'lucide-react-native';
+import { Shield, Radio, LogOut, ArrowLeft } from 'lucide-react-native';
 import { colors, typography, spacing } from '../../theme';
 import { useAuthStore } from '../../store/authStore';
 
-interface HeaderBarProps {
+export interface HeaderBarProps {
   title?: string;
   subtitle?: string;
+  showBack?: boolean;
+  onBackPress?: () => void;
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
   title = 'HONEYSHIELD X',
   subtitle = 'CYBER COMMAND CENTRE',
+  showBack = false,
+  onBackPress,
 }) => {
   const { operator, logout } = useAuthStore();
 
@@ -37,6 +41,16 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
     <View style={styles.container}>
       <View style={styles.brandRow}>
         <View style={styles.brandGroup}>
+          {showBack && (
+            <TouchableOpacity
+              onPress={onBackPress}
+              style={{ marginRight: spacing.xs, padding: spacing.xs }}
+              activeOpacity={0.7}
+              accessibilityLabel="Navigate Back"
+            >
+              <ArrowLeft color={colors.cyan} size={20} />
+            </TouchableOpacity>
+          )}
           <Shield color={colors.cyan} size={22} strokeWidth={2.2} />
           <View style={styles.titleColumn}>
             <Text style={styles.titleText}>{title}</Text>
