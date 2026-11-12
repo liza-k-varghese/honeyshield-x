@@ -18,3 +18,4 @@ dist/
 *.crt
 certs/
 .DS_Store
+.expo/

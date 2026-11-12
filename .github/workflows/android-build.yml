@@ -2,12 +2,12 @@ name: HoneyShield X Android Build & Package Validation
 
 on:
   push:
-    branches: [ main, 'fix/android-build-ci' ]
+    branches: [ main, 'fix/android-build-ci', 'fix/android-runtime-bootstrap' ]
     paths:
       - 'mobile/**'
       - '.github/workflows/android-build.yml'
   pull_request:
-    branches: [ main, 'fix/android-build-ci' ]
+    branches: [ main, 'fix/android-build-ci', 'fix/android-runtime-bootstrap' ]
     paths:
       - 'mobile/**'
   workflow_dispatch:
@@ -53,26 +53,14 @@ jobs:
         run: |
           npm run typecheck
 
-      - name: Bundle React Native JavaScript Asset
-        working-directory: mobile
-        run: |
-          mkdir -p android/app/src/main/assets
-          npx esbuild index.js \
-            --bundle \
-            --minify \
-            --platform=neutral \
-            --packages=external \
-            --outfile=android/app/src/main/assets/index.android.bundle
-          cp app.json android/app/src/main/assets/app.json
-
       - name: Grant Execute Permission to Gradle Wrapper
         run: |
-          chmod +x mobile/android/gradlew || true
+          chmod +x mobile/android/gradlew
 
       - name: Assemble Debug APK with Gradle
         working-directory: mobile/android
         run: |
-          gradle :app:assembleDebug --stacktrace --no-daemon
+          ./gradlew :app:assembleDebug --stacktrace --no-daemon
 
       - name: Verify APK Binary Structure & Signature
         working-directory: mobile/android

@@ -46,7 +46,8 @@
           "icon": "./assets/icon.png",
           "color": "#00f0ff"
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "extra": {
       "defaultApiUrl": "http://10.0.2.2:8000/api/v1",
@@ -54,4 +55,3 @@
     }
   }
 }
-
