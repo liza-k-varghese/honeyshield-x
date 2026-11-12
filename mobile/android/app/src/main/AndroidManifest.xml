@@ -25,7 +25,7 @@
         android:label="HoneyShield X"
         android:icon="@drawable/icon"
         android:roundIcon="@drawable/adaptive_icon"
-        android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
+        android:theme="@style/AppTheme"
         android:allowBackup="false"
         android:usesCleartextTraffic="false">
 
