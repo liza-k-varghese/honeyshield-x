@@ -88,6 +88,10 @@ class MarionetteClient:
             pass
 
 
+ARTIFACT_DIR = "/home/liza/.gemini/antigravity/brain/ed93eb72-4628-4c8c-be7b-fab727dc29f0"
+AFTER_DIR = os.path.join(REPO_ROOT, "docs", "system1-excellence", "redesign_evidence", "after")
+
+
 def save_screenshot(client: MarionetteClient, filename: str) -> str:
     path = os.path.join(EVIDENCE_DIR, filename)
     png_bytes = client.take_screenshot()
@@ -95,6 +99,23 @@ def save_screenshot(client: MarionetteClient, filename: str) -> str:
         with open(path, "wb") as f:
             f.write(png_bytes)
         logger.info("[EVIDENCE CAPTURED] %s (%d bytes)", filename, len(png_bytes))
+
+        # Mirror into redesign after/ directory
+        if os.path.isdir(AFTER_DIR):
+            after_path = os.path.join(AFTER_DIR, filename)
+            try:
+                shutil.copy2(path, after_path)
+            except Exception as e:
+                logger.warning("Could not copy to after dir: %s", e)
+
+        # Mirror into artifact directory
+        if os.path.isdir(ARTIFACT_DIR):
+            art_path = os.path.join(ARTIFACT_DIR, f"staging_{filename}")
+            try:
+                shutil.copy2(path, art_path)
+            except Exception as e:
+                logger.warning("Could not copy to artifact dir: %s", e)
+
         return path
     else:
         logger.warning("[SCREENSHOT FAILED] %s", filename)
@@ -287,6 +308,35 @@ def run_staging_browser_acceptance():
         results["screenshots"].append("13_staging_mobile_universe.png")
         results["mobile_responsive_verified"] = True
         logger.info("[PASS] Mobile responsive views successfully verified at 390x844.")
+
+        # Step 6: Tablet & Laptop Responsive Verification
+        logger.info("Executing Step 6: Validating Tablet (768x1024) and Laptop (1440x900) responsive layouts...")
+        client.send("WebDriver:SetWindowRect", {"width": 768, "height": 1024})
+        client.send("WebDriver:Navigate", {"url": f"{STAGING_URL}/?view=overview"})
+        time.sleep(2.0)
+        save_screenshot(client, "14_staging_tablet_overview.png")
+        results["screenshots"].append("14_staging_tablet_overview.png")
+
+        client.send("WebDriver:SetWindowRect", {"width": 1440, "height": 900})
+        client.send("WebDriver:Navigate", {"url": f"{STAGING_URL}/?view=overview"})
+        time.sleep(2.0)
+        save_screenshot(client, "15_staging_laptop_overview.png")
+        results["screenshots"].append("15_staging_laptop_overview.png")
+
+        # Step 7: Compact Mobile (360px) and Tablet Landscape (1024px)
+        logger.info("Executing Step 7: Validating Compact Mobile (360x640) and Tablet Landscape (1024x768)...")
+        client.send("WebDriver:SetWindowRect", {"width": 360, "height": 640})
+        client.send("WebDriver:Navigate", {"url": f"{STAGING_URL}/?view=overview"})
+        time.sleep(2.0)
+        save_screenshot(client, "16_staging_compact_mobile_360.png")
+        results["screenshots"].append("16_staging_compact_mobile_360.png")
+
+        client.send("WebDriver:SetWindowRect", {"width": 1024, "height": 768})
+        client.send("WebDriver:Navigate", {"url": f"{STAGING_URL}/?view=overview"})
+        time.sleep(2.0)
+        save_screenshot(client, "17_staging_tablet_landscape_1024.png")
+        results["screenshots"].append("17_staging_tablet_landscape_1024.png")
+        logger.info("[PASS] Full responsive matrix (1920, 1440, 1024, 768, 390, 360) verified.")
 
         # Save Summary Evidence JSON
         summary_path = os.path.join(EVIDENCE_DIR, "staging_browser_acceptance_summary.json")

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-11T04:04:23Z",
+  "timestamp": "2026-11-12T01:33:27Z",
   "staging_frontend_url": "http://127.0.0.1:5174",
   "browser": "Mozilla Firefox 140.16.0esr",
   "auth_hardening_verified": true,
@@ -9,47 +9,47 @@
       "view": "overview",
       "description": "Security Overview & Key Metrics",
       "screenshot": "02_staging_security_overview.png",
-      "dom_nodes": 594,
-      "error_banner": "9+",
-      "status": "WARN"
+      "dom_nodes": 593,
+      "error_banner": null,
+      "status": "PASS"
     },
     {
       "view": "universe",
       "description": "Digital Agent Universe (SCOUT/NEXUS/ORACLE/SENTINEL)",
       "screenshot": "03_staging_digital_universe.png",
-      "dom_nodes": 938,
-      "error_banner": "9+",
-      "status": "WARN"
+      "dom_nodes": 947,
+      "error_banner": null,
+      "status": "PASS"
     },
     {
       "view": "alerts",
       "description": "Active Alerts & Incident Triage",
       "screenshot": "04_staging_alerts_triage.png",
-      "dom_nodes": 2488,
-      "error_banner": "9+",
-      "status": "WARN"
+      "dom_nodes": 3711,
+      "error_banner": null,
+      "status": "PASS"
     },
     {
       "view": "cases",
       "description": "Case Management & Incident Response",
       "screenshot": "05_staging_case_management.png",
-      "dom_nodes": 336,
-      "error_banner": "9+",
-      "status": "WARN"
+      "dom_nodes": 387,
+      "error_banner": null,
+      "status": "PASS"
     },
     {
       "view": "deception",
       "description": "Deception Grid & Decoy Tokens",
       "screenshot": "06_staging_deception_grid.png",
-      "dom_nodes": 336,
-      "error_banner": "9+",
-      "status": "WARN"
+      "dom_nodes": 447,
+      "error_banner": null,
+      "status": "PASS"
     },
     {
       "view": "intel",
       "description": "Threat Intelligence & Adversary Profiling",
       "screenshot": "07_staging_threat_intelligence.png",
-      "dom_nodes": 371,
+      "dom_nodes": 370,
       "error_banner": null,
       "status": "PASS"
     },
@@ -57,7 +57,7 @@
       "view": "command",
       "description": "Live Incident Command Center",
       "screenshot": "08_staging_live_command.png",
-      "dom_nodes": 379,
+      "dom_nodes": 316,
       "error_banner": null,
       "status": "PASS"
     },
@@ -65,7 +65,7 @@
       "view": "hunts",
       "description": "Automated Threat Hunting Studio",
       "screenshot": "09_staging_threat_hunting.png",
-      "dom_nodes": 373,
+      "dom_nodes": 372,
       "error_banner": null,
       "status": "PASS"
     },
@@ -73,7 +73,7 @@
       "view": "rules",
       "description": "Detection Rule Engine & Replay",
       "screenshot": "10_staging_detection_rules.png",
-      "dom_nodes": 333,
+      "dom_nodes": 332,
       "error_banner": null,
       "status": "PASS"
     },
@@ -81,7 +81,7 @@
       "view": "integrations",
       "description": "System 2 Integration & Gateway Status",
       "screenshot": "11_staging_system2_integrations.png",
-      "dom_nodes": 364,
+      "dom_nodes": 363,
       "error_banner": null,
       "status": "PASS"
     }
@@ -100,6 +100,10 @@
     "10_staging_detection_rules.png",
     "11_staging_system2_integrations.png",
     "12_staging_mobile_overview.png",
-    "13_staging_mobile_universe.png"
+    "13_staging_mobile_universe.png",
+    "14_staging_tablet_overview.png",
+    "15_staging_laptop_overview.png",
+    "16_staging_compact_mobile_360.png",
+    "17_staging_tablet_landscape_1024.png"
   ]
 }

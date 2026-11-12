@@ -34,6 +34,17 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          icons: ['lucide-react'],
+          query: ['@tanstack/react-query'],
+        },
+      },
+    },
+  },
   // @ts-expect-error vitest options
   test: {
     environment: 'happy-dom',

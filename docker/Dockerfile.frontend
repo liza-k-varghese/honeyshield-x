@@ -4,28 +4,57 @@ FROM nginx:alpine-slim
 # Copy pre-compiled production distribution
 COPY dist /usr/share/nginx/html
 
-# Lightweight Nginx configuration proxying /api/ to backend-staging with dynamic DNS resolution
-RUN echo 'server { \
-    listen 80; \
-    server_name localhost; \
-    resolver 10.89.0.1 valid=30s ipv6=off; \
-    resolver_timeout 5s; \
-    location / { \
-        root /usr/share/nginx/html; \
-        index index.html; \
-        try_files $uri $uri/ /index.html; \
-    } \
-    location /api/ { \
-        set $backend_upstream "http://backend-staging:8000"; \
-        proxy_pass $backend_upstream$request_uri; \
-        proxy_http_version 1.1; \
-        proxy_set_header Upgrade $http_upgrade; \
-        proxy_set_header Connection "upgrade"; \
-        proxy_set_header Host $host; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
+# Hardened Nginx configuration with security headers and reverse proxy
+RUN cat << 'EOF' > /etc/nginx/conf.d/default.conf
+server {
+    listen 80;
+    server_name localhost;
+    resolver 10.89.0.1 127.0.0.11 valid=30s ipv6=off;
+    resolver_timeout 5s;
+
+    # Hardened Security Headers
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+
+    # Block sensitive hidden files and backups
+    location ~ /\.(?!well-known) {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+    location ~* \.(bak|config|sql|fla|psd|ini|log|sh|inc|swp|dist|env)$ {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+
+    # SPA Routing
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # API and WebSocket reverse proxying
+    location /api/ {
+        set $backend_upstream "http://backend-staging:8000";
+        proxy_pass $backend_upstream$request_uri;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+    }
+}
+EOF
 
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
-
