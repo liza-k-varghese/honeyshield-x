@@ -10,6 +10,11 @@ buildscript {
 
         ndkVersion = "26.1.10909125"
     }
+    configurations.classpath {
+        resolutionStrategy {
+            force("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        }
+    }
     repositories {
         google()
         mavenCentral()
@@ -17,7 +22,7 @@ buildscript {
     dependencies {
         classpath('com.android.tools.build:gradle')
         classpath('com.facebook.react:react-native-gradle-plugin')
-        classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
 }
 
